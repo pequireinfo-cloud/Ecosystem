@@ -1,0 +1,12 @@
+﻿
+   info - 
+Constructor 
+declarations should 
+be before 
+non-constructor 
+declarations - lib\co
+re\error\failure.dart
+:5:9 - sort_construct
+ors_first
+
+

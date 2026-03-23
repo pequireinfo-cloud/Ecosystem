@@ -1,0 +1,17 @@
+﻿   info - Constructor declarations should be before non-constructor declarations - lib\core\error\failure.dart:5:9 - sort_constructors_first
+  error - Target of URI doesn't exist: '../../core/constants/api_constants.dart' - lib\presentation\pages\dashboard\provider_tracking_broadcast.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../core/constants/app_colors.dart' - lib\presentation\pages\dashboard\provider_tracking_broadcast.dart:5:8 - uri_does_not_exist
+  error - Undefined name 'ApiConstants' - lib\presentation\pages\dashboard\provider_tracking_broadcast.dart:28:20 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\provider_tracking_broadcast.dart:133:67 - undefined_identifier
+  error - Target of URI doesn't exist: '../../core/constants/api_constants.dart' - lib\presentation\pages\dashboard\tracking_page.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../core/constants/app_colors.dart' - lib\presentation\pages\dashboard\tracking_page.dart:5:8 - uri_does_not_exist
+  error - Undefined name 'ApiConstants' - lib\presentation\pages\dashboard\tracking_page.dart:50:20 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:180:26 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:242:47 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:276:38 - undefined_identifier
+  error - Invalid constant value - lib\presentation\pages\dashboard\tracking_page.dart:277:68 - invalid_constant
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:277:68 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:291:65 - undefined_identifier
+  error - Undefined name 'AppColors' - lib\presentation\pages\dashboard\tracking_page.dart:336:46 - undefined_identifier
+   ErrorId : Native  
+  CommandError

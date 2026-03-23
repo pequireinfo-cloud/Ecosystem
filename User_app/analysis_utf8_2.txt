@@ -1,0 +1,98 @@
+﻿Analyzing Introviaa...                                          
+
+warning - 'package_api_docs' was removed in Dart '3.7.0' - analysis_options.yaml:11:7 - removed_lint
+   info - Constructor declarations should be before non-constructor declarations - lib\core\error\failure.dart:5:9 - sort_constructors_first
+   info - Unnecessary use of an abstract class - lib\core\util\usecase.dart:4:16 - one_member_abstracts
+   info - The type parameter name 'Type' matches a visible type name - lib\core\util\usecase.dart:4:24 - avoid_types_as_parameter_names
+   info - Constructor declarations should be before non-constructor declarations - lib\data\datasources\auth_remote_data_source.dart:22:3 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\data\repositories\auth_repository_impl.dart:12:3 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\domain\entities\user_entity.dart:9:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\domain\usecases\login_usecase.dart:12:3 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\domain\usecases\login_usecase.dart:29:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\domain\usecases\register_usecase.dart:12:3 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\domain\usecases\register_usecase.dart:29:9 - sort_constructors_first
+warning - Unused import: 'presentation/pages/home_page.dart' - lib\main.dart:3:8 - unused_import
+warning - Unused import: '../../../core/constants/app_colors.dart' - lib\presentation\pages\dashboard\bookings_tab.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\bookings_tab.dart:39:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\bookings_tab.dart:45:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\bookings_tab.dart:61:60 - deprecated_member_use
+warning - Unused import: '../../../domain/entities/login_role.dart' - lib\presentation\pages\dashboard\home_tab.dart:4:8 - unused_import
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\pages\dashboard\home_tab.dart:8:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\home_tab.dart:68:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\home_tab.dart:84:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\home_tab.dart:96:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\home_tab.dart:140:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\home_tab.dart:161:51 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\dashboard\home_tab.dart:163:14 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\presentation\pages\dashboard\home_tab.dart:164:19 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\dashboard\home_tab.dart:167:11 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\presentation\pages\dashboard\home_tab.dart:169:23 - prefer_const_literals_to_create_immutables
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\pages\dashboard\profile_tab.dart:7:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\profile_tab.dart:43:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\profile_tab.dart:58:137 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\quick_fix_tab.dart:25:40 - deprecated_member_use
+warning - Unused import: '../../../core/constants/app_colors.dart' - lib\presentation\pages\dashboard\rewards_tab.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\rewards_tab.dart:38:52 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\dashboard\rewards_tab.dart:40:14 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\presentation\pages\dashboard\rewards_tab.dart:41:19 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\dashboard\rewards_tab.dart:80:139 - deprecated_member_use
+warning - Unused import: 'package:flutter_bloc/flutter_bloc.dart' - lib\presentation\pages\home_page.dart:2:8 - unused_import
+warning - Unused import: '../../domain/entities/login_role.dart' - lib\presentation\pages\home_page.dart:5:8 - unused_import
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\pages\home_page.dart:14:9 - sort_constructors_first
+warning - Unused import: '../../core/constants/app_strings.dart' - lib\presentation\pages\login_page.dart:5:8 - unused_import
+   info - The private field _selectedRole could be 'final' - lib\presentation\pages\login_page.dart:21:13 - prefer_final_fields
+warning - The value of the local variable 'headerHeight' isn't used - lib\presentation\pages\login_page.dart:36:11 - unused_local_variable
+  error - Expected to find ')' - lib\presentation\pages\login_page.dart:155:22 - expected_token
+  error - Expected to find ']' - lib\presentation\pages\login_page.dart:159:13 - expected_token
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\login_page.dart:276:71 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\login_page.dart:289:25 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\login_page.dart:300:25 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\presentation\pages\login_page.dart:302:37 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\login_page.dart:303:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\login_page.dart:304:29 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\presentation\pages\login_page.dart:305:29 - prefer_const_constructors
+  error - Expected an identifier - lib\presentation\pages\login_page.dart:329:11 - missing_identifier
+  error - Expected to find ')' - lib\presentation\pages\login_page.dart:329:11 - expected_token
+  error - Expected to find ';' - lib\presentation\pages\login_page.dart:331:7 - expected_token
+warning - Dead code - lib\presentation\pages\login_page.dart:331:8 - dead_code
+  error - Expected an identifier - lib\presentation\pages\login_page.dart:331:8 - missing_identifier
+  error - Expected to find ';' - lib\presentation\pages\login_page.dart:331:8 - expected_token
+  error - Unexpected text ';' - lib\presentation\pages\login_page.dart:331:8 - unexpected_token
+  error - Expected an identifier - lib\presentation\pages\login_page.dart:332:5 - missing_identifier
+  error - Unexpected text ';' - lib\presentation\pages\login_page.dart:332:5 - unexpected_token
+   info - Unnecessary empty statement - lib\presentation\pages\login_page.dart:332:6 - empty_statements
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\pages\login_page.dart:339:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\login_page.dart:359:30 - deprecated_member_use
+   info - The import of '../../domain/entities/login_role.dart' is unnecessary because all of the used elements are also provided by the import of '../widgets/role_selection_widget.dart' - lib\presentation\pages\register_page.dart:8:8 - unnecessary_import
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\state\auth_bloc.dart:10:3 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\state\auth_state.dart:18:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\state\auth_state.dart:33:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\state\auth_state.dart:57:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\state\auth_state.dart:65:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\widgets\role_selection_widget.dart:11:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\widgets\role_selection_widget.dart:56:48 - deprecated_member_use
+
+C:\src\flutter\bin\fl
+utter.bat : 71 
+issues found. (ran 
+in 18.7s)
+At line:1 char:1
++ C:\src\flutter\bin\
+flutter.bat analyze 
+> analysis_fixed.txt 
+2>&1
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (71 issu   
+ es found. (ran i    
+n 18.7s):String)     
+[], RemoteExcep    
+tion
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 

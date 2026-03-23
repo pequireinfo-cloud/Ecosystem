@@ -1,0 +1,1 @@
+enum LoginRole { serviceProvider, user }
