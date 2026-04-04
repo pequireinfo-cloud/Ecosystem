@@ -42,3 +42,10 @@ app.*.map.json
 # Firebase
 .firebase/
 firebase-debug.log
+
+# Node
+node_modules/
+.env
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
