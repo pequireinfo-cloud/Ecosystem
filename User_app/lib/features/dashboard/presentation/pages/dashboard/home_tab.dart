@@ -4,7 +4,7 @@ import 'package:glassmorphism/glassmorphism.dart';
 import 'package:animations/animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../domain/entities/user_entity.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
 import '../provider_detail_page.dart';
 import 'profile_tab.dart';
 import 'categories_page.dart';

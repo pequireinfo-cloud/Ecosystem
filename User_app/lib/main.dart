@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'presentation/pages/home_page.dart';
-import 'presentation/pages/onboarding_page.dart';
+import 'features/home/presentation/pages/home_page.dart';
+import 'features/onboarding/presentation/pages/onboarding_page.dart';
 import 'core/theme/app_theme.dart';
 import 'injection_container.dart' as di;
-import 'presentation/state/auth_bloc.dart';
+import 'features/auth/presentation/bloc/auth_bloc.dart';
 
 
 void main() async {

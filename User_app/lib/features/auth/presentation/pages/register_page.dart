@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/core/constants/app_strings.dart';
 import '../widgets/role_selection_widget.dart';
-import '../state/auth_bloc.dart';
-import '../state/auth_state.dart';
+import '../bloc/auth_bloc.dart';
+import '../bloc/auth_state.dart';
 import '../../domain/entities/login_role.dart';
 import 'home_page.dart';
 

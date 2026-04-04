@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../domain/entities/user_entity.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
 import 'orders_page.dart';
 import '../profile/manage_profile_page.dart';
 import '../profile/security_page.dart';
