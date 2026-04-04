@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../../../../core/services/booking_service.dart';
 import 'provider_found_page.dart';
 import 'job_status_page.dart';

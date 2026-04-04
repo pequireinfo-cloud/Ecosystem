@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../../domain/entities/login_role.dart';
 
 export '../../domain/entities/login_role.dart';
@@ -74,3 +74,4 @@ class RoleSelectionWidget extends StatelessWidget {
     );
   }
 }
+

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../../../domain/entities/user_entity.dart';
 import 'orders_page.dart';
 import '../profile/manage_profile_page.dart';

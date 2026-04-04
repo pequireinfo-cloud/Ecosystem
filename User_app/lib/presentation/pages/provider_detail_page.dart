@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class ProviderDetailPage extends StatefulWidget {
   final String providerName;
@@ -581,3 +581,4 @@ class _ProviderDetailPageState extends State<ProviderDetailPage> {
     );
   }
 }
+

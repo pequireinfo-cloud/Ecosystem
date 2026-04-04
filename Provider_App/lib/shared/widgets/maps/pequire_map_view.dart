@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 
@@ -19,7 +18,7 @@ class PequireMapView extends StatefulWidget {
 }
 
 class _PequireMapViewState extends State<PequireMapView> {
-  final MapController _mapController = MapController();
+  GoogleMapController? _mapController;
   LatLng _currentPosition = const LatLng(28.6273, 77.3725); // Default to Sector 62, Noida
   bool _isLoading = true;
 
@@ -60,7 +59,7 @@ class _PequireMapViewState extends State<PequireMapView> {
           _currentPosition = LatLng(position.latitude, position.longitude);
           _isLoading = false;
         });
-        _mapController.move(_currentPosition, 15);
+        _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_currentPosition, 15));
         // Convert latlong2 LatLng to any other if needed, but here we just use it
       }
     } catch (e) {
@@ -72,46 +71,18 @@ class _PequireMapViewState extends State<PequireMapView> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        FlutterMap(
-          mapController: _mapController,
-          options: MapOptions(
-            initialCenter: _currentPosition,
-            initialZoom: 15,
-            interactionOptions: const InteractionOptions(
-              flags: InteractiveFlag.all & ~InteractiveFlag.rotate,
-            ),
+        GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: _currentPosition,
+            zoom: 15,
           ),
-          children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'com.pequire.provider.pequire_provider_app',
-            ),
-            MarkerLayer(
-              markers: [
-                Marker(
-                  point: _currentPosition,
-                  width: 40,
-                  height: 40,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.blue.withValues(alpha: 0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 14,
-                        height: 14,
-                        decoration: const BoxDecoration(
-                          color: AppColors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          onMapCreated: (controller) => _mapController = controller,
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          mapToolbarEnabled: false,
+          compassEnabled: false,
+          rotateGesturesEnabled: false,
         ),
         if (_isLoading)
           const Center(

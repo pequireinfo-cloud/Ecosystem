@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-import '../../../core/constants/api_constants.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/api_constants.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class ProviderTrackingBroadcast extends StatefulWidget {
   final String orderId;

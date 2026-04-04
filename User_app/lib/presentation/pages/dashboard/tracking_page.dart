@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
-import '../../../core/constants/api_constants.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/services/tracking_service.dart';
+import 'package:pequire_user_app/injection_container.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class TrackingPage extends StatefulWidget {
   final String serviceTitle;
@@ -22,8 +22,7 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
   
-  // Socket & Live Data
-  IO.Socket? socket;
+  StreamSubscription? _trackingSubscription;
   Offset _currentProPosition = const Offset(0.2, 0.2); // Default mock start
   final Offset _userPosition = const Offset(0.6, 0.7); // Static user pos
   int _remainingMinutes = 8;
@@ -43,44 +42,28 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
-    _connectSocket();
+    _startTracking();
   }
 
-  void _connectSocket() {
-    socket = IO.io(ApiConstants.socketServerUrl, 
-      IO.OptionBuilder()
-        .setTransports(['websocket'])
-        .enableAutoConnect()
-        .build()
-    );
-
-    socket?.onConnect((_) {
-      print('User connected to tracking server');
-      setState(() => _statusStatus = 'Live Connection Active');
-      socket?.emit('join_order', widget.orderId);
-    });
-
-    socket?.on('location_received', (data) {
-      // data: { latitude: number, longitude: number, heading: number }
-      print('Location received: $data');
-      
-      // For this custom painter demo, we map coordinates to 0..1 range
-      // In real Google Maps, you'd just use LatLng(data['latitude'], data['longitude'])
-      
-      setState(() {
-        _hasReceivedUpdate = true;
-        // Mock a mapping of coordinates to UI space for the demo painter
-        // In a real app, this would be LatLng on a Google Map
-        _currentProPosition = _mapCoordsToUI(data['latitude'], data['longitude']);
+  void _startTracking() {
+    _trackingSubscription = sl<TrackingService>().listenToLocation(widget.orderId).listen((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data()!;
+        print('Location received from Firestore: $data');
         
-        // Calculate minutes based on some distance logic or backend data
-        _remainingMinutes = _calculateTimeRemaining(data['latitude'], data['longitude']);
-        _statusStatus = 'Tracking Live';
-      });
-    });
-
-    socket?.onDisconnect((_) {
-      setState(() => _statusStatus = 'Connection Lost');
+        setState(() {
+          _hasReceivedUpdate = true;
+          _currentProPosition = _mapCoordsToUI(data['latitude'], data['longitude']);
+          // Calculate minutes if needed (mocked for now)
+          _remainingMinutes = 5; 
+          _statusStatus = 'Tracking Live (Firestore)';
+        });
+      } else {
+        setState(() => _statusStatus = 'Waiting for Provider...');
+      }
+    }, onError: (error) {
+      setState(() => _statusStatus = 'Connection Error');
+      print('Firestore Tracking Error: $error');
     });
   }
 
@@ -99,7 +82,7 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
   @override
   void dispose() {
     _pulseController.dispose();
-    socket?.disconnect();
+    _trackingSubscription?.cancel();
     super.dispose();
   }
 

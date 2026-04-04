@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../../domain/entities/user_entity.dart';
 import 'dashboard/home_tab.dart';
 import 'quick_fix/capture_issue_page.dart';
@@ -64,3 +64,4 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+

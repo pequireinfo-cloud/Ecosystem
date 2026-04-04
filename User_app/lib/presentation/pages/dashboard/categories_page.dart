@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
+import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});

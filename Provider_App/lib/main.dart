@@ -21,6 +21,7 @@ import 'features/notifications/screens/notifications_screen.dart';
 import 'features/help/screens/help_screen.dart';
 
 import 'package:pequire_provider_app/core/services/firebase_service.dart';
+import 'package:pequire_provider_app/core/services/socket_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,9 @@ void main() async {
   debugPrint("Starting Firebase initialization...");
   await FirebaseService().initialize();
   debugPrint("Firebase initialization check complete.");
+
+  // Initialize Socket Service
+  SocketService().connect();
   
   debugPrint("Starting runApp...");
   runApp(
