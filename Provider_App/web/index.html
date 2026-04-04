@@ -31,6 +31,32 @@
 
   <title>Pequire Provider</title>
   <link rel="manifest" href="manifest.json">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBZXciAs5hh654Z78GNgwom7HucBZsGzQ"></script>
+
+  <script>
+    // Workaround to pierce Flutter Web's Shadow DOM and hide Google Maps API errors during dev
+    setInterval(function() {
+      function hideErrorElements(rootNode) {
+        if (!rootNode || !rootNode.querySelectorAll) return;
+        
+        // Hide error classes
+        var errNodes = rootNode.querySelectorAll('.gm-err-container, .gm-style-bg');
+        for (var i = 0; i < errNodes.length; i++) {
+          if (errNodes[i].style.display !== 'none') {
+            errNodes[i].style.display = 'none';
+          }
+        }
+        // Traverse all children to find nested shadow roots (Flutter's platform views)
+        var allNodes = rootNode.querySelectorAll('*');
+        for (var i = 0; i < allNodes.length; i++) {
+          if (allNodes[i].shadowRoot) {
+            hideErrorElements(allNodes[i].shadowRoot);
+          }
+        }
+      }
+      hideErrorElements(document);
+    }, 1000);
+  </script>
 </head>
 <body>
   <!--

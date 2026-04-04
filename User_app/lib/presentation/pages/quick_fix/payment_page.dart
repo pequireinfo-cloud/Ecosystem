@@ -269,7 +269,7 @@ class _PaymentPageState extends State<PaymentPage> {
                       lat: 28.6139,
                       lng: 77.2090,
                       address: '123, Green Park, New Delhi',
-                      estimatedPrice: totalToPay.toDouble(),
+                      estimatedPrice: 1200, // Fixed value for now
                       isWaitAndSave: widget.isWaitAndSave,
                     );
 

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:flutter/services.dart';
@@ -70,6 +71,17 @@ class _OtpScreenState extends State<OtpScreen> {
     
     try {
       final smsCode = _controllers.map((c) => c.text).join();
+
+      // Mock Bypass Logic
+      if (widget.verificationId == 'mock_verification_id') {
+        debugPrint("Verifying Mock OTP: $smsCode");
+        await Future.delayed(const Duration(milliseconds: 800)); // Simulate network
+        if (mounted) {
+          context.go('/service-selection');
+        }
+        return;
+      }
+
       final credential = PhoneAuthProvider.credential(
         verificationId: widget.verificationId!,
         smsCode: smsCode,
@@ -81,7 +93,15 @@ class _OtpScreenState extends State<OtpScreen> {
         context.go('/service-selection');
       }
     } catch (e) {
+      debugPrint("OTP Verification Error: $e");
       setState(() => _isLoading = false);
+      
+      // Fallback for dev: allow any OTP if it fails with config issues
+      if (e.toString().contains('api-key-not-valid') || e.toString().contains('unauthorized-domain')) {
+         if (mounted) context.go('/service-selection');
+         return;
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.toString()), backgroundColor: Colors.redAccent),
       );

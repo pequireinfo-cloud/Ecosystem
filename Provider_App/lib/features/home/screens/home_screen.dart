@@ -9,11 +9,12 @@ import 'package:pequire_provider_app/core/providers/location_provider.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:pequire_provider_app/core/services/routing_service.dart';
 import 'package:pequire_provider_app/core/services/booking_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_provider_app/features/home/widgets/active_job_panel.dart';
+import 'package:pequire_provider_app/core/services/tracking_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -25,11 +26,15 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _isOnline = false;
-  final MapController _mapController = MapController();
+  GoogleMapController? _mapController;
   bool _mapInitialized = false;
+  double _totalRouteDistance = 0.0;
   LatLng? _activeJobDestination;
   List<LatLng> _routePoints = [];
   bool _isLoadingRoute = false;
+  double _distanceCovered = 0.0;
+  double _remainingDistance = 0.0;
+  double _completedPercentage = 0.0;
   final TextEditingController _locationController = TextEditingController();
   bool _followUser = true;
   StreamSubscription? _bookingSubscription;
@@ -47,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    TrackingService().startTracking('initial'); // Or remove if not needed for init
     _startBookingListener();
   }
 
@@ -86,14 +92,49 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     // Fix: Move map centering out of the build loop using ref.listen
     ref.listen(locationProvider, (previous, next) {
-      if (_followUser) {
-        next.whenData((position) {
-          final target = LatLng(position.latitude, position.longitude);
-          if (_mapInitialized) {
-            _mapController.move(target, _mapController.camera.zoom);
+      next.whenData((position) {
+        final target = LatLng(position.latitude, position.longitude);
+        if (_followUser && _mapInitialized) {
+          _mapController?.animateCamera(CameraUpdate.newCameraPosition(
+            CameraPosition(target: target, zoom: 15.0, bearing: position.heading),
+          ));
+        }
+
+        // Deviation logic trigger
+        if (_routePoints.isNotEmpty && _activeJobDestination != null) {
+          bool isDeviated = RoutingService.checkDeviationFromRoute(target, _routePoints);
+          if (isDeviated) {
+            // Refetch route if deviating
+            _fetchRoute(target, _activeJobDestination!);
+          } else {
+            // Calculate distance metrics & trim visual route
+            final double covered = RoutingService.calculateDistanceCovered(target, _routePoints);
+            setState(() {
+              _distanceCovered = covered;
+              _remainingDistance = (_totalRouteDistance - covered).clamp(0.0, double.maxFinite);
+              if (_totalRouteDistance > 0) {
+                 _completedPercentage = ((covered / _totalRouteDistance) * 100).clamp(0.0, 100.0);
+              }
+              // Trim polyline visually to "eat" the path
+              List<LatLng> originalPoints = _routePoints;
+              List<LatLng> trimmed = RoutingService.trimPolyline(originalPoints, target);
+              if (trimmed.length != originalPoints.length) {
+                _routePoints = trimmed;
+              }
+            });
           }
-        });
-      }
+        }
+        
+        // Emit location update if there is an active job
+        if (_activeBookingId != null) {
+          TrackingService().updateLocation(
+            orderId: _activeBookingId!,
+            latitude: position.latitude,
+            longitude: position.longitude,
+            heading: position.heading,
+          );
+        }
+      });
     });
 
     return Scaffold(
@@ -206,7 +247,53 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: _buildKycBanner(kycState),
                     ),
                   
-                  // 4. Active Job Panel Overlay
+                  // 4. Minimal Map Navigation Overlay
+                  if (_activeBookingId != null && _routePoints.isNotEmpty)
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      top: 100,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('${(_distanceCovered / 1000).toStringAsFixed(1)} km', style: AppTypography.h3.copyWith(fontSize: 16, color: AppColors.primary)),
+                                Text('Covered', style: AppTypography.bodySmall.copyWith(fontSize: 10)),
+                              ],
+                            ),
+                            Container(width: 1, height: 30, color: const Color(0xFFE2E8F0)),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('${_completedPercentage.toStringAsFixed(0)}%', style: AppTypography.h3.copyWith(fontSize: 16, color: const Color(0xFFF59E0B))),
+                                Text('Completed', style: AppTypography.bodySmall.copyWith(fontSize: 10)),
+                              ],
+                            ),
+                            Container(width: 1, height: 30, color: const Color(0xFFE2E8F0)),
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text('${(_remainingDistance / 1000).toStringAsFixed(1)} km', style: AppTypography.h3.copyWith(fontSize: 16, color: const Color(0xFF0F172A))),
+                                Text('Remaining', style: AppTypography.bodySmall.copyWith(fontSize: 10)),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  
+                  // 5. Active Job Panel Overlay
                   if (_activeBookingId != null)
                     Positioned(
                       left: 0,
@@ -221,6 +308,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             _activeBookingId = null;
                             _activeJobDestination = null;
                             _routePoints.clear();
+                            _distanceCovered = 0.0;
+                            _remainingDistance = 0.0;
+                            _completedPercentage = 0.0;
                           });
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Job Completed Successfully!')),
@@ -404,6 +494,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     _activeAddress = address;
                     _activeJobDestination = LatLng(lat, lon);
                   });
+                  // Start Firestore tracking
+                  TrackingService().startTracking(bookingId);
+
                   final providerLocation = ref.read(locationProvider).value;
                   if (providerLocation != null) {
                     _fetchRoute(LatLng(providerLocation.latitude, providerLocation.longitude), LatLng(lat, lon));
@@ -538,26 +631,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Future<void> _fetchRoute(LatLng start, LatLng end) async {
     try {
-      final url = Uri.parse('http://router.project-osrm.org/route/v1/driving/${start.longitude},${start.latitude};${end.longitude},${end.latitude}?geometries=geojson');
-      final response = await http.get(url);
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final routes = data['routes'] as List;
-        if (routes.isNotEmpty) {
-          final geometry = routes[0]['geometry']['coordinates'] as List;
-          setState(() {
-            _routePoints = geometry.map((coord) => LatLng(coord[1] as double, coord[0] as double)).toList();
-          });
-          
-          final bounds = LatLngBounds.fromPoints([start, end, ..._routePoints]);
-          _mapController.fitCamera(CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(50)));
-        } else {
-          _showError('No travel route found for this location.');
-        }
+      setState(() => _isLoadingRoute = true);
+      final result = await RoutingService.getDirections(start, end);
+      final coords = result['coords'] as List<LatLng>;
+      
+      if (coords.isNotEmpty) {
+        setState(() {
+          _routePoints = coords;
+          _totalRouteDistance = result['totalDistance'] as double;
+          _isLoadingRoute = false;
+        });
+        
+        // Fit bounds for Google Maps
+        double minLat = [start.latitude, end.latitude, ...coords.map((c) => c.latitude)].reduce((a, b) => a < b ? a : b);
+        double maxLat = [start.latitude, end.latitude, ...coords.map((c) => c.latitude)].reduce((a, b) => a > b ? a : b);
+        double minLng = [start.longitude, end.longitude, ...coords.map((c) => c.longitude)].reduce((a, b) => a < b ? a : b);
+        double maxLng = [start.longitude, end.longitude, ...coords.map((c) => c.longitude)].reduce((a, b) => a > b ? a : b);
+        
+        final bounds = LatLngBounds(southwest: LatLng(minLat, minLng), northeast: LatLng(maxLat, maxLng));
+        _mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 50));
       } else {
-        _showError('Mapping service unavailable (Error ${response.statusCode})');
+        setState(() => _isLoadingRoute = false);
+        _showError('No travel route found for this location.');
       }
     } catch (e) {
+      setState(() => _isLoadingRoute = false);
       debugPrint('Routing error: $e');
       _showError('Could not calculate route: $e');
     }
@@ -587,83 +685,55 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 _mapInitialized = true;
               }
 
-              return FlutterMap(
-                mapController: _mapController,
-                options: MapOptions(
-                  initialCenter: target,
-                  initialZoom: 15.0,
-                  onPointerDown: (_, __) {
-                    // Disable following when user manually interacts with map
-                    if (_followUser) setState(() => _followUser = false);
-                  },
+              return GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: target,
+                  zoom: 15.0,
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.pequire.provider',
-                  ),
-                  if (_routePoints.isNotEmpty)
-                    PolylineLayer(
-                      polylines: [
-                        Polyline(
-                          points: _routePoints,
-                          color: AppColors.primary,
-                          strokeWidth: 4.0,
-                        ),
-                      ],
+                onMapCreated: (controller) => _mapController = controller,
+                myLocationEnabled: true,
+                myLocationButtonEnabled: false,
+                zoomControlsEnabled: false,
+                mapToolbarEnabled: false,
+                compassEnabled: false,
+                polylines: _routePoints.isNotEmpty 
+                  ? {
+                      Polyline(
+                        polylineId: const PolylineId('route'),
+                        points: _routePoints,
+                        color: AppColors.primary,
+                        width: 4,
+                      )
+                    }
+                  : {},
+                circles: {
+                  ..._hotspots.map((latLng) => Circle(
+                    circleId: CircleId('hotspot_outer_\${latLng.latitude}_\${latLng.longitude}'),
+                    center: latLng,
+                    radius: 800,
+                    fillColor: Colors.orange.withOpacity(0.15),
+                    strokeColor: Colors.orange.withOpacity(0.3),
+                    strokeWidth: 2,
+                  )),
+                  ..._hotspots.map((latLng) => Circle(
+                    circleId: CircleId('hotspot_inner_\${latLng.latitude}_\${latLng.longitude}'),
+                    center: latLng,
+                    radius: 300,
+                    fillColor: Colors.deepOrange.withOpacity(0.2),
+                    strokeWidth: 0,
+                  )),
+                },
+                markers: {
+                  if (_activeJobDestination != null)
+                    Marker(
+                      markerId: const MarkerId('destination'),
+                      position: _activeJobDestination!,
+                      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
                     ),
-                  CircleLayer(
-                    circles: _hotspots.map((latLng) => CircleMarker(
-                      point: latLng,
-                      radius: 800,
-                      useRadiusInMeter: true,
-                      color: Colors.orange.withOpacity(0.15),
-                      borderColor: Colors.orange.withOpacity(0.3),
-                      borderStrokeWidth: 2,
-                    )).toList(),
-                  ),
-                  CircleLayer(
-                    circles: _hotspots.map((latLng) => CircleMarker(
-                      point: latLng,
-                      radius: 300,
-                      useRadiusInMeter: true,
-                      color: Colors.deepOrange.withOpacity(0.2),
-                    )).toList(),
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: target,
-                        width: 40,
-                        height: 40,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 5)],
-                          ),
-                          child: const Icon(
-                            Icons.my_location_rounded,
-                            color: Color(0xFF025EF3),
-                            size: 24,
-                          ),
-                        ),
-                      ),
-                      if (_activeJobDestination != null)
-                        Marker(
-                          point: _activeJobDestination!,
-                          width: 40,
-                          height: 40,
-                          alignment: Alignment.topCenter,
-                          child: const Icon(
-                            Icons.location_on_rounded,
-                            color: Color(0xFFDC2626),
-                            size: 40,
-                          ),
-                        ),
-                    ],
-                  ),
-                ],
+                },
+                onCameraMoveStarted: () {
+                  if (_followUser) setState(() => _followUser = false);
+                },
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
@@ -708,7 +778,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   setState(() => _followUser = true);
                   final pos = ref.read(locationProvider).value;
                   if (pos != null) {
-                    _mapController.move(LatLng(pos.latitude, pos.longitude), 15.0);
+                    _mapController?.animateCamera(CameraUpdate.newLatLngZoom(LatLng(pos.latitude, pos.longitude), 15.0));
                   }
                 },
                 backgroundColor: Colors.white,

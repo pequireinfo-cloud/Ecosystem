@@ -26,8 +26,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Firebase
+  debugPrint("Starting Firebase initialization...");
   await FirebaseService().initialize();
-
+  debugPrint("Firebase initialization check complete.");
+  
+  debugPrint("Starting runApp...");
   runApp(
     const ProviderScope(
       child: PequireApp(),

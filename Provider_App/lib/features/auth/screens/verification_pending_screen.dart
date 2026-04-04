@@ -164,7 +164,7 @@ class VerificationPendingScreen extends StatelessWidget {
                           duration: Duration(seconds: 1),
                         ),
                       );
-                      await Future.delayed(const Duration(seconds: 1.5));
+                      await Future.delayed(const Duration(milliseconds: 1500));
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Verification still in progress.'), backgroundColor: Colors.orangeAccent),

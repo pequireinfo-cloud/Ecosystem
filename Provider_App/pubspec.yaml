@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.8.1
+  sdk: ^3.0.0
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -44,9 +44,9 @@ dependencies:
   latlong2: any
   http: any
   file_picker: any
-  firebase_core: any
-  cloud_firestore: any
-  firebase_auth: any
+  firebase_core: ^2.32.0
+  cloud_firestore: ^4.17.5
+  firebase_auth: ^4.17.9
   geoflutterfire2: any
   image_picker: ^1.0.4
 
