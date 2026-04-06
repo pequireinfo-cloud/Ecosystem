@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
 import 'orders_page.dart';
-import '../profile/manage_profile_page.dart';
-import '../profile/security_page.dart';
-import '../profile/notifications_settings_page.dart';
-import '../profile/language_page.dart';
-import '../profile/about_us_page.dart';
-import '../profile/help_center_page.dart';
-import '../profile/privacy_policy_page.dart';
-import '../profile/my_coupons_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/manage_profile_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/security_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/notifications_settings_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/language_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/about_us_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/help_center_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/privacy_policy_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/my_coupons_page.dart';
 import 'provider_tracking_broadcast.dart';
 
 class ProfileTab extends StatefulWidget {

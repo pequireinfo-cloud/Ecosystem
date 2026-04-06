@@ -5,13 +5,13 @@ import 'package:animations/animations.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
-import '../provider_detail_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/provider_detail_page.dart';
 import 'profile_tab.dart';
 import 'categories_page.dart';
 import 'emergency_sos_page.dart';
 import 'subscription_page.dart';
-import '../notifications/notification_page.dart';
-import '../quick_fix/capture_issue_page.dart';
+import 'package:pequire_user_app/features/notifications/presentation/pages/notifications/notification_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
 
 class HomeTab extends StatefulWidget {
   final UserEntity user;
@@ -100,7 +100,7 @@ class _HomeTabState extends State<HomeTab> {
             icon: Icons.camera_alt_outlined,
             color: AppColors.secondary,
             label: 'Photo Request',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptureIssuePage())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptureIssuePage(autoProceed: true))),
           ),
           const SizedBox(height: 16),
         ],

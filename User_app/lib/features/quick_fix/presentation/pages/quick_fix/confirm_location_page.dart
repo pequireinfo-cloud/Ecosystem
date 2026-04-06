@@ -1,24 +1,85 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
+import 'package:geolocator/geolocator.dart';
+import 'searching_provider_page.dart';
+import 'package:pequire_user_app/core/services/booking_service.dart';
 import 'payment_page.dart';
 
 class ConfirmLocationPage extends StatefulWidget {
   final bool isWaitAndSave;
-  const ConfirmLocationPage({super.key, this.isWaitAndSave = false});
+  final List<String> imageUrls;
+  final String notes;
+  final String serviceType;
+  final int suggestedPrice;
+  const ConfirmLocationPage({
+    super.key, 
+    this.isWaitAndSave = false,
+    this.imageUrls = const [],
+    this.notes = '',
+    this.serviceType = 'Plumbing',
+    this.suggestedPrice = 500,
+  });
 
   @override
   State<ConfirmLocationPage> createState() => _ConfirmLocationPageState();
 }
 
 class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
-  // Default to New Delhi coordinates
-  static const LatLng _center = LatLng(28.6139, 77.2090);
+  GoogleMapController? _mapController;
+  LatLng _currentPosition = const LatLng(28.6139, 77.2090);
+  String _addressLine1 = 'Fetching location...';
+  String _addressLine2 = '';
+  bool _isLoadingLocation = true;
+  
   String _selectedSchedule = 'ASAP'; // 'ASAP' or 'Scheduled'
   
   // Form controllers
   final TextEditingController _flatController = TextEditingController();
   final TextEditingController _landmarkController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _determinePosition();
+  }
+
+  Future<void> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      setState(() {
+        _addressLine1 = 'Location services disabled';
+        _isLoadingLocation = false;
+      });
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        setState(() {
+          _addressLine1 = 'Permission denied';
+          _isLoadingLocation = false;
+        });
+        return;
+      }
+    }
+
+    final position = await Geolocator.getCurrentPosition();
+    if (mounted) {
+      setState(() {
+        _currentPosition = LatLng(position.latitude, position.longitude);
+        _addressLine1 = 'Current Location';
+        _addressLine2 = 'Tap to refine';
+        _isLoadingLocation = false;
+      });
+      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(_currentPosition, 16));
+    }
+  }
 
   @override
   void dispose() {
@@ -42,12 +103,17 @@ class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
             child: Stack(
               children: [
                 GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: _center,
+                  initialCameraPosition: CameraPosition(
+                    target: _currentPosition,
                     zoom: 15.0,
                   ),
+                  onMapCreated: (controller) => _mapController = controller,
+                  onCameraMove: (position) {
+                    _currentPosition = position.target;
+                  },
                   zoomControlsEnabled: false,
-                  myLocationButtonEnabled: false,
+                  myLocationButtonEnabled: true,
+                  myLocationEnabled: true,
                   mapToolbarEnabled: false,
                 ),
                 // Gradient Overlay for AppBar visibility
@@ -87,19 +153,19 @@ class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
                             ),
                           ],
                         ),
-                        child: const Column(
+                        child: Column(
                           children: [
                              Text(
-                              'New Delhi',
-                              style: TextStyle(
+                              _addressLine1,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                                 color: AppColors.textPrimary,
                               ),
                             ),
                             Text(
-                              'Pin Location',
-                              style: TextStyle(
+                              _addressLine2,
+                              style: const TextStyle(
                                 color: AppColors.textSecondary,
                                 fontSize: 12,
                               ),
@@ -467,13 +533,35 @@ class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
                       width: double.infinity,
                       height: 56,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => PaymentPage(isWaitAndSave: widget.isWaitAndSave),
-                            ),
-                          );
+                        onPressed: _isLoadingLocation ? null : () async {
+                          // Create booking in Firestore
+                          try {
+                            final bookingId = await BookingService().createBooking(
+                              userId: 'test_user_123', // Static for now
+                              serviceType: widget.serviceType,
+                              lat: _currentPosition.latitude,
+                              lng: _currentPosition.longitude,
+                              address: '${_flatController.text}, ${_landmarkController.text}',
+                              estimatedPrice: widget.suggestedPrice.toDouble(),
+                              imageUrls: widget.imageUrls,
+                              isWaitAndSave: widget.isWaitAndSave,
+                            );
+
+                            if (mounted) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SearchingProviderPage(bookingId: bookingId),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Booking failed: $e')),
+                              );
+                            }
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,

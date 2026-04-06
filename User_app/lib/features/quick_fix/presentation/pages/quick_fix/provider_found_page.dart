@@ -4,7 +4,8 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'tracking_page.dart';
 
 class ProviderFoundPage extends StatelessWidget {
-  const ProviderFoundPage({super.key});
+  final String bookingId;
+  const ProviderFoundPage({super.key, required this.bookingId});
 
   static const LatLng _center = LatLng(28.6139, 77.2090);
 
@@ -219,7 +220,7 @@ class ProviderFoundPage extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const TrackingPage(),
+                              builder: (context) => TrackingPage(bookingId: bookingId),
                             ),
                           );
                         },

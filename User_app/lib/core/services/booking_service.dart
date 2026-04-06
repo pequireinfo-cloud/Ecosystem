@@ -11,6 +11,7 @@ class BookingService {
     required double lng,
     required String address,
     required double estimatedPrice,
+    List<String> imageUrls = const [],
     bool isWaitAndSave = false,
   }) async {
     final bookingRef = _firestore.collection('bookings').doc();
@@ -22,6 +23,7 @@ class BookingService {
       'status': 'pending',
       'location': GeoPoint(lat, lng),
       'address': address,
+      'imageUrls': imageUrls,
       'estimatedPrice': estimatedPrice,
       'isWaitAndSave': isWaitAndSave,
       'createdAt': FieldValue.serverTimestamp(),

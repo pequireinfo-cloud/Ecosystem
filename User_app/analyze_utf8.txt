@@ -1,0 +1,417 @@
+﻿Analyzing User_app...                                           
+
+warning - 'package_api_docs' was removed in Dart '3.7.0' - analysis_options.yaml:11:7 - removed_lint
+   info - Constructor declarations should be before non-constructor declarations - lib\core\error\failure.dart:5:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\firebase_service.dart:6:11 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\firebase_service.dart:7:3 - sort_constructors_first
+   info - The prefix 'IO' isn't a lower_case_with_underscores identifier - lib\core\services\socket_service.dart:1:60 - library_prefixes
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\socket_service.dart:6:11 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\socket_service.dart:7:3 - sort_constructors_first
+warning - Unused import: 'firebase_service.dart' - lib\core\services\storage_service.dart:4:8 - unused_import
+   info - Use the end-of-line form ('///') for doc comments - lib\core\services\storage_service.dart:9:3 - slash_for_doc_comments
+   info - Use the end-of-line form ('///') for doc comments - lib\core\services\storage_service.dart:26:3 - slash_for_doc_comments
+   info - Local variables should be final - lib\core\services\storage_service.dart:33:5 - prefer_final_locals
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\tracking_service.dart:6:11 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\core\services\tracking_service.dart:7:3 - sort_constructors_first
+   info - Unnecessary use of an abstract class - lib\core\util\usecase.dart:4:16 - one_member_abstracts
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\data\datasources\auth_remote_data_source.dart:22:3 - sort_constructors_first
+  error - Target of URI doesn't exist: '../../../core/error/failure.dart' - lib\features\auth\data\repositories\auth_repository_impl.dart:2:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\data\repositories\auth_repository_impl.dart:12:3 - sort_constructors_first
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\data\repositories\auth_repository_impl.dart:15:17 - non_type_as_type_argument
+  error - The method 'ServerFailure' isn't defined for the type 'AuthRepositoryImpl' - lib\features\auth\data\repositories\auth_repository_impl.dart:29:19 - undefined_method
+  error - Invalid constant value - lib\features\auth\data\repositories\auth_repository_impl.dart:31:25 - invalid_constant
+  error - The method 'ServerFailure' isn't defined for the type 'AuthRepositoryImpl' - lib\features\auth\data\repositories\auth_repository_impl.dart:31:25 - undefined_method
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\data\repositories\auth_repository_impl.dart:36:17 - non_type_as_type_argument
+  error - The method 'ServerFailure' isn't defined for the type 'AuthRepositoryImpl' - lib\features\auth\data\repositories\auth_repository_impl.dart:50:19 - undefined_method
+  error - Invalid constant value - lib\features\auth\data\repositories\auth_repository_impl.dart:52:25 - invalid_constant
+  error - The method 'ServerFailure' isn't defined for the type 'AuthRepositoryImpl' - lib\features\auth\data\repositories\auth_repository_impl.dart:52:25 - undefined_method
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\domain\entities\user_entity.dart:9:9 - sort_constructors_first
+  error - Target of URI doesn't exist: '../../../core/error/failure.dart' - lib\features\auth\domain\repositories\auth_repository.dart:2:8 - uri_does_not_exist
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\domain\repositories\auth_repository.dart:7:17 - non_type_as_type_argument
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\domain\repositories\auth_repository.dart:13:17 - non_type_as_type_argument
+  error - Target of URI doesn't exist: '../../../core/error/failure.dart' - lib\features\auth\domain\usecases\login_usecase.dart:3:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../../core/util/usecase.dart' - lib\features\auth\domain\usecases\login_usecase.dart:4:8 - uri_does_not_exist
+  error - Classes and mixins can only implement other classes and mixins - lib\features\auth\domain\usecases\login_usecase.dart:9:31 - implements_non_class
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\domain\usecases\login_usecase.dart:12:3 - sort_constructors_first
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\domain\usecases\login_usecase.dart:15:17 - non_type_as_type_argument
+warning - The method doesn't override an inherited method - lib\features\auth\domain\usecases\login_usecase.dart:15:39 - override_on_non_overriding_member
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\domain\usecases\login_usecase.dart:29:9 - sort_constructors_first
+  error - Target of URI doesn't exist: '../../../core/error/failure.dart' - lib\features\auth\domain\usecases\register_usecase.dart:3:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../../core/util/usecase.dart' - lib\features\auth\domain\usecases\register_usecase.dart:4:8 - uri_does_not_exist
+  error - Classes and mixins can only implement other classes and mixins - lib\features\auth\domain\usecases\register_usecase.dart:9:34 - implements_non_class
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\domain\usecases\register_usecase.dart:12:3 - sort_constructors_first
+  error - The name 'Failure' isn't a type, so it can't be used as a type argument - lib\features\auth\domain\usecases\register_usecase.dart:15:17 - non_type_as_type_argument
+warning - The method doesn't override an inherited method - lib\features\auth\domain\usecases\register_usecase.dart:15:39 - override_on_non_overriding_member
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\domain\usecases\register_usecase.dart:29:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\bloc\auth_bloc.dart:10:3 - sort_constructors_first
+  error - The property 'message' can't be unconditionally accessed because the receiver can be 'null' - lib\features\auth\presentation\bloc\auth_bloc.dart:31:43 - unchecked_use_of_nullable_value
+  error - The property 'message' can't be unconditionally accessed because the receiver can be 'null' - lib\features\auth\presentation\bloc\auth_bloc.dart:49:43 - unchecked_use_of_nullable_value
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\bloc\auth_state.dart:18:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\bloc\auth_state.dart:33:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\bloc\auth_state.dart:57:9 - sort_constructors_first
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\bloc\auth_state.dart:65:9 - sort_constructors_first
+warning - Unused import: 'package:flutter_bloc/flutter_bloc.dart' - lib\features\auth\presentation\pages\login_page.dart:2:8 - unused_import
+warning - Unused import: '../bloc/auth_bloc.dart' - lib\features\auth\presentation\pages\login_page.dart:4:8 - unused_import
+warning - Unused import: '../bloc/auth_state.dart' - lib\features\auth\presentation\pages\login_page.dart:5:8 - unused_import
+  error - Target of URI doesn't exist: 'onboarding/otp_verification_page.dart' - lib\features\auth\presentation\pages\login_page.dart:6:8 - uri_does_not_exist
+warning - The value of the field '_selectedFlag' isn't used - lib\features\auth\presentation\pages\login_page.dart:18:10 - unused_field
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:87:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:116:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:117:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:179:47 - deprecated_member_use
+  error - The method 'OTPVerificationPage' isn't defined for the type '_LoginPageState' - lib\features\auth\presentation\pages\login_page.dart:217:53 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:236:51 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:251:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:267:19 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\auth\presentation\pages\login_page.dart:269:31 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:270:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:271:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:272:23 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:279:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\auth\presentation\pages\login_page.dart:280:28 - prefer_const_constructors
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\pages\login_page.dart:308:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\login_page.dart:320:33 - deprecated_member_use
+   info - The import of '../../domain/entities/login_role.dart' is unnecessary because all of the used elements are also provided by the import of '../widgets/role_selection_widget.dart' - lib\features\auth\presentation\pages\register_page.dart:8:8 - unnecessary_import
+  error - Target of URI doesn't exist: 'home_page.dart' - lib\features\auth\presentation\pages\register_page.dart:9:8 - uri_does_not_exist
+  error - The method 'HomePage' isn't defined for the type '_RegisterPageState' - lib\features\auth\presentation\pages\register_page.dart:36:47 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\pages\register_page.dart:254:30 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\auth\presentation\widgets\role_selection_widget.dart:11:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\auth\presentation\widgets\role_selection_widget.dart:56:48 - deprecated_member_use
+warning - Unused import: 'package:pequire_user_app/core/constants/app_colors.dart' - lib\features\dashboard\presentation\pages\dashboard\categories_page.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\categories_page.dart:83:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\categories_page.dart:112:40 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\categories_page.dart:134:32 - prefer_const_constructors
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\chat_page.dart:7:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\chat_page.dart:63:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\chat_page.dart:119:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\chat_page.dart:156:39 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\chat_page.dart:179:35 - prefer_const_constructors
+warning - Unused import: 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/searching_provider_page.dart' - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:3:8 - unused_import
+warning - The value of the local variable 'bookingId' isn't used - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:31:13 - unused_local_variable
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:81:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:83:60 - deprecated_member_use
+   info - Local variables should be final - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:107:25 - prefer_final_locals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:114:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:147:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:155:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:157:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\emergency_sos_page.dart:193:58 - deprecated_member_use
+  error - Target of URI doesn't exist: '../provider_detail_page.dart' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:8:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../notifications/notification_page.dart' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:13:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../quick_fix/capture_issue_page.dart' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:14:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:18:9 - sort_constructors_first
+   info - The private field _searchQuery could be 'final' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:26:10 - prefer_final_fields
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:69:39 - deprecated_member_use
+  error - The name 'CaptureIssuePage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:96:96 - creation_with_non_type
+  error - The name 'CaptureIssuePage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:103:96 - creation_with_non_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:129:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:159:72 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:170:23 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:221:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:265:35 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:268:37 - deprecated_member_use
+  error - The name 'NotificationPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:283:42 - creation_with_non_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:297:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:297:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:302:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:302:74 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:327:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:327:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:332:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:332:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:360:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:379:60 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:421:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:439:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:485:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:490:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:504:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:515:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:531:62 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:573:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:575:26 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:613:57 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:660:15 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:662:27 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:667:19 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:669:28 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:676:26 - prefer_const_constructors
+  error - The method 'ProviderDetailPage' isn't defined for the type '_HomeTabState' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:709:38 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:721:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:736:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:736:90 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:741:86 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:757:54 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:823:17 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:825:26 - prefer_const_constructors
+  error - The method 'ProviderDetailPage' isn't defined for the type '_HomeTabState' - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:856:35 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:871:35 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:917:32 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:929:26 - prefer_const_constructors
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:946:9 - sort_constructors_first
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:1018:31 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:1059:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:1071:40 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\home_tab.dart:1102:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\orders_page.dart:49:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\orders_page.dart:62:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\orders_page.dart:101:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\orders_page.dart:137:64 - deprecated_member_use
+  error - Target of URI doesn't exist: '../profile/manage_profile_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:5:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/security_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:6:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/notifications_settings_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:7:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/language_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:8:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/about_us_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:9:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/help_center_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:10:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/privacy_policy_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:11:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../profile/my_coupons_page.dart' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:12:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:17:9 - sort_constructors_first
+   info - The private field _isDarkMode could be 'final' - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:24:8 - prefer_final_fields
+warning - The value of the field '_isDarkMode' isn't used - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:24:8 - unused_field
+  error - The name 'MyCouponsPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:57:87 - creation_with_non_type
+  error - The name 'ManageProfilePage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:66:87 - creation_with_non_type
+  error - The name 'SecurityPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:73:87 - creation_with_non_type
+  error - The name 'NotificationsSettingsPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:80:87 - creation_with_non_type
+  error - The name 'LanguagePage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:95:87 - creation_with_non_type
+  error - The name 'AboutUsPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:104:87 - creation_with_non_type
+  error - The name 'HelpCenterPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:130:87 - creation_with_non_type
+  error - The name 'PrivacyPolicyPage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:137:87 - creation_with_non_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:157:29 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:213:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\profile_tab.dart:224:68 - deprecated_member_use
+   info - The prefix 'IO' isn't a lower_case_with_underscores identifier - lib\features\dashboard\presentation\pages\dashboard\provider_tracking_broadcast.dart:3:60 - library_prefixes
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\provider_tracking_broadcast.dart:9:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\provider_tracking_broadcast.dart:102:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\provider_tracking_broadcast.dart:102:85 - deprecated_member_use
+  error - Target of URI doesn't exist: '../quick_fix/capture_issue_page.dart' - lib\features\dashboard\presentation\pages\dashboard\quick_fix_tab.dart:3:8 - uri_does_not_exist
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\dashboard\presentation\pages\dashboard\quick_fix_tab.dart:15:5 - unawaited_futures
+  error - The name 'CaptureIssuePage' isn't a class - lib\features\dashboard\presentation\pages\dashboard\quick_fix_tab.dart:18:37 - creation_with_non_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\quick_fix_tab.dart:45:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\quick_fix_tab.dart:46:45 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\request_details_modal.dart:9:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\request_details_modal.dart:114:48 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\subscription_page.dart:35:86 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\subscription_page.dart:46:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\subscription_page.dart:165:28 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:11:9 - sort_constructors_first
+   info - Don't invoke 'print' in production code - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:52:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:66:7 - avoid_print
+warning - The declaration '_calculateTimeRemaining' isn't referenced - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:77:7 - unused_element
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:110:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:123:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:163:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:179:40 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:225:30 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:259:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:288:22 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\dashboard\presentation\pages\dashboard\tracking_page.dart:300:3 - sort_constructors_first
+  error - Target of URI doesn't exist: 'dashboard/home_tab.dart' - lib\features\home\presentation\pages\home_page.dart:4:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: 'quick_fix/capture_issue_page.dart' - lib\features\home\presentation\pages\home_page.dart:5:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\home\presentation\pages\home_page.dart:10:9 - sort_constructors_first
+  error - The name 'CaptureIssuePage' isn't a class - lib\features\home\presentation\pages\home_page.dart:21:53 - creation_with_non_type
+  error - The method 'HomeTab' isn't defined for the type '_HomePageState' - lib\features\home\presentation\pages\home_page.dart:28:13 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\home\presentation\pages\home_page.dart:36:44 - deprecated_member_use
+warning - Unused import: 'package:pequire_user_app/core/constants/app_colors.dart' - lib\features\notifications\presentation\pages\notifications\notification_page.dart:3:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\notifications\presentation\pages\notifications\notification_page.dart:124:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\notifications\presentation\pages\notifications\notification_page.dart:183:32 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\notifications\presentation\pages\notifications\notification_page.dart:196:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\notifications\presentation\pages\notifications\notification_page.dart:201:32 - deprecated_member_use
+  error - Target of URI doesn't exist: 'login_page.dart' - lib\features\onboarding\presentation\pages\onboarding_page.dart:3:8 - uri_does_not_exist
+  error - The name 'LoginPage' isn't a class - lib\features\onboarding\presentation\pages\onboarding_page.dart:107:57 - creation_with_non_type
+  error - The name 'LoginPage' isn't a class - lib\features\onboarding\presentation\pages\onboarding_page.dart:155:59 - creation_with_non_type
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\onboarding\presentation\pages\onboarding_page.dart:168:66 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\onboarding\presentation\pages\onboarding_page.dart:202:3 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\about_us_page.dart:38:46 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\help_center_page.dart:114:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\help_center_page.dart:114:42 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\help_center_page.dart:130:21 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\help_center_page.dart:134:23 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\help_center_page.dart:149:41 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\help_center_page.dart:154:19 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\help_center_page.dart:193:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\language_page.dart:92:87 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\manage_profile_page.dart:258:45 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\profile\presentation\pages\profile\my_coupons_page.dart:30:22 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\my_coupons_page.dart:87:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\my_coupons_page.dart:100:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\my_coupons_page.dart:100:87 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\security_page.dart:96:79 - deprecated_member_use
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\features\profile\presentation\pages\profile\security_page.dart:104:12 - sized_box_for_whitespace
+warning - Unused import: 'package:lottie/lottie.dart' - lib\features\profile\presentation\pages\profile\theme_settings_page.dart:2:8 - unused_import
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\theme_settings_page.dart:64:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\theme_settings_page.dart:113:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\profile\presentation\pages\profile\theme_settings_page.dart:113:84 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:8:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:110:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:145:48 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:148:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:149:28 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:151:30 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:222:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:244:46 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:247:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:249:26 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:257:20 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:260:11 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:261:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:266:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:268:24 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:305:28 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:326:16 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:328:21 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:334:13 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:336:22 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:355:11 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:357:23 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:362:15 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:364:24 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:480:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:489:44 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:559:11 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\provider_detail_page.dart:573:54 - deprecated_member_use
+warning - Unused import: 'package:image_picker/image_picker.dart' - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:2:8 - unused_import
+warning - Unused import: 'dart:typed_data' - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:3:8 - unused_import
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:10:9 - sort_constructors_first
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:59:8 - unawaited_futures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:102:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:113:54 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:115:73 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:184:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:189:68 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:216:99 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:220:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:235:55 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:273:49 - deprecated_member_use
+   info - Local variables should be final - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:293:23 - prefer_final_locals
+   info - Local variables should be final - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:294:23 - prefer_final_locals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:334:78 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:357:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\analyzing_page.dart:383:30 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../../../core/services/storage_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:6:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:10:9 - sort_constructors_first
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:46:11 - unawaited_futures
+  error - The method 'StorageService' isn't defined for the type '_CaptureIssuePageState' - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:69:27 - undefined_method
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:73:9 - unawaited_futures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:97:34 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:123:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:139:43 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:197:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:227:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:253:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:267:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:281:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:311:83 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:352:71 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:388:71 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:421:73 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:462:85 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:517:44 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:572:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:647:61 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:657:46 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:671:58 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\capture_issue_page.dart:682:39 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../../../core/services/chat_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\chat_page.dart:4:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\chat_page.dart:10:9 - sort_constructors_first
+  error - The method 'ChatService' isn't defined for the type '_ChatPageState' - lib\features\quick_fix\presentation\pages\quick_fix\chat_page.dart:26:5 - undefined_method
+  error - The method 'ChatService' isn't defined for the type '_ChatPageState' - lib\features\quick_fix\presentation\pages\quick_fix\chat_page.dart:56:23 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\chat_page.dart:99:35 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../../../core/services/booking_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:6:8 - uri_does_not_exist
+warning - Unused import: 'payment_page.dart' - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:7:8 - unused_import
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:15:9 - sort_constructors_first
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:80:7 - unawaited_futures
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:127:38 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:150:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:196:45 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:278:56 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:284:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:285:36 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:287:41 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:441:56 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:488:56 - deprecated_member_use
+  error - The method 'BookingService' isn't defined for the type '_ConfirmLocationPageState' - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:539:53 - undefined_method
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:551:31 - unawaited_futures
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:552:33 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps, guarded by an unrelated 'mounted' check - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:560:52 - use_build_context_synchronously
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\confirm_location_page.dart:573:58 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:8:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:59:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:96:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:126:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:140:53 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:149:31 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:150:40 - prefer_const_constructors
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:164:64 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:199:40 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:201:45 - prefer_const_literals_to_create_immutables
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:259:64 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:272:59 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:306:57 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:347:64 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\cost_breakdown_page.dart:417:33 - deprecated_member_use
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:8:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:44:47 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:81:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:111:49 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:123:53 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:171:72 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:309:62 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:381:33 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:393:28 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\diagnosis_page.dart:414:26 - prefer_const_constructors
+  error - Target of URI doesn't exist: '../../../../core/services/booking_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:4:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:10:9 - sort_constructors_first
+  error - The method 'BookingService' isn't defined for the type '_JobStatusPageState' - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:31:17 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:76:51 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:106:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\job_status_page.dart:123:62 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../../../core/services/booking_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:3:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:8:9 - sort_constructors_first
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:58:40 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:108:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:212:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:229:35 - deprecated_member_use
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:259:19 - unawaited_futures
+  error - The method 'BookingService' isn't defined for the type '_PaymentPageState' - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:266:45 - undefined_method
+   info - Missing an 'await' for the 'Future' computed by this expression - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:278:23 - unawaited_futures
+   info - Local variables should be final - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:325:5 - prefer_final_locals
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\payment_page.dart:344:30 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\provider_found_page.dart:53:43 - deprecated_member_use
+  error - The named parameter 'bookingId' is required, but there's no corresponding argument - lib\features\quick_fix\presentation\pages\quick_fix\provider_found_page.dart:222:59 - missing_required_argument
+warning - Unused import: 'package:cloud_firestore/cloud_firestore.dart' - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:4:8 - unused_import
+  error - Target of URI doesn't exist: '../../../../core/services/booking_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:6:8 - uri_does_not_exist
+warning - Unused import: 'provider_found_page.dart' - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:7:8 - unused_import
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:12:9 - sort_constructors_first
+  error - The method 'BookingService' isn't defined for the type '_SearchingProviderPageState' - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:32:28 - undefined_method
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:207:50 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\searching_provider_page.dart:210:48 - deprecated_member_use
+  error - Target of URI doesn't exist: '../../../../core/services/tracking_service.dart' - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:4:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:8:9 - sort_constructors_first
+  error - The method 'TrackingService' isn't defined for the type '_TrackingPageState' - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:26:5 - undefined_method
+   info - The member 'build' overrides an inherited member but isn't annotated with '@override' - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:49:10 - annotate_overrides
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:84:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:110:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:150:41 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:184:55 - deprecated_member_use
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:228:23 - prefer_const_constructors
+   info - Use 'const' literals as arguments to constructors of '@immutable' classes - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:230:35 - prefer_const_literals_to_create_immutables
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:239:27 - prefer_const_constructors
+   info - Use 'const' with the constructor to improve performance - lib\features\quick_fix\presentation\pages\quick_fix\tracking_page.dart:241:36 - prefer_const_constructors
+warning - Unused import: 'features/home/presentation/pages/home_page.dart' - lib\main.dart:5:8 - unused_import
+  error - Target of URI doesn't exist: '../../../domain/entities/login_role.dart' - lib\presentation\pages\onboarding\otp_verification_page.dart:5:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../state/auth_bloc.dart' - lib\presentation\pages\onboarding\otp_verification_page.dart:6:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../../state/auth_state.dart' - lib\presentation\pages\onboarding\otp_verification_page.dart:7:8 - uri_does_not_exist
+  error - Target of URI doesn't exist: '../home_page.dart' - lib\presentation\pages\onboarding\otp_verification_page.dart:8:8 - uri_does_not_exist
+   info - Constructor declarations should be before non-constructor declarations - lib\presentation\pages\onboarding\otp_verification_page.dart:12:9 - sort_constructors_first
+  error - The name 'AuthBloc' isn't a type, so it can't be used as a type argument - lib\presentation\pages\onboarding\otp_verification_page.dart:56:25 - non_type_as_type_argument
+  error - The name 'AuthState' isn't a type, so it can't be used as a type argument - lib\presentation\pages\onboarding\otp_verification_page.dart:56:35 - non_type_as_type_argument
+  error - The name 'AuthAuthenticated' isn't defined, so it can't be used in an 'is' expression - lib\presentation\pages\onboarding\otp_verification_page.dart:58:22 - type_test_with_undefined_name
+  error - The method 'HomePage' isn't defined for the type '_OTPVerificationPageState' - lib\presentation\pages\onboarding\otp_verification_page.dart:60:47 - undefined_method
+  error - The name 'AuthError' isn't defined, so it can't be used in an 'is' expression - lib\presentation\pages\onboarding\otp_verification_page.dart:63:29 - type_test_with_undefined_name
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\onboarding\otp_verification_page.dart:122:80 - deprecated_member_use
+   info - Local variables should be final - lib\presentation\pages\onboarding\otp_verification_page.dart:146:21 - prefer_final_locals
+  error - The name 'AuthBloc' isn't a type, so it can't be used as a type argument - lib\presentation\pages\onboarding\otp_verification_page.dart:148:36 - non_type_as_type_argument
+  error - The name 'LoginSubmitted' isn't a class - lib\presentation\pages\onboarding\otp_verification_page.dart:149:31 - creation_with_non_type
+  error - Undefined name 'LoginRole' - lib\presentation\pages\onboarding\otp_verification_page.dart:152:33 - undefined_identifier
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\presentation\pages\onboarding\otp_verification_page.dart:162:61 - deprecated_member_use
+

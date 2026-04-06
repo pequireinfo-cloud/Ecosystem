@@ -3,7 +3,9 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'confirm_location_page.dart';
 
 class CostBreakdownPage extends StatefulWidget {
-  const CostBreakdownPage({super.key});
+  final List<String> imageUrls;
+  final String notes;
+  const CostBreakdownPage({super.key, this.imageUrls = const [], this.notes = ''});
 
   @override
   State<CostBreakdownPage> createState() => _CostBreakdownPageState();

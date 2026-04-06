@@ -1,4 +1,4 @@
-const { db } = require('../config/firebase');
+const { db, messaging } = require('../config/firebase');
 
 /**
  * Service to handle booking operations.
@@ -10,7 +10,7 @@ class BookingService {
    * @returns {Promise<Object>}
    */
   async createBooking(bookingData) {
-    const { userId, serviceCategory, problemDescription, location } = bookingData;
+    const { userId, serviceCategory, problemDescription, location, imageUrls } = bookingData;
     
     if (!db) {
       throw new Error('Firebase DB not initialized');
@@ -24,15 +24,59 @@ class BookingService {
       providerId: null, // Unassigned
       serviceCategory,
       problemDescription,
-      status: 'REQUESTED',
-      location,
+      status: 'pending',
+      location, // Should be { latitude, longitude }
+      imageUrls: imageUrls || [],
       estimatedPrice: null,
       timeline: [{ status: 'REQUESTED', timestamp: new Date() }],
       createdAt: new Date()
     };
 
     await bookingRef.set(newBooking);
+
+    // Trigger provider matching and notifications asynchronously
+    this.notifyNearbyProviders(newBooking).catch(err => console.error('Notification Error:', err));
+
     return newBooking;
+  }
+
+  /**
+   * Find and notify nearby providers.
+   * @param {Object} booking 
+   */
+  async notifyNearbyProviders(booking) {
+    if (!messaging || !db) return;
+
+    // Simple proximity: Find SPs with same serviceCategory
+    // In a real app, use GeoFirestore or coordinate range queries
+    const providersSnapshot = await db.collection('service_providers')
+      .where('category', '==', booking.serviceCategory)
+      .where('isOnline', '==', true)
+      .get();
+
+    const tokens = [];
+    providersSnapshot.forEach(doc => {
+      const data = doc.data();
+      if (data.fcmToken) tokens.push(data.fcmToken);
+    });
+
+    if (tokens.length === 0) return;
+
+    const message = {
+      notification: {
+        title: 'New Service Request!',
+        body: `A new ${booking.serviceCategory} request is available near you.`
+      },
+      data: {
+        bookingId: booking.bookingId,
+        serviceCategory: booking.serviceCategory,
+        type: 'NEW_BOOKING'
+      },
+      tokens: tokens
+    };
+
+    await messaging.sendMulticast(message);
+    console.log(`Sent notifications to ${tokens.length} providers.`);
   }
 
   /**

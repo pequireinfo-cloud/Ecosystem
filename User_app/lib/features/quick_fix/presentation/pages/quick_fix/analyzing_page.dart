@@ -5,8 +5,9 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'diagnosis_page.dart';
 
 class AnalyzingPage extends StatefulWidget {
-  final XFile? image;
-  const AnalyzingPage({super.key, this.image});
+  final List<String> imageUrls;
+  final String notes;
+  const AnalyzingPage({super.key, this.imageUrls = const [], this.notes = ''});
 
   @override
   State<AnalyzingPage> createState() => _AnalyzingPageState();
@@ -58,7 +59,10 @@ class _AnalyzingPageState extends State<AnalyzingPage> with SingleTickerProvider
        Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const DiagnosisPage(),
+          builder: (context) => DiagnosisPage(
+            imageUrls: widget.imageUrls,
+            notes: widget.notes,
+          ),
         ),
       );
     }
@@ -131,7 +135,10 @@ class _AnalyzingPageState extends State<AnalyzingPage> with SingleTickerProvider
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const DiagnosisPage(),
+                              builder: (context) => DiagnosisPage(
+                                imageUrls: widget.imageUrls,
+                                notes: widget.notes,
+                              ),
                             ),
                           );
                         },
@@ -179,28 +186,25 @@ class _AnalyzingPageState extends State<AnalyzingPage> with SingleTickerProvider
                         spreadRadius: -5,
                       ),
                     ],
-                    color: widget.image == null ? Colors.white.withOpacity(0.05) : null,
+                    color: widget.imageUrls.isEmpty ? Colors.white.withOpacity(0.05) : null,
                   ),
                   child: Stack(
                     children: [
-                        if (widget.image != null)
+                        if (widget.imageUrls.isNotEmpty)
                           ClipRRect(
                             borderRadius: BorderRadius.circular(24),
-                            child: FutureBuilder<Uint8List>(
-                              future: widget.image!.readAsBytes(),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  return Image.memory(
-                                    snapshot.data!,
-                                    width: double.infinity,
-                                    height: 280,
-                                    fit: BoxFit.cover,
-                                  );
-                                }
-                                 return Container(
-                                  color: Colors.black,
-                                  child: const Center(child: CircularProgressIndicator()),
-                                );
+                            child: Image.network(
+                              widget.imageUrls.first,
+                              width: double.infinity,
+                              height: 280,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => Container(
+                                color: Colors.black,
+                                child: const Center(child: Icon(Icons.error, color: Colors.white)),
+                              ),
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const Center(child: CircularProgressIndicator());
                               },
                             ),
                           )

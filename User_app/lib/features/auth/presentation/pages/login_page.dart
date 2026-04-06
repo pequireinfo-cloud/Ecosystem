@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
-import 'onboarding/otp_verification_page.dart';
+import 'package:pequire_user_app/presentation/pages/onboarding/otp_verification_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

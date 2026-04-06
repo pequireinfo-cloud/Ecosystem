@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../../core/services/booking_service.dart';
+import 'package:pequire_user_app/core/services/booking_service.dart';
 import 'searching_provider_page.dart';
 
 class PaymentPage extends StatefulWidget {

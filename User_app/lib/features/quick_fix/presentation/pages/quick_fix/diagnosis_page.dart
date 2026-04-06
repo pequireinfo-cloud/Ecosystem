@@ -3,7 +3,9 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'cost_breakdown_page.dart';
 
 class DiagnosisPage extends StatelessWidget {
-  const DiagnosisPage({super.key});
+  final List<String> imageUrls;
+  final String notes;
+  const DiagnosisPage({super.key, this.imageUrls = const [], this.notes = ''});
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +146,9 @@ class DiagnosisPage extends StatelessWidget {
                                           ],
                                         ),
                                       ),
-                                      child: const Icon(Icons.plumbing, size: 64, color: Colors.grey),
+                                      child: imageUrls.isNotEmpty 
+                                        ? Image.network(imageUrls.first, fit: BoxFit.cover)
+                                        : const Icon(Icons.plumbing, size: 64, color: Colors.grey),
                                     ),
                                   ),
                                   
@@ -285,12 +289,15 @@ class DiagnosisPage extends StatelessWidget {
                           height: 56,
                           child: ElevatedButton(
                             onPressed: () {
-                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CostBreakdownPage(),
-                                ),
-                              );
+                                Navigator.push(
+                                 context,
+                                 MaterialPageRoute(
+                                   builder: (context) => CostBreakdownPage(
+                                     imageUrls: imageUrls,
+                                     notes: notes,
+                                   ),
+                                 ),
+                               );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,

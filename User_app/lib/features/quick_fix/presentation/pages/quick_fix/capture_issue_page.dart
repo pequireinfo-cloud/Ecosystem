@@ -3,9 +3,11 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:typed_data';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'analyzing_page.dart';
+import 'package:pequire_user_app/core/services/storage_service.dart';
 
 class CaptureIssuePage extends StatefulWidget {
-  const CaptureIssuePage({super.key});
+  final bool autoProceed;
+  const CaptureIssuePage({super.key, this.autoProceed = false});
 
   @override
   State<CaptureIssuePage> createState() => _CaptureIssuePageState();
@@ -16,6 +18,17 @@ class _CaptureIssuePageState extends State<CaptureIssuePage> {
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _notesController = TextEditingController();
   bool _isListening = false; // Mock for voice recording state
+  bool _isUploading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.autoProceed) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pickImage(ImageSource.camera);
+      });
+    }
+  }
 
   Future<void> _pickImage(ImageSource source) async {
     try {
@@ -27,6 +40,11 @@ class _CaptureIssuePageState extends State<CaptureIssuePage> {
         setState(() {
           _images.add(image);
         });
+        
+        if (widget.autoProceed && _images.length == 1) {
+          // Auto-trigger analysis for seamless experience
+          _startAnalysis();
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -41,6 +59,36 @@ class _CaptureIssuePageState extends State<CaptureIssuePage> {
     setState(() {
       _images.removeAt(index);
     });
+  }
+
+  Future<void> _startAnalysis() async {
+    setState(() => _isUploading = true);
+    try {
+      List<String> imageUrls = [];
+      if (_images.isNotEmpty) {
+        imageUrls = await StorageService().uploadMultipleImages(_images, 'issue_images');
+      }
+      
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AnalyzingPage(
+              imageUrls: imageUrls,
+              notes: _notesController.text.trim(),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload failed: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
+    }
   }
 
   void _showARScan() {
@@ -510,18 +558,9 @@ class _CaptureIssuePageState extends State<CaptureIssuePage> {
                           width: double.infinity,
                           height: 56,
                           child: ElevatedButton(
-                            onPressed: (_images.isEmpty && _notesController.text.trim().isEmpty)
+                            onPressed: (_images.isEmpty && _notesController.text.trim().isEmpty) || _isUploading
                               ? null 
-                              : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AnalyzingPage(
-                                      image: _images.isNotEmpty ? _images.first : null
-                                    ),
-                                  ),
-                                );
-                              },
+                              : () => _startAnalysis(),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
                               foregroundColor: Colors.white,
@@ -532,18 +571,25 @@ class _CaptureIssuePageState extends State<CaptureIssuePage> {
                               elevation: 8,
                               shadowColor: AppColors.primary.withOpacity(0.4),
                             ),
-                            child: const Row(
+                            child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Analyze Problem',
-                                  style: TextStyle(
+                                  _isUploading ? 'Uploading...' : 'Analyze Problem',
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                SizedBox(width: 8),
-                                Icon(Icons.arrow_forward_rounded, size: 20),
+                                const SizedBox(width: 8),
+                                if (_isUploading)
+                                  const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                  )
+                                else
+                                  const Icon(Icons.arrow_forward_rounded, size: 20),
                               ],
                             ),
                           ),

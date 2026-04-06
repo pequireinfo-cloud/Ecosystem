@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:pequire_user_app/core/services/booking_service.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/searching_provider_page.dart';
 
 class EmergencySOSPage extends StatefulWidget {
   const EmergencySOSPage({super.key});
@@ -19,12 +21,36 @@ class _EmergencySOSPageState extends State<EmergencySOSPage> with TickerProvider
       duration: const Duration(seconds: 2),
     )..repeat();
 
-    // Simulate finding a pro after 5 seconds
-    Future.delayed(const Duration(seconds: 5), () {
+    // Real booking creation for Emergency
+    _createEmergencyBooking();
+  }
+
+  Future<void> _createEmergencyBooking() async {
+    try {
+      // For SOS, we assume user is in the same location and needs immediate help
+      final bookingId = await BookingService().createBooking(
+        userId: 'test_user_123', // Static for now
+        serviceType: 'Emergency',
+        lat: 28.6139, // Default to New Delhi if geolocator is not wrapped here yet
+        lng: 77.2090,
+        address: 'Emergency SOS Request',
+        estimatedPrice: 999, // Emergency premium
+        isWaitAndSave: false,
+      );
+
       if (mounted) {
         setState(() => _isFinding = false);
+        // Optionally navigate to a special emergency tracking or existing searching page
+        // Future.delayed(const Duration(seconds: 2), () {
+        //   Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => SearchingProviderPage(bookingId: bookingId)));
+        // });
       }
-    });
+    } catch (e) {
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('SOS failed: $e')));
+         Navigator.pop(context);
+      }
+    }
   }
 
   @override

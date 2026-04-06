@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../../core/services/booking_service.dart';
+import 'package:pequire_user_app/core/services/booking_service.dart';
 import 'chat_page.dart';
+import 'tracking_page.dart';
 
 class JobStatusPage extends StatefulWidget {
   final String bookingId;
@@ -106,6 +107,23 @@ class _JobStatusPageState extends State<JobStatusPage> {
               child: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.primary),
             ),
           ),
+          const SizedBox(width: 8),
+          if (data['status'] == 'accepted')
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TrackingPage(bookingId: widget.bookingId),
+                  ),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                child: const Icon(Icons.map_outlined, color: Colors.blue),
+              ),
+            ),
         ],
       ),
     );

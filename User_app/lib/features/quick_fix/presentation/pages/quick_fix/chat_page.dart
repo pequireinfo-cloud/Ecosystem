@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../../core/services/chat_service.dart';
+import 'package:pequire_user_app/core/services/chat_service.dart';
 
 class ChatPage extends StatefulWidget {
   final String bookingId;

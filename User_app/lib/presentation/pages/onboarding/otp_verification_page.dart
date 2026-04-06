@@ -2,10 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../domain/entities/login_role.dart';
-import '../../state/auth_bloc.dart';
-import '../../state/auth_state.dart';
-import '../home_page.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/login_role.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
 
 class OTPVerificationPage extends StatefulWidget {
   final String phoneNumber;

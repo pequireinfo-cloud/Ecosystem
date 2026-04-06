@@ -6,7 +6,7 @@ import '../widgets/role_selection_widget.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import '../../domain/entities/login_role.dart';
-import 'home_page.dart';
+import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});

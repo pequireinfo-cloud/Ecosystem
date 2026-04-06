@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/confirm_location_page.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
@@ -88,7 +89,17 @@ class CategoriesPage extends StatelessWidget {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ConfirmLocationPage(
+                        serviceType: category['label'] as String,
+                        suggestedPrice: 400, // Base price for standard category
+                      ),
+                    ),
+                  );
+                },
                 borderRadius: BorderRadius.circular(28),
                 child: Padding(
                   padding: const EdgeInsets.all(20),

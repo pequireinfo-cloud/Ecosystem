@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../quick_fix/capture_issue_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
 
 class QuickFixTab extends StatefulWidget {
   const QuickFixTab({super.key});

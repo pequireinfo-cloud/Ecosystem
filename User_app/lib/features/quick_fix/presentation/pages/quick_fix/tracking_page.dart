@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import '../../../../core/services/socket_service.dart';
+import 'package:pequire_user_app/core/services/tracking_service.dart';
 
 class TrackingPage extends StatefulWidget {
-  const TrackingPage({super.key});
+  final String bookingId;
+  const TrackingPage({super.key, required this.bookingId});
 
   @override
   State<TrackingPage> createState() => _TrackingPageState();
@@ -14,28 +15,28 @@ class _TrackingPageState extends State<TrackingPage> {
   static const LatLng _center = LatLng(28.6139, 77.2090);
   GoogleMapController? _mapController;
   LatLng? _providerLocation;
-  final String _orderId = "demo_order_123"; // Dummy ID for "as is" testing
   
   @override
   void initState() {
     super.initState();
-    _setupSocket();
+    _setupTracking();
   }
 
-  void _setupSocket() {
-    SocketService().connect();
-    SocketService().joinOrder(_orderId, (data) {
-      if (mounted) {
-        setState(() {
-          _providerLocation = LatLng(
-            data['latitude'] as double,
-            data['longitude'] as double,
-          );
-        });
-        
-        // Optionally animate camera to provider if they are the focus
-        if (_providerLocation != null && _mapController != null) {
-          // _mapController!.animateCamera(CameraUpdate.newLatLng(_providerLocation!));
+  void _setupTracking() {
+    TrackingService().listenToLocation(widget.bookingId).listen((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        final data = snapshot.data()!;
+        if (mounted) {
+          setState(() {
+            _providerLocation = LatLng(
+              data['latitude'] as double,
+              data['longitude'] as double,
+            );
+          });
+          
+          if (_mapController != null && _providerLocation != null) {
+            _mapController!.animateCamera(CameraUpdate.newLatLng(_providerLocation!));
+          }
         }
       }
     });
@@ -43,7 +44,6 @@ class _TrackingPageState extends State<TrackingPage> {
 
   @override
   void dispose() {
-    SocketService().disconnect();
     super.dispose();
   }
   Widget build(BuildContext context) {
