@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
 import 'package:pequire_user_app/features/dashboard/presentation/pages/dashboard/home_tab.dart';
-import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
+import 'package:pequire_user_app/features/dashboard/presentation/pages/dashboard/categories_page.dart';
+import 'package:pequire_user_app/features/dashboard/presentation/pages/dashboard/quick_fix_categories_page.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
   void _handleQuickFix() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CaptureIssuePage()),
+      MaterialPageRoute(builder: (context) => const QuickFixCategoriesPage()),
     );
   }
 

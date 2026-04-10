@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/login_role.dart';
+import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
 import 'package:pequire_user_app/presentation/pages/onboarding/otp_verification_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,6 +16,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final _phoneController = TextEditingController();
+  final _otpController = TextEditingController();
+  bool _isOtpSent = false;
   String _selectedCountryCode = '+91';
   String _selectedFlag = '🇮🇳';
 
@@ -28,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void dispose() {
     _phoneController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
@@ -93,211 +98,268 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF1A1B2F),
-      body: Stack(
-        children: [
-          // Background Image
-          Positioned.fill(
-            child: Image.asset(
-              'assets/login_bg.jpg',
-              fit: BoxFit.cover,
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => HomePage(user: state.user)),
+            (route) => false,
+          );
+        } else if (state is AuthError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.message), backgroundColor: AppColors.error),
+          );
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFF000814),
+        body: Stack(
+          children: [
+            // Background Image
+            Positioned.fill(
+              child: Image.asset(
+                'assets/login_bg.jpg',
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          
-          // Subtle Dark Overlay for contrast
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.3),
-                    const Color(0xFF1A1B2F).withOpacity(0.8),
+            
+            // Subtle Dark Overlay for contrast
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.3),
+                      const Color(0xFF1A1B2F).withOpacity(0.8),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    // Top Logo & Back Button Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Image.asset('assets/logo.png', width: 32, height: 32),
+                            const SizedBox(width: 12),
+                            const Text(
+                              'PEQUIRE.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (_isOtpSent)
+                          IconButton(
+                            onPressed: () => setState(() => _isOtpSent = false),
+                            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                          ),
+                      ],
+                    ),
+                    
+                    const Spacer(),
+                    
+                    // Animated Content Area (Bottom Bottom)
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 350),
+                      transitionBuilder: (Widget child, Animation<double> animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: SlideTransition(
+                            position: Tween<Offset>(
+                              begin: const Offset(0.1, 0),
+                              end: Offset.zero,
+                            ).animate(animation),
+                            child: child,
+                          ),
+                        );
+                      },
+                      child: _isOtpSent ? _buildOtpView() : _buildPhoneView(),
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Terms and Privacy
+                    Center(
+                      child: Column(
+                        children: const [
+                          Text(
+                            'By signing up, you agree to the Terms of Service',
+                            style: TextStyle(color: Colors.white30, fontSize: 11),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'and Data Processing Agreement',
+                            style: TextStyle(color: Colors.white30, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
                   ],
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneView() {
+    return Column(
+      key: const ValueKey('phone_view'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Enter your mobile\nnumber',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 34,
+            fontWeight: FontWeight.bold,
+            height: 1.2,
           ),
-          
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 20),
-                  // Logo
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/logo.png',
-                        width: 40,
-                        height: 40,
-                      ),
-                      const SizedBox(width: 12),
-                      Image.asset(
-                        'assets/wordmark.png',
-                        height: 24,
-                        color: Colors.white,
-                      ),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 60),
-                  
-                  const Text(
-                    'Enter your mobile\nnumber',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight: FontWeight.bold,
-                      height: 1.2,
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 48),
-                  
-                  const Text(
-                    'Phone Number',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  
-                  // Phone Input
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                      ),
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                        hintText: '9256771264',
-                        prefixIcon: _buildCountryPicker(),
-                        suffixIcon: const Padding(
-                          padding: EdgeInsets.only(right: 12.0),
-                          child: Icon(Icons.contact_phone_rounded, color: AppColors.buttonPurple, size: 26),
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 24),
-                  
-                  // Get OTP Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_phoneController.text.isNotEmpty) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OTPVerificationPage(
-                                phoneNumber: '$_selectedCountryCode ${_phoneController.text}',
-                              ),
-                            ),
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Please enter your phone number')),
-                          );
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.buttonPurple,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 18),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        shadowColor: Colors.black.withOpacity(0.3),
-                      ),
-                      child: const Text(
-                        'Get OTP',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  
-                  const SizedBox(height: 40),
-                  
-                  // Social Login Section
-                  Row(
-                    children: const [
-                      Expanded(child: Divider(color: Colors.white24)),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          'Or login with',
-                          style: TextStyle(color: Colors.white60, fontSize: 14),
-                        ),
-                      ),
-                      Expanded(child: Divider(color: Colors.white24)),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      SocialButton(imageAsset: 'assets/google_icon.png', iconData: Icons.g_mobiledata),
-                      SocialButton(imageAsset: 'assets/facebook_icon.png', iconData: Icons.facebook),
-                      SocialButton(imageAsset: 'assets/apple_icon.png', iconData: Icons.apple),
-                    ],
-                  ),
-                  
-                  const SizedBox(height: 60),
-                  
-                  // Terms and Privacy
-                  Center(
-                    child: Column(
-                      children: const [
-                        Text(
-                          'By signing up, you agree to the Terms of Service',
-                          style: TextStyle(color: Colors.white54, fontSize: 11),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'and Data Processing Agreement',
-                          style: TextStyle(color: Colors.white54, fontSize: 11),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                ],
+        ),
+        const SizedBox(height: 40),
+        const Text(
+          'Phone Number',
+          style: TextStyle(color: Colors.white60, fontSize: 14),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: TextField(
+            controller: _phoneController,
+            keyboardType: TextInputType.phone,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+              hintText: '98765 43210',
+              prefixIcon: _buildCountryPicker(),
+              suffixIcon: const Padding(
+                padding: EdgeInsets.only(right: 12.0),
+                child: Icon(Icons.contact_phone_rounded, color: AppColors.primary, size: 24),
               ),
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          height: 60,
+          child: ElevatedButton(
+            onPressed: () => setState(() => _isOtpSent = true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text('Get OTP', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOtpView() {
+    return Column(
+      key: const ValueKey('otp_view'),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Verify your\nnumber',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 34,
+            fontWeight: FontWeight.bold,
+            height: 1.2,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Code is sent to $_selectedCountryCode ${_phoneController.text}',
+          style: const TextStyle(color: Colors.white60, fontSize: 14),
+        ),
+        const SizedBox(height: 40),
+        const Text(
+          'Enter 6-digit OTP',
+          style: TextStyle(color: Colors.white60, fontSize: 14),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: TextField(
+            controller: _otpController,
+            keyboardType: TextInputType.number,
+            maxLength: 6,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8, color: Colors.black),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              counterText: '',
+              contentPadding: EdgeInsets.symmetric(vertical: 18),
+              hintText: '******',
+              hintStyle: TextStyle(color: Colors.grey, letterSpacing: 8),
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        SizedBox(
+          width: double.infinity,
+          height: 60,
+          child: ElevatedButton(
+            onPressed: () {
+              if (_otpController.text.length >= 4) {
+                context.read<AuthBloc>().add(
+                  const LoginSubmitted(
+                    email: 'demo@example.com', // Using demo values as per legacy OTP page
+                    password: 'password123',
+                    role: LoginRole.user,
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter the verification code')),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            ),
+            child: const Text('Verify & Login', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            onPressed: () {},
+            child: const Text('Resend Code', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+          ),
+        ),
+      ],
     );
   }
 }

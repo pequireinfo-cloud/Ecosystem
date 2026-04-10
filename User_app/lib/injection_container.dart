@@ -7,6 +7,7 @@ import 'features/auth/domain/usecases/login_usecase.dart';
 import 'features/auth/domain/usecases/register_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'core/services/tracking_service.dart';
+import 'core/services/location_service.dart';
 
 final sl = GetIt.instance;
 
@@ -35,4 +36,5 @@ Future<void> init() async {
   // External
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => TrackingService());
+  sl.registerLazySingleton(() => LocationService());
 }

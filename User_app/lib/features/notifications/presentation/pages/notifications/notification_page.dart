@@ -8,9 +8,9 @@ class NotificationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.background,
         elevation: 0,
         leadingWidth: 70,
         leading: Padding(
@@ -55,14 +55,14 @@ class NotificationPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildNotificationItem(
             icon: Icons.account_balance_wallet_rounded,
-            color: const Color(0xFF7E57C2),
+            color: AppColors.primary,
             title: 'Payment Successful!',
             subtitle: 'You have made a services payment',
           ),
           const SizedBox(height: 16),
           _buildNotificationItem(
             icon: Icons.grid_view_rounded,
-            color: const Color(0xFFEF5350),
+            color: AppColors.accent,
             title: 'New Category Services!',
             subtitle: 'Now the plumbing service is available',
           ),
@@ -71,7 +71,7 @@ class NotificationPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildNotificationItem(
             icon: Icons.card_giftcard_rounded,
-            color: const Color(0xFFFFCA28),
+            color: AppColors.secondary,
             title: 'Today\'s Special Offers',
             subtitle: 'You get a special promo today!',
           ),
@@ -80,14 +80,14 @@ class NotificationPage extends StatelessWidget {
           const SizedBox(height: 16),
           _buildNotificationItem(
             icon: Icons.account_balance_wallet_rounded,
-            color: const Color(0xFF7E57C2),
+            color: AppColors.primary,
             title: 'Credit Card Connected!',
             subtitle: 'Credit Card has been linked!',
           ),
           const SizedBox(height: 16),
           _buildNotificationItem(
             icon: Icons.person_rounded,
-            color: const Color(0xFF42BCA3),
+            color: AppColors.accent,
             title: 'Account Setup Successful!',
             subtitle: 'Your account has been created!',
           ),

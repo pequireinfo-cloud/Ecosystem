@@ -52,4 +52,27 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Left(ServerFailure('An unexpected error occurred'));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateUserLocation({
+    required String userId,
+    required double lat,
+    required double lng,
+    required String address,
+  }) async {
+    try {
+      await remoteDataSource.updateUserLocation(
+        userId: userId,
+        lat: lat,
+        lng: lng,
+        address: address,
+      );
+      return const Right(null);
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'Failed to update location';
+      return Left(ServerFailure(message));
+    } catch (e) {
+      return const Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
 }

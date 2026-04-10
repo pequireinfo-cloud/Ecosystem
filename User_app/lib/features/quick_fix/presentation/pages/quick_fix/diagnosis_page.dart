@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'cost_breakdown_page.dart';
-
+import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 class DiagnosisPage extends StatelessWidget {
   final List<String> imageUrls;
   final String notes;
@@ -293,8 +293,7 @@ class DiagnosisPage extends StatelessWidget {
                                  context,
                                  MaterialPageRoute(
                                    builder: (context) => CostBreakdownPage(
-                                     imageUrls: imageUrls,
-                                     notes: notes,
+                                     session: BookingSession(category: 'Plumbing Services'),
                                    ),
                                  ),
                                );

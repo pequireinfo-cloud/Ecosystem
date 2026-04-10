@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import '../models/auth_model.dart';
 import '../../domain/entities/login_role.dart';
+import 'package:flutter/foundation.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthModel> login({
@@ -13,6 +14,13 @@ abstract class AuthRemoteDataSource {
     required String email,
     required String password,
     required LoginRole role,
+  });
+
+  Future<void> updateUserLocation({
+    required String userId,
+    required double lat,
+    required double lng,
+    required String address,
   });
 }
 
@@ -77,5 +85,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         ),
       );
     }
+  }
+
+  @override
+  Future<void> updateUserLocation({
+    required String userId,
+    required double lat,
+    required double lng,
+    required String address,
+  }) async {
+    // Mocking an API call to update user location
+    await Future.delayed(const Duration(milliseconds: 500));
+    debugPrint("Location updated for $userId to $address ($lat, $lng)");
   }
 }

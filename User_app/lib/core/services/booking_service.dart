@@ -36,4 +36,35 @@ class BookingService {
   Stream<DocumentSnapshot> watchBooking(String bookingId) {
     return _firestore.collection('bookings').doc(bookingId).snapshots();
   }
+
+  Future<void> updateBookingStatus(String bookingId, String status) async {
+    await _firestore.collection('bookings').doc(bookingId).update({
+      'status': status,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> submitDiagnosis({
+    required String bookingId,
+    required String applianceDetails,
+    required String problemDescription,
+    required double finalPrice,
+  }) async {
+    await _firestore.collection('bookings').doc(bookingId).update({
+      'status': 'waiting_approval',
+      'diagnosis': {
+        'appliance': applianceDetails,
+        'problem': problemDescription,
+      },
+      'finalPrice': finalPrice,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> approvePrice(String bookingId) async {
+    await _firestore.collection('bookings').doc(bookingId).update({
+      'status': 'working',
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

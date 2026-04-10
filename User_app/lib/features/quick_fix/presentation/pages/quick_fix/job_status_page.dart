@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
+import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_user_app/core/services/booking_service.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/widgets/diagnosis_approval_panel.dart';
 import 'chat_page.dart';
 import 'tracking_page.dart';
+import 'payment_page.dart';
 
 class JobStatusPage extends StatefulWidget {
-  final String bookingId;
-  const JobStatusPage({super.key, required this.bookingId});
+  final BookingSession session;
+  const JobStatusPage({super.key, required this.session});
 
   @override
   State<JobStatusPage> createState() => _JobStatusPageState();
@@ -16,49 +20,75 @@ class JobStatusPage extends StatefulWidget {
 class _JobStatusPageState extends State<JobStatusPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text('Job Status', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: BookingService().watchBooking(widget.bookingId),
+    return QuickFixBaseLayout(
+      title: 'Job Status',
+      initialSheetSize: 0.8,
+      child: StreamBuilder<DocumentSnapshot>(
+        stream: BookingService().watchBooking(widget.session.bookingId ?? ''),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: CircularProgressIndicator(),
+            ));
           }
           if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('Booking not found'));
+            return const Center(child: Padding(
+              padding: EdgeInsets.all(40.0),
+              child: Text('Booking details unavailable'),
+            ));
           }
 
           final data = snapshot.data!.data() as Map<String, dynamic>;
           final status = data['status'] ?? 'pending';
           final progress = data['progress'] ?? 'started';
-          final serviceType = data['serviceType'] ?? 'Service';
+          final diagnosis = data['diagnosis'] as Map<String, dynamic>?;
+          final finalPrice = (data['finalPrice'] ?? 0.0).toDouble();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+          // Handle Completion Navigation
+          if (status == 'completed' && mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.pushReplacement(
+                context, 
+                MaterialPageRoute(builder: (context) => PaymentPage(session: widget.session))
+              );
+            });
+          }
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildProviderCard(data),
-                const SizedBox(height: 32),
-                _buildStatusStepper(status, progress),
-                const SizedBox(height: 32),
-                const Text('SERVICE DETAILS', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1)),
-                const SizedBox(height: 16),
-                _buildInfoCard(Icons.settings_suggest_outlined, 'Service', serviceType),
                 const SizedBox(height: 12),
-                _buildInfoCard(Icons.location_on_outlined, 'Location', data['address'] ?? 'Nearby'),
+                _buildProviderCard(data),
+                const SizedBox(height: 24),
+                
+                // Dynamic Content based on Status
+                if (status == 'accepted') 
+                  _buildArrivalStatus(data)
+                else if (status == 'at_location' || status == 'diagnosing')
+                  _buildDiagnosingStatus()
+                else if (status == 'waiting_approval' && diagnosis != null)
+                  DiagnosisApprovalPanel(
+                    bookingId: widget.session.bookingId!,
+                    appliance: diagnosis['appliance'] ?? 'Appliance',
+                    problem: diagnosis['problem'] ?? 'Problem',
+                    finalPrice: finalPrice,
+                  )
+                else if (status == 'working')
+                   _buildWorkingStatus()
+                else
+                  _buildDefaultStatus(status, progress),
+
                 const SizedBox(height: 32),
-                if (status == 'completed' || progress.contains('photo'))
-                  _buildPhotoVerification(data),
+                const Divider(),
+                const SizedBox(height: 24),
+                
+                // SP Mock Buttons (Debug Only)
+                _buildDebugMocks(data),
+                
+                const SizedBox(height: 40),
               ],
             ),
           );
@@ -67,63 +97,131 @@ class _JobStatusPageState extends State<JobStatusPage> {
     );
   }
 
+  Widget _buildArrivalStatus(Map<String, dynamic> data) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+          ),
+          child: Column(
+            children: [
+              const Text('ARRIVAL OTP', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 2)),
+              const SizedBox(height: 12),
+              const Text(
+                '4 2 3 1',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8, color: Color(0xFF001233)),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'Share this with the professional once they arrive at your door',
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDiagnosingStatus() {
+    return Column(
+       children: [
+         const SizedBox(height: 20),
+         const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+         const SizedBox(height: 24),
+         const Text(
+           'Provider is Diagnosing...',
+           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF001233)),
+         ),
+         const SizedBox(height: 8),
+         const Text(
+           'They are inspecting your appliance to find the root cause.',
+           textAlign: TextAlign.center,
+           style: TextStyle(color: Colors.grey, fontSize: 14),
+         ),
+       ],
+    );
+  }
+
+  Widget _buildWorkingStatus() {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.green.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.green.withOpacity(0.1)),
+          ),
+          child: Column(
+            children: [
+              const Text('REPAIR IN PROGRESS', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 2)),
+              const SizedBox(height: 20),
+              const Icon(Icons.build_circle_rounded, color: Colors.green, size: 48),
+              const SizedBox(height: 20),
+              const Text('WORK OTP', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 10, letterSpacing: 2)),
+              const SizedBox(height: 8),
+              const Text('8 8 2 1', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 6, color: Color(0xFF001233))),
+              const SizedBox(height: 12),
+              const Text('Share this only once the work is completed to your satisfaction', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey, fontSize: 11)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDefaultStatus(String status, String progress) {
+    return _buildStatusStepper(status, progress);
+  }
+
   Widget _buildProviderCard(Map<String, dynamic> data) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.background,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
         children: [
           const CircleAvatar(
-            radius: 30,
-            backgroundColor: Color(0xFFF1F5F9),
-            child: Icon(Icons.person, size: 30, color: AppColors.primary),
+            radius: 28,
+            backgroundColor: Colors.white,
+            child: Icon(Icons.person, size: 28, color: AppColors.primary),
           ),
           const SizedBox(width: 16),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Professional Assigned', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                Text('Ramesh Kumar', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Ramesh Kumar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
+                Text('Verified Professional', style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatPage(bookingId: widget.bookingId),
-                ),
-              );
+          IconButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ChatPage(bookingId: widget.session.bookingId ?? '')));
             },
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-              child: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.primary),
-            ),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, color: AppColors.primary),
+            style: IconButton.styleFrom(backgroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
           ),
-          const SizedBox(width: 8),
-          if (data['status'] == 'accepted')
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TrackingPage(bookingId: widget.bookingId),
-                  ),
-                );
+          if (data['status'] == 'accepted') ...[
+            const SizedBox(width: 8),
+            IconButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => TrackingPage(session: widget.session)));
               },
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: Colors.blue.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-                child: const Icon(Icons.map_outlined, color: Colors.blue),
-              ),
+              icon: const Icon(Icons.map_outlined, color: AppColors.primary),
+              style: IconButton.styleFrom(backgroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
             ),
+          ],
         ],
       ),
     );
@@ -132,8 +230,8 @@ class _JobStatusPageState extends State<JobStatusPage> {
   Widget _buildStatusStepper(String status, String progress) {
     int currentStep = 0;
     if (status == 'accepted') currentStep = 1;
-    if (progress == 'arrived') currentStep = 2;
-    if (progress.contains('working') || progress.contains('photo')) currentStep = 3;
+    if (status == 'at_location') currentStep = 2;
+    if (status == 'working') currentStep = 3;
     if (status == 'completed') currentStep = 4;
 
     return Column(
@@ -154,80 +252,58 @@ class _JobStatusPageState extends State<JobStatusPage> {
   Widget _stepperRow(String label, bool isDone) {
     return Row(
       children: [
-        Icon(isDone ? Icons.check_circle : Icons.circle_outlined, color: isDone ? Colors.green : Colors.grey[300]),
+        Icon(isDone ? Icons.check_circle_rounded : Icons.radio_button_off_rounded, color: isDone ? Colors.green : Colors.grey.shade300, size: 22),
         const SizedBox(width: 16),
-        Text(label, style: TextStyle(fontWeight: isDone ? FontWeight.bold : FontWeight.normal, color: isDone ? Colors.black : Colors.grey)),
+        Text(label, style: TextStyle(fontWeight: isDone ? FontWeight.bold : FontWeight.normal, color: isDone ? const Color(0xFF001233) : Colors.grey, fontSize: 14)),
       ],
     );
   }
 
   Widget _stepperDivider(bool isDone) {
     return Container(
-      margin: const EdgeInsets.only(left: 11),
-      height: 24,
+      margin: const EdgeInsets.only(left: 10),
+      height: 20,
       width: 2,
-      color: isDone ? Colors.green : Colors.grey[200],
+      color: isDone ? Colors.green : Colors.grey.shade200,
     );
   }
 
-  Widget _buildInfoCard(IconData icon, String label, String value) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-      child: Row(
-        children: [
-          Icon(icon, color: Colors.grey, size: 20),
-          const SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhotoVerification(Map<String, dynamic> data) {
+  Widget _buildDebugMocks(Map<String, dynamic> data) {
+    final status = data['status'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('QUALITY VERIFICATION', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1)),
-        const SizedBox(height: 16),
-        Row(
+        const Text('DEBUG: SP SIMULATOR', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 10)),
+        const SizedBox(height: 12),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
           children: [
-            _photoPreview('Before', data['progress']?.contains('before') ?? false),
-            const SizedBox(width: 16),
-            _photoPreview('After', data['status'] == 'completed'),
+            ElevatedButton(
+              onPressed: () => BookingService().updateBookingStatus(widget.session.bookingId!, 'at_location'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade200, foregroundColor: Colors.black87, elevation: 0),
+              child: const Text('SP: Arrived', style: TextStyle(fontSize: 12)),
+            ),
+            ElevatedButton(
+              onPressed: () => BookingService().submitDiagnosis(
+                bookingId: widget.session.bookingId!,
+                applianceDetails: widget.session.category ?? 'Appliance',
+                problemDescription: 'Motor bearing failure - Needs lubrication and part replacement',
+                finalPrice: 850,
+              ),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade200, foregroundColor: Colors.black87, elevation: 0),
+              child: const Text('SP: Diagnosed', style: TextStyle(fontSize: 12)),
+            ),
+            ElevatedButton(
+              onPressed: () => BookingService().updateBookingStatus(widget.session.bookingId!, 'completed'),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade200, foregroundColor: Colors.black87, elevation: 0),
+              child: const Text('SP: Finished', style: TextStyle(fontSize: 12)),
+            ),
           ],
         ),
       ],
     );
   }
-
-  Widget _photoPreview(String label, bool isAvailable) {
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
-            ),
-            child: Center(
-              child: isAvailable 
-                ? const Icon(Icons.image, color: Colors.green, size: 30)
-                : const Icon(Icons.image_not_supported_outlined, color: Colors.grey, size: 30),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
 }
+
+

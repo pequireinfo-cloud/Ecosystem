@@ -15,4 +15,11 @@ abstract class AuthRepository {
     required String password,
     required LoginRole role,
   });
+
+  Future<Either<Failure, void>> updateUserLocation({
+    required String userId,
+    required double lat,
+    required double lng,
+    required String address,
+  });
 }

@@ -6,6 +6,9 @@ class AuthModel extends UserEntity {
     required super.id,
     required super.email,
     required super.role,
+    super.lastLat,
+    super.lastLng,
+    super.lastAddress,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
@@ -13,6 +16,9 @@ class AuthModel extends UserEntity {
       id: json['id'],
       email: json['email'],
       role: _parseRole(json['role']),
+      lastLat: json['lastLat']?.toDouble(),
+      lastLng: json['lastLng']?.toDouble(),
+      lastAddress: json['lastAddress'],
     );
   }
 
@@ -21,6 +27,9 @@ class AuthModel extends UserEntity {
       'id': id,
       'email': email,
       'role': role.toString().split('.').last,
+      'lastLat': lastLat,
+      'lastLng': lastLng,
+      'lastAddress': lastAddress,
     };
   }
 

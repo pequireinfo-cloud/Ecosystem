@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
-import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/confirm_location_page.dart';
-
+import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/select_problem_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/laundry_setup_page.dart';
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
 
@@ -12,48 +13,36 @@ class CategoriesPage extends StatelessWidget {
         'icon': Icons.plumbing_rounded,
         'label': 'Plumbing Services',
         'description': 'Expert repairs for leaks, pipes, and installations. Available 24/7.',
-        'color': const Color(0xFF2196F3)
+        'color': AppColors.primary
       },
       {
         'icon': Icons.electrical_services_rounded,
         'label': 'Electrical Works',
         'description': 'Professional wiring, fuse fixes, and appliance setup by certified experts.',
-        'color': const Color(0xFFFF9800)
+        'color': AppColors.secondary
       },
       {
         'icon': Icons.local_laundry_service_rounded,
         'label': 'Laundry & Dry Clean',
         'description': 'Premium care for your clothes. Wash, fold, and iron with doorstep delivery.',
-        'color': const Color(0xFF9C27B0)
+        'color': AppColors.primary
       },
       {
         'icon': Icons.carpenter_rounded,
         'label': 'Carpentry',
         'description': 'Custom furniture repair and woodwork from skilled craftsmen.',
-        'color': const Color(0xFF795548)
-      },
-      {
-        'icon': Icons.format_paint_rounded,
-        'label': 'Painting & Deco',
-        'description': 'Give your home a fresh look with our professional interior and exterior painting.',
-        'color': const Color(0xFFE91E63)
-      },
-      {
-        'icon': Icons.cleaning_services_rounded,
-        'label': 'Home Cleaning',
-        'description': 'Deep cleaning for every corner. Eco-friendly products and thorough service.',
-        'color': const Color(0xFF4CAF50)
+        'color': AppColors.secondary
       },
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FE),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           'All Categories',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        backgroundColor: const Color(0xFFF8F9FE),
+        backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
@@ -61,92 +50,142 @@ class CategoriesPage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(20),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680), // Perfect width for list views
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            itemCount: categories.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              return _AnimatedCategoryListTile(category: categories[index]);
+            },
+          ),
         ),
-        itemCount: categories.length,
-        itemBuilder: (context, index) {
-          final category = categories[index];
-          final color = category['color'] as Color;
-          
-          return Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(28),
-              boxShadow: [
-                BoxShadow(
-                  color: color.withOpacity(0.06),
-                  blurRadius: 15,
-                  offset: const Offset(0, 8),
-                ),
-              ],
+      ),
+    );
+  }
+}
+
+class _AnimatedCategoryListTile extends StatefulWidget {
+  final Map<String, dynamic> category;
+
+  const _AnimatedCategoryListTile({required this.category});
+
+  @override
+  State<_AnimatedCategoryListTile> createState() => _AnimatedCategoryListTileState();
+}
+
+class _AnimatedCategoryListTileState extends State<_AnimatedCategoryListTile> {
+  bool _isHovering = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = widget.category['color'] as Color;
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovering = true),
+      onExit: (_) => setState(() => _isHovering = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: () {
+          final session = BookingSession(category: widget.category['label'] as String);
+          if (session.category == 'Laundry & Dry Clean') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => LaundrySetupPage(session: session)));
+          } else {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => SelectProblemPage(session: session)));
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          transform: Matrix4.identity()
+            ..scale(_isPressed ? 0.98 : (_isHovering ? 1.02 : 1.0)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: _isHovering ? color.withOpacity(0.3) : Colors.transparent,
+              width: 1.5,
             ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ConfirmLocationPage(
-                        serviceType: category['label'] as String,
-                        suggestedPrice: 400, // Base price for standard category
-                      ),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(28),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(_isHovering ? 0.12 : 0.04),
+                blurRadius: _isHovering ? 20 : 10,
+                offset: Offset(0, _isHovering ? 8 : 4),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(_isHovering ? 0.15 : 0.08),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    widget.category['icon'] as IconData,
+                    color: color,
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                Expanded(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          category['icon'] as IconData,
-                          color: color,
-                          size: 30,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       Text(
-                        category['label'] as String,
+                        widget.category['label'] as String,
                         style: const TextStyle(
-                          fontSize: 15,
+                          fontSize: 17,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
+                          letterSpacing: -0.3,
                         ),
-                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       Text(
-                        category['description'] as String,
-                        style: TextStyle(
-                          fontSize: 11,
+                        widget.category['description'] as String,
+                        style: const TextStyle(
+                          fontSize: 13,
                           color: Colors.black54,
-                          height: 1.3,
+                          height: 1.4,
                         ),
-                        textAlign: TextAlign.center,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(width: 16),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: _isHovering ? color.withOpacity(0.1) : const Color(0xFFF8F9FE),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_ios_rounded,
+                    color: _isHovering ? color : Colors.black38,
+                    size: 16,
+                  ),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

@@ -8,10 +8,17 @@ import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart'
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/provider_detail_page.dart';
 import 'profile_tab.dart';
 import 'categories_page.dart';
+import 'quick_fix_categories_page.dart';
 import 'emergency_sos_page.dart';
 import 'subscription_page.dart';
 import 'package:pequire_user_app/features/notifications/presentation/pages/notifications/notification_page.dart';
+import 'location_picker_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
+import 'package:pequire_user_app/core/services/location_service.dart';
+import 'package:pequire_user_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:pequire_user_app/injection_container.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class HomeTab extends StatefulWidget {
   final UserEntity user;
@@ -25,7 +32,62 @@ class _HomeTabState extends State<HomeTab> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   bool _isFabOpen = false;
-  String _currentLocation = 'Washington DC';
+  String _currentLocation = 'Detecting location...';
+  LatLng? _currentPosition;
+
+  @override
+  void initState() {
+    super.initState();
+    _initLocation();
+  }
+
+  Future<void> _initLocation() async {
+    setState(() {
+      _currentLocation = 'Detecting location...';
+    });
+    
+    try {
+      final locationService = sl<LocationService>();
+      final position = await locationService.getCurrentLocation().timeout(
+        const Duration(seconds: 10),
+        onTimeout: () => throw Exception('Timeout'),
+      );
+      
+      if (position != null) {
+        final address = await locationService.getAddressFromLatLng(position.latitude, position.longitude);
+        if (mounted) {
+          setState(() {
+            _currentPosition = LatLng(position.latitude, position.longitude);
+            _currentLocation = address;
+          });
+          _updateBackendLocation(position.latitude, position.longitude, address);
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _currentLocation = 'Tap to set location';
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Location initialization error: $e");
+      if (mounted) {
+        setState(() {
+          _currentLocation = 'Tap to set location';
+        });
+      }
+    }
+  }
+
+  Future<void> _updateBackendLocation(double lat, double lng, String address) async {
+    final authRepository = sl<AuthRepository>();
+    await authRepository.updateUserLocation(
+      userId: widget.user.id,
+      lat: lat,
+      lng: lng,
+      address: address,
+    );
+  }
 
   @override
   void dispose() {
@@ -37,7 +99,6 @@ class _HomeTabState extends State<HomeTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      floatingActionButton: _buildPremiumFAB(),
       body: SafeArea(
         child: Stack(
           children: [
@@ -46,31 +107,14 @@ class _HomeTabState extends State<HomeTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildHeader(context),
-                  const SizedBox(height: 8),
-                  _buildPremiumSearchBar(),
-                  const SizedBox(height: 24),
-                  _buildSubscriptionBanner(context),
-                  const SizedBox(height: 28),
+                  const SizedBox(height: 16),
                   _buildRecommendedSection(),
                   const SizedBox(height: 32),
                   _buildCategories(),
-                  const SizedBox(height: 32),
-                  _buildFeaturedSection(context),
-                  const SizedBox(height: 32),
-                  _buildNearbySection(context),
                   const SizedBox(height: 24),
                 ],
               ),
             ),
-            if (_isFabOpen)
-              GestureDetector(
-                onTap: () => setState(() => _isFabOpen = false),
-                child: Container(
-                  color: Colors.black.withOpacity(0.3),
-                  width: double.infinity,
-                  height: double.infinity,
-                ),
-              ),
           ],
         ),
       ),
@@ -92,15 +136,15 @@ class _HomeTabState extends State<HomeTab> {
           _buildFabOption(
             icon: Icons.mic_none_rounded,
             color: AppColors.primary,
-            label: 'Voice Request',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptureIssuePage())),
+            label: 'Voice Request (Beta)',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuickFixCategoriesPage())),
           ),
           const SizedBox(height: 16),
           _buildFabOption(
             icon: Icons.camera_alt_outlined,
             color: AppColors.secondary,
-            label: 'Photo Request',
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const CaptureIssuePage(autoProceed: true))),
+            label: 'Quick Fix Request',
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QuickFixCategoriesPage())),
           ),
           const SizedBox(height: 16),
         ],
@@ -167,7 +211,13 @@ class _HomeTabState extends State<HomeTab> {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.secondary),
+                      if (_currentLocation == 'Detecting...' || _currentLocation == 'Detecting location...')
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8),
+                          child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.black54)),
+                        )
+                      else
+                        Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.secondary),
                     ],
                   ),
                 ],
@@ -183,73 +233,25 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  void _showLocationPicker(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.6,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 24),
-            const Text('Change Location', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 24),
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'Search for building, area or street...',
-                prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
-              ),
-            ),
-            const SizedBox(height: 24),
-            ListTile(
-              onTap: () {
-                setState(() => _currentLocation = 'Current Location');
-                Navigator.pop(context);
-              },
-              leading: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
-                child: const Icon(Icons.my_location_rounded, color: AppColors.primary, size: 20),
-              ),
-              title: const Text('Use Current Location', style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: const Text('Detect your precise current location'),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
-            ),
-            const Divider(height: 32),
-            const Text('SAVED ADDRESSES', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2)),
-            const SizedBox(height: 8),
-            _buildLocationItem('Home', '123, Luxury Villas, Beverly Hills', Icons.home_rounded),
-            _buildLocationItem('Work', 'Block C, Tech Park, Silicon Valley', Icons.work_rounded),
-          ],
-        ),
-      ),
+  void _showLocationPicker(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LocationPickerPage()),
     );
-  }
 
-  Widget _buildLocationItem(String label, String address, IconData icon) {
-    return ListTile(
-      onTap: () {
-        setState(() => _currentLocation = address);
-        Navigator.pop(context);
-      },
-      leading: Container(
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(color: Colors.grey.shade100, shape: BoxShape.circle),
-        child: Icon(icon, color: Colors.black87, size: 20),
-      ),
-      title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-      subtitle: Text(address, style: const TextStyle(fontSize: 12)),
-    );
+    if (result == 'CURRENT_LOCATION') {
+      await _initLocation();
+    } else if (result == 'SELECT_ON_MAP') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Map selection coming soon!')));
+    } else if (result is LocationResult) {
+      if (mounted) {
+        setState(() {
+          _currentLocation = result.address;
+          _currentPosition = result.position;
+        });
+        _updateBackendLocation(result.position.latitude, result.position.longitude, result.address);
+      }
+    }
   }
 
   Widget _buildGlassButton({required Widget child, VoidCallback? onTap}) {
@@ -352,12 +354,12 @@ class _HomeTabState extends State<HomeTab> {
             gradient: const LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6366F1), Color(0xFF4338CA)],
+              colors: [AppColors.primary, AppColors.secondary],
             ),
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFF6366F1).withOpacity(0.3),
+                color: AppColors.primary.withOpacity(0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               ),
@@ -389,7 +391,7 @@ class _HomeTabState extends State<HomeTab> {
                 ),
                 child: const Text(
                   'Explore',
-                  style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold, fontSize: 12),
+                  style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12),
                 ),
               ),
             ],
@@ -454,13 +456,13 @@ class _HomeTabState extends State<HomeTab> {
       {
         'title': 'Spring Deep Cleaning',
         'subtitle': 'Get 20% off on your first home cleaning',
-        'color': const Color(0xFF6366F1),
+        'color': AppColors.primary,
         'image': Icons.auto_awesome,
       },
       {
         'title': 'AC Service Special',
         'subtitle': 'Expert maintenance for summer comfort',
-        'color': const Color(0xFF10B981),
+        'color': AppColors.accent,
         'image': Icons.ac_unit_rounded,
       },
     ];
@@ -543,12 +545,10 @@ class _HomeTabState extends State<HomeTab> {
 
   Widget _buildCategories() {
     final categories = [
-      {'icon': Icons.plumbing_rounded, 'label': 'Plumber', 'color': const Color(0xFF2196F3)},
-      {'icon': Icons.electrical_services_rounded, 'label': 'Electrician', 'color': const Color(0xFFFF9800)},
-      {'icon': Icons.local_laundry_service_rounded, 'label': 'Laundry', 'color': const Color(0xFF9C27B0)},
-      {'icon': Icons.carpenter_rounded, 'label': 'Carpenter', 'color': const Color(0xFF795548)},
-      {'icon': Icons.format_paint_rounded, 'label': 'Painter', 'color': const Color(0xFFE91E63)},
-      {'icon': Icons.cleaning_services_rounded, 'label': 'Cleaner', 'color': const Color(0xFF4CAF50)},
+      {'icon': Icons.plumbing_rounded, 'label': 'Plumber', 'color': AppColors.primary},
+      {'icon': Icons.electrical_services_rounded, 'label': 'Electrician', 'color': AppColors.secondary},
+      {'icon': Icons.local_laundry_service_rounded, 'label': 'Laundry', 'color': AppColors.primary},
+      {'icon': Icons.carpenter_rounded, 'label': 'Carpenter', 'color': AppColors.secondary},
     ];
 
     return Column(
