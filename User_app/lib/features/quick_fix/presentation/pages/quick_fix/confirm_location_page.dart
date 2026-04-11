@@ -99,7 +99,7 @@ class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Confirm Location',
-      initialSheetSize: 0.7,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

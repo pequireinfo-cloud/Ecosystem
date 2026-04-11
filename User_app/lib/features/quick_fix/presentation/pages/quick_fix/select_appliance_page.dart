@@ -35,7 +35,7 @@ class _SelectAppliancePageState extends State<SelectAppliancePage> {
 
     return QuickFixBaseLayout(
       title: 'Select Appliance',
-      initialSheetSize: 0.75,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

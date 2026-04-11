@@ -15,7 +15,7 @@ class CostBreakdownPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Review Booking',
-      initialSheetSize: 0.7,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

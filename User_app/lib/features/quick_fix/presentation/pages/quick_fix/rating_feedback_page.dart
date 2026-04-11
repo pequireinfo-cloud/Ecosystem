@@ -19,7 +19,7 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Rate Experience',
-      initialSheetSize: 0.75,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

@@ -47,7 +47,7 @@ class _LaundrySetupPageState extends State<LaundrySetupPage> {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Laundry Setup',
-      initialSheetSize: 0.85,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

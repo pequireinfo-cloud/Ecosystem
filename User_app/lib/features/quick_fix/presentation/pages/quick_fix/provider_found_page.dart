@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
@@ -13,7 +12,7 @@ class ProviderFoundPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Professional Assigned',
-      initialSheetSize: 0.65,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

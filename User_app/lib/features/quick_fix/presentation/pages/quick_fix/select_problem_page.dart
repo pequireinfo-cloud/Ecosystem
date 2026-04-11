@@ -35,7 +35,7 @@ class _SelectProblemPageState extends State<SelectProblemPage> {
 
     return QuickFixBaseLayout(
       title: 'Select Problem',
-      initialSheetSize: 0.65,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

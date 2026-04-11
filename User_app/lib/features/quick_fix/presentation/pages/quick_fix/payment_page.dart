@@ -44,7 +44,7 @@ class _PaymentPageState extends State<PaymentPage> {
 
         return QuickFixBaseLayout(
           title: isFinalPayment ? 'Final Payment' : 'Select Payment Method',
-          initialSheetSize: 0.75,
+          initialSheetSize: 0.8,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0),
             child: Column(

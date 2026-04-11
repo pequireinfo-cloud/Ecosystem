@@ -36,7 +36,7 @@ class _SearchingProviderPageState extends State<SearchingProviderPage> {
   Widget build(BuildContext context) {
     return QuickFixBaseLayout(
       title: 'Finding Professional',
-      initialSheetSize: 0.35,
+      initialSheetSize: 0.8,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
