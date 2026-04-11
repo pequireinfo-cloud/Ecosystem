@@ -37,6 +37,7 @@ class QuickFixCategoriesPage extends StatelessWidget {
     return QuickFixBaseLayout(
       title: 'Quick Fix',
       initialSheetSize: 0.8,
+      sheetColor: const Color(0xFF001233),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
@@ -46,7 +47,7 @@ class QuickFixCategoriesPage extends StatelessWidget {
             const Text(
               'Book your service',
               style: TextStyle(
-                color: Color(0xFF001233),
+                color: Colors.white,
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
                 height: 1.1,
@@ -56,7 +57,7 @@ class QuickFixCategoriesPage extends StatelessWidget {
             const Text(
               'Verified professionals at your doorstep',
               style: TextStyle(
-                color: Colors.grey,
+                color: Colors.white60,
                 fontSize: 14,
               ),
             ),
@@ -66,7 +67,7 @@ class QuickFixCategoriesPage extends StatelessWidget {
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF001233),
+                color: Colors.white70,
               ),
             ),
             const SizedBox(height: 16),

@@ -8,6 +8,7 @@ class QuickFixBaseLayout extends StatelessWidget {
   final double initialSheetSize;
   final double minSheetSize;
   final double maxSheetSize;
+  final Color? sheetColor;
 
   const QuickFixBaseLayout({
     super.key,
@@ -17,6 +18,7 @@ class QuickFixBaseLayout extends StatelessWidget {
     this.initialSheetSize = 0.5,
     this.minSheetSize = 0.3,
     this.maxSheetSize = 0.9,
+    this.sheetColor,
   });
 
   @override
@@ -104,15 +106,16 @@ class QuickFixBaseLayout extends StatelessWidget {
             minChildSize: minSheetSize,
             maxChildSize: maxSheetSize,
             builder: (context, scrollController) {
+              final isDark = (sheetColor ?? Colors.white).computeLuminance() < 0.5;
               return Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+                decoration: BoxDecoration(
+                  color: sheetColor ?? Colors.white,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: Colors.black.withOpacity(0.1),
                       blurRadius: 20,
-                      offset: Offset(0, -5),
+                      offset: const Offset(0, -5),
                     ),
                   ],
                 ),
@@ -124,7 +127,7 @@ class QuickFixBaseLayout extends StatelessWidget {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: isDark ? Colors.white24 : Colors.grey.shade300,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
