@@ -100,6 +100,20 @@ class _ConfirmLocationPageState extends State<ConfirmLocationPage> {
     return QuickFixBaseLayout(
       title: 'Confirm Location',
       initialSheetSize: 0.8,
+      background: Stack(
+        children: [
+          GoogleMap(
+            initialCameraPosition: CameraPosition(target: _currentPosition, zoom: 16),
+            onMapCreated: (controller) => _mapController = controller,
+            myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            zoomControlsEnabled: false,
+            mapToolbarEnabled: false,
+          ),
+          if (_isLoadingLocation)
+            const Center(child: CircularProgressIndicator()),
+        ],
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class QuickFixBaseLayout extends StatelessWidget {
   final Widget child;
@@ -8,6 +7,7 @@ class QuickFixBaseLayout extends StatelessWidget {
   final double initialSheetSize;
   final double minSheetSize;
   final double maxSheetSize;
+  final Widget? background;
   final Color? sheetColor;
 
   const QuickFixBaseLayout({
@@ -17,7 +17,8 @@ class QuickFixBaseLayout extends StatelessWidget {
     this.onBack,
     this.initialSheetSize = 0.5,
     this.minSheetSize = 0.3,
-    this.maxSheetSize = 0.9,
+    this.maxSheetSize = 0.95,
+    this.background,
     this.sheetColor,
   });
 
@@ -26,9 +27,9 @@ class QuickFixBaseLayout extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // Background Map Layer
+          // Background Layer (Real Map or Dummy Map)
           Positioned.fill(
-            child: Container(
+            child: background ?? Container(
               color: Colors.grey.shade200,
               child: Center(
                 child: Column(
@@ -100,11 +101,12 @@ class QuickFixBaseLayout extends StatelessWidget {
             ),
           ),
 
-          // Foregound content in a Draggable Bottom Sheet
           DraggableScrollableSheet(
             initialChildSize: initialSheetSize,
             minChildSize: minSheetSize,
             maxChildSize: maxSheetSize,
+            snap: true,
+            snapSizes: const [0.35, 0.8, 0.95],
             builder: (context, scrollController) {
               final isDark = (sheetColor ?? Colors.white).computeLuminance() < 0.5;
               return Container(

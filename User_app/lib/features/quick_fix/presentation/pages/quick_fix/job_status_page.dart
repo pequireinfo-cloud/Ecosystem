@@ -4,6 +4,7 @@ import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_f
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_user_app/core/services/booking_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/diagnosis_approval_panel.dart';
 import 'chat_page.dart';
 import 'tracking_page.dart';
@@ -23,6 +24,7 @@ class _JobStatusPageState extends State<JobStatusPage> {
     return QuickFixBaseLayout(
       title: 'Job Status',
       initialSheetSize: 0.8,
+      background: TrackerMapContainer(session: widget.session),
       child: StreamBuilder<DocumentSnapshot>(
         stream: BookingService().watchBooking(widget.session.bookingId ?? ''),
         builder: (context, snapshot) {
@@ -302,6 +304,34 @@ class _JobStatusPageState extends State<JobStatusPage> {
           ],
         ),
       ],
+    );
+  }
+}
+
+class TrackerMapContainer extends StatelessWidget {
+  final BookingSession session;
+  const TrackerMapContainer({super.key, required this.session});
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+      initialCameraPosition: const CameraPosition(
+        target: LatLng(28.6139, 77.2090),
+        zoom: 14,
+      ),
+      myLocationEnabled: true,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      circles: {
+        Circle(
+          circleId: const CircleId('service_area'),
+          center: const LatLng(28.6139, 77.2090),
+          radius: 500,
+          fillColor: AppColors.primary.withOpacity(0.1),
+          strokeColor: AppColors.primary.withOpacity(0.3),
+          strokeWidth: 2,
+        ),
+      },
     );
   }
 }

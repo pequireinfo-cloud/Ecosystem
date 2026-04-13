@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
@@ -15,7 +16,13 @@ class TrackingPage extends StatelessWidget {
     return QuickFixBaseLayout(
       title: 'Booking Confirmed',
       onBack: () => Navigator.of(context).popUntil((route) => route.isFirst),
-      initialSheetSize: 0.6,
+      initialSheetSize: 0.8,
+      background: GoogleMap(
+        initialCameraPosition: const CameraPosition(target: LatLng(28.6139, 77.2090), zoom: 14),
+        myLocationEnabled: true,
+        zoomControlsEnabled: false,
+        mapToolbarEnabled: false,
+      ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
