@@ -84,7 +84,7 @@ class DiagnosisApprovalPanel extends StatelessWidget {
               );
 
               try {
-                await BookingService().approvePrice(bookingId);
+                await BookingService().approveDiagnosis(bookingId);
                 if (context.mounted) Navigator.pop(context); // Close loading
               } catch (e) {
                 if (context.mounted) {

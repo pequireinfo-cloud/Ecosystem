@@ -1,65 +1,77 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'firebase_service.dart';
+import 'package:pequire_provider_app/core/services/api_service.dart';
 
 class BookingService {
   static final BookingService _instance = BookingService._internal();
   factory BookingService() => _instance;
   BookingService._internal();
 
-  final _firestore = FirebaseService().firestore;
-  final _auth = FirebaseService().auth;
-
-  /// Listen for bookings searching for a provider
-  Stream<QuerySnapshot> listenForBookings() {
-    return _firestore
-        .collection('bookings')
-        .where('status', isEqualTo: 'pending')
-        // In a real app, you'd filter by category and location
-        .snapshots();
+  /// Fetch pending bookings for the professional
+  Future<List<Map<String, dynamic>>> getPendingBookings() async {
+    try {
+      final response = await ApiService().get('/bookings');
+      final List data = response.data;
+      // Filter the list for pending bookings
+      return data.cast<Map<String, dynamic>>().where((b) => b['status'] == 'pending').toList();
+    } catch (e) {
+      print('Error fetching bookings: $e');
+      return [];
+    }
   }
 
   /// Accept a booking request
-  Future<void> acceptBooking(String bookingId) async {
-    final user = _auth.currentUser;
-    // For demo/ecosystem check, we can allow even if user is null if we want to mock it
-    // but better to use uid if available.
-    final uid = user?.uid ?? 'temp_provider_456';
-
-    await _firestore.collection('bookings').doc(bookingId).update({
-      'providerId': uid,
-      'status': 'accepted',
-      'acceptedAt': FieldValue.serverTimestamp(),
-    });
-    
-    // Also update provider status
-    await _firestore.collection('providers').doc(uid).update({
-      'activeBookingId': bookingId,
-      'isAvailable': false,
-    });
+  Future<void> acceptBooking(String bookingId, String providerId) async {
+    try {
+      await ApiService().put('/bookings/$bookingId/accept', data: {
+        'providerId': providerId,
+      });
+    } catch (e) {
+      print('Error accepting booking: $e');
+      rethrow;
+    }
   }
 
-  /// Update job progress with granular steps
-  Future<void> updateJobProgress(String bookingId, String step) async {
-    await _firestore.collection('bookings').doc(bookingId).update({
-      'progress': step,
-      'lastUpdatedAt': FieldValue.serverTimestamp(),
-    });
+  /// Verify the Arrival OTP from the user
+  Future<void> verifyArrivalOtp(String bookingId, String otp) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/verify-arrival', data: {
+        'otp': otp,
+      });
+    } catch (e) {
+      print('Error verifying arrival OTP: $e');
+      rethrow;
+    }
   }
 
-  /// Mark a booking as completed
-  Future<void> completeBooking(String bookingId) async {
-    final user = _auth.currentUser;
-    final uid = user?.uid ?? 'temp_provider_456';
+  /// Submit diagnosis and final price
+  Future<void> submitDiagnosis({
+    required String bookingId,
+    required String appliance,
+    required String problem,
+    required String solution,
+    required double price,
+  }) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/diagnosis', data: {
+        'appliance': appliance,
+        'problem': problem,
+        'solution': solution,
+        'price': price,
+      });
+    } catch (e) {
+      print('Error submitting diagnosis: $e');
+      rethrow;
+    }
+  }
 
-    await _firestore.collection('bookings').doc(bookingId).update({
-      'status': 'completed',
-      'completedAt': FieldValue.serverTimestamp(),
-    });
-
-    // Free up the provider
-    await _firestore.collection('providers').doc(uid).update({
-      'activeBookingId': null,
-      'isAvailable': true,
-    });
+  /// Verify the Work Completion OTP from the user
+  Future<void> verifyWorkOtp(String bookingId, String otp) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/verify-work', data: {
+        'otp': otp,
+      });
+    } catch (e) {
+      print('Error verifying work OTP: $e');
+      rethrow;
+    }
   }
 }

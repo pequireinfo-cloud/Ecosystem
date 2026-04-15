@@ -2,32 +2,95 @@ const bookingService = require('../services/bookingService');
 
 exports.createBooking = async (req, res) => {
   try {
-    const { userId, serviceCategory, problemDescription, location } = req.body;
-    
-    const newBooking = await bookingService.createBooking({
-      userId,
-      serviceCategory,
-      problemDescription,
-      location
-    });
-
-    res.status(201).json({ 
-      message: 'Booking created successfully', 
-      booking: newBooking 
-    });
+    const { userId, serviceType, problemDescription, location, estimatedPrice } = req.body;
+    const newBooking = await bookingService.createBooking({ userId, serviceType, problemDescription, location, estimatedPrice });
+    res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
   } catch (error) {
-    console.error('Create booking error:', error);
-    res.status(500).json({ error: error.message || 'Failed to create booking' });
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.acceptBooking = async (req, res) => {
+  try {
+    const { providerId } = req.body;
+    const booking = await bookingService.acceptBooking(req.params.id, providerId);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.verifyArrival = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const booking = await bookingService.verifyArrival(req.params.id, otp);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.submitDiagnosis = async (req, res) => {
+  try {
+    const booking = await bookingService.submitDiagnosis(req.params.id, req.body);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.approveDiagnosis = async (req, res) => {
+  try {
+    const booking = await bookingService.approveDiagnosis(req.params.id);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.verifyWork = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    const booking = await bookingService.verifyWork(req.params.id, otp);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+exports.submitFeedback = async (req, res) => {
+  try {
+    const { rating, feedback } = req.body;
+    const booking = await bookingService.submitFeedback(req.params.id, rating, feedback);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getAllBookings = async (req, res) => {
+  try {
+    const bookings = await bookingService.getAllBookings();
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.getBookingById = async (req, res) => {
+  try {
+    const booking = await bookingService.getBookingById(req.params.id);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 
 exports.getUserBookings = async (req, res) => {
   try {
-    const { userId } = req.params;
-    const bookings = await bookingService.getUserBookings(userId);
+    const bookings = await bookingService.getUserBookings(req.params.userId);
     res.status(200).json(bookings);
   } catch (error) {
-    console.error('Get bookings error:', error);
-    res.status(500).json({ error: error.message || 'Failed to retrieve bookings' });
+    res.status(500).json({ error: error.message });
   }
 };

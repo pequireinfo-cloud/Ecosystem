@@ -6,33 +6,60 @@ import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix
 
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
 
-class QuickFixCategoriesPage extends StatelessWidget {
+import 'package:pequire_user_app/core/services/api_service.dart';
+
+class QuickFixCategoriesPage extends StatefulWidget {
   const QuickFixCategoriesPage({super.key});
 
   @override
+  State<QuickFixCategoriesPage> createState() => _QuickFixCategoriesPageState();
+}
+
+class _QuickFixCategoriesPageState extends State<QuickFixCategoriesPage> {
+  late Future<List<Map<String, dynamic>>> _categoriesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _categoriesFuture = _fetchCategories();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchCategories() async {
+    try {
+      final response = await ApiService().get('/categories');
+      final List data = response.data;
+      return data.map((cat) => {
+        'id': cat['_id'],
+        'label': cat['name'],
+        'icon': _getIconForCategory(cat['name']),
+        'color': _getColorForCategory(cat['name']),
+        'description': cat['description']
+      }).toList();
+    } catch (e) {
+      debugPrint('Error fetching categories: $e');
+      return [];
+    }
+  }
+
+  IconData _getIconForCategory(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('plumb')) return Icons.plumbing_rounded;
+    if (n.contains('electr')) return Icons.electrical_services_rounded;
+    if (n.contains('clean')) return Icons.cleaning_services_rounded;
+    if (n.contains('laundry')) return Icons.local_laundry_service_rounded;
+    if (n.contains('carpent')) return Icons.carpenter_rounded;
+    return Icons.home_repair_service_rounded;
+  }
+
+  Color _getColorForCategory(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('plumb') || n.contains('laundry')) return AppColors.primary;
+    if (n.contains('electr') || n.contains('carpent')) return AppColors.secondary;
+    return AppColors.primary;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final categories = [
-      {
-        'icon': Icons.plumbing_rounded,
-        'label': 'Plumbing Services',
-        'color': AppColors.primary
-      },
-      {
-        'icon': Icons.electrical_services_rounded,
-        'label': 'Electrical Works',
-        'color': AppColors.secondary
-      },
-      {
-        'icon': Icons.local_laundry_service_rounded,
-        'label': 'Laundry & Dry Clean',
-        'color': AppColors.primary
-      },
-      {
-        'icon': Icons.carpenter_rounded,
-        'label': 'Carpentry',
-        'color': AppColors.secondary
-      },
-    ];
 
     return QuickFixBaseLayout(
       title: 'Quick Fix',
@@ -71,19 +98,32 @@ class QuickFixCategoriesPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 1.4, // Making them slightly taller for better look in sheet
-              ),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                return _QuickFixCategoryCard(category: category);
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _categoriesFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                }
+                if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No categories available', style: TextStyle(color: Colors.white)));
+                }
+                
+                final categories = snapshot.data!;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 1.4,
+                  ),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    return _QuickFixCategoryCard(category: category);
+                  },
+                );
               },
             ),
             const SizedBox(height: 48),

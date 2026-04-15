@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Star, Eye, Edit2, ShieldCheck, Clock, XCircle, MoreVertical } from 'lucide-react';
 import axios from 'axios';
+import ProviderDetailsModal from '../components/ProviderDetailsModal';
 
 const ProviderList = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedProvider, setSelectedProvider] = useState(null);
 
   const fetchProviders = async () => {
     try {
@@ -120,7 +122,12 @@ const ProviderList = () => {
                       >
                         {p.status === 'Blocked' ? 'Activate' : 'Block'}
                       </button>
-                      <button style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)' }}><Eye size={18} /></button>
+                      <button 
+                        onClick={() => setSelectedProvider(p)}
+                        style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer' }}
+                      >
+                        <Eye size={18} />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -128,6 +135,14 @@ const ProviderList = () => {
           </tbody>
         </table>
       </div>
+
+      {selectedProvider && (
+        <ProviderDetailsModal 
+          provider={selectedProvider} 
+          onClose={() => setSelectedProvider(null)} 
+          onUpdate={fetchProviders}
+        />
+      )}
     </div>
   );
 };

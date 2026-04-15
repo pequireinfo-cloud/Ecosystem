@@ -1,12 +1,42 @@
-import React from 'react';
-import { Users, BookOpen, IndianRupee, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Users, BookOpen, Clock, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import axios from 'axios';
 
 const Dashboard = () => {
-  const stats = [
-    { label: 'Total Providers', value: '1,284', trend: '+12%', icon: Users, color: '#3B82F6' },
-    { label: 'Active Bookings', value: '45', trend: '+5%', icon: BookOpen, color: '#10B981' },
-    { label: 'Revenue', value: '₹4.2L', trend: '+18%', icon: IndianRupee, color: '#F59E0B' },
-    { label: 'Pending KYC', value: '12', trend: '-2%', icon: Clock, color: '#EF4444' },
+  const [stats, setStats] = useState({
+    totalProviders: 0,
+    totalServices: 0,
+    activeBookings: 0,
+    revenue: 0
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [provs, servs, books] = await Promise.all([
+          axios.get('http://localhost:3000/api/admin/providers'),
+          axios.get('http://localhost:3000/api/services'),
+          axios.get('http://localhost:3000/api/bookings')
+        ]);
+        
+        setStats({
+          totalProviders: provs.data.length,
+          totalServices: servs.data.length,
+          activeBookings: books.data.filter(b => b.status === 'pending' || b.status === 'accepted').length,
+          revenue: books.data.reduce((acc, curr) => acc + (curr.estimatedPrice || 0), 0)
+        });
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const statsData = [
+    { label: 'Total Providers', value: stats.totalProviders.toString(), icon: Users, color: '#3B82F6', change: '+12%' },
+    { label: 'Total Services', value: stats.totalServices.toString(), icon: BookOpen, color: '#10B981', change: '+5%' },
+    { label: 'Active Bookings', value: stats.activeBookings.toString(), icon: Clock, color: '#F59E0B', change: '+18%' },
+    { label: 'Total Revenue', value: `₹${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: '#6366F1', change: '+25%' },
   ];
 
   return (

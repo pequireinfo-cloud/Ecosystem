@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
+import 'package:pequire_user_app/core/services/booking_service.dart';
 
 class RatingFeedbackPage extends StatefulWidget {
   final BookingSession session;
@@ -14,6 +15,62 @@ class RatingFeedbackPage extends StatefulWidget {
 class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
   int _rating = 0;
   final _commentController = TextEditingController();
+  bool _isSubmitting = false;
+
+  Future<void> _submitFeedback() async {
+    if (_rating == 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a rating')),
+      );
+      return;
+    }
+
+    setState(() => _isSubmitting = true);
+    
+    try {
+      await BookingService().submitFeedback(
+        bookingId: widget.session.bookingId!,
+        rating: _rating,
+        feedback: _commentController.text,
+      );
+      
+      if (!mounted) return;
+
+      // Show Success and Go Home
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.green, size: 60),
+              const SizedBox(height: 16),
+              const Text('Thank You!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              const Text('Your feedback helps us improve.', textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                  child: const Text('Back to Home'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to submit feedback: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +89,7 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Ramesh Kumar',
+              'Professional Partner',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF001233)),
             ),
             const Text(
@@ -81,46 +138,15 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  if (_rating == 0) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a rating')),
-                    );
-                    return;
-                  }
-                  
-                  // Show Success and Go Home
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(Icons.check_circle_rounded, color: Colors.green, size: 60),
-                          const SizedBox(height: 16),
-                          const Text('Thank You!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8),
-                          const Text('Your feedback helps us improve.', textAlign: TextAlign.center),
-                          const SizedBox(height: 24),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
-                              child: const Text('Back to Home'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
+                onPressed: _isSubmitting ? null : _submitFeedback,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: const Text('Submit Feedback', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)),
+                child: _isSubmitting 
+                  ? const CircularProgressIndicator(color: Colors.white)
+                  : const Text('Submit Feedback', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
             const SizedBox(height: 16),

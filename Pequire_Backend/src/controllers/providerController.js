@@ -12,6 +12,17 @@ exports.toggleProviderStatus = async (req, res) => {
   }
 };
 
+exports.updateProviderKyc = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { kycStatus } = req.body; // 'Verified' or 'Rejected'
+    const provider = await Provider.findByIdAndUpdate(id, { kycStatus }, { new: true });
+    res.json(provider);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getProviders = async (req, res) => {
     try {
         const providers = await Provider.find();

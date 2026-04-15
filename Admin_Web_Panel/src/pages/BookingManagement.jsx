@@ -1,13 +1,26 @@
-import React from 'react';
-import { Download, Calendar, MapPin, MoreVertical } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Download, Calendar, MapPin, MoreVertical, Eye } from 'lucide-react';
+import axios from 'axios';
+import BookingDetailsModal from '../components/BookingDetailsModal';
 
 const BookingManagement = () => {
-  const bookings = [
-    { id: 'BK-5012', service: 'Electrician', address: '123 Tech Park, Bengaluru', status: 'pending', date: '2026-04-13' },
-    { id: 'BK-5013', service: 'Cleaning', address: 'Whitefield Main Rd, Bengaluru', status: 'accepted', date: '2026-04-13' },
-    { id: 'BK-5014', service: 'Plumbing', address: 'Indiranagar 12th Cross, Bengaluru', status: 'ongoing', date: '2026-04-12' },
-    { id: 'BK-5015', service: 'Appliance', address: 'Koramangala 4th Block, Bengaluru', status: 'completed', date: '2026-04-11' },
-  ];
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedBookingId, setSelectedBookingId] = useState(null);
+
+  const fetchBookings = async () => {
+    try {
+      const res = await axios.get('http://localhost:3000/api/bookings');
+      setBookings(res.data);
+    } catch (err) {
+      console.error('Error fetching bookings:', err);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -72,42 +85,62 @@ const BookingManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {bookings.map((b, i) => (
-              <tr key={i} style={{ borderTop: '1px solid var(--border)' }}>
-                <td style={{ padding: '16px 24px', fontWeight: '600', color: 'var(--primary)', fontSize: '14px' }}>#{b.id}</td>
-                <td style={{ padding: '16px 24px', fontSize: '14px' }}>{b.service}</td>
-                <td style={{ padding: '16px 24px', fontSize: '14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <MapPin size={14} color="var(--text-muted)" />
-                    {b.address}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', fontSize: '14px' }}>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Calendar size={14} color="var(--text-muted)" />
-                    {b.date}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <span style={{
-                    padding: '4px 8px',
-                    borderRadius: '6px',
-                    fontSize: '11px',
-                    fontWeight: '800',
-                    backgroundColor: `${getStatusColor(b.status)}15`,
-                    color: getStatusColor(b.status)
-                  }}>{b.status.toUpperCase()}</span>
-                </td>
-                <td style={{ padding: '16px 24px' }}>
-                  <button style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-                    <MoreVertical size={18} />
-                  </button>
+            {bookings.length > 0 ? (
+              bookings.map((b, i) => (
+                <tr key={b._id || i} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '16px 24px', fontWeight: '600', color: 'var(--primary)', fontSize: '14px' }}>
+                    #{b.bookingId || (b._id ? b._id.substring(b._id.length - 8).toUpperCase() : 'N/A')}
+                  </td>
+                  <td style={{ padding: '16px 24px', fontSize: '14px' }}>{b.serviceType || 'N/A'}</td>
+                  <td style={{ padding: '16px 24px', fontSize: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <MapPin size={14} color="var(--text-muted)" />
+                      {b.location?.address || 'No Address'}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px', fontSize: '14px' }}>
+                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Calendar size={14} color="var(--text-muted)" />
+                      {b.createdAt ? new Date(b.createdAt).toLocaleDateString() : 'N/A'}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <span style={{
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11px',
+                      fontWeight: '800',
+                      backgroundColor: `${getStatusColor(b.status || 'pending')}15`,
+                      color: getStatusColor(b.status || 'pending')
+                    }}>{(b.status || 'pending').toUpperCase()}</span>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <button onClick={() => setSelectedBookingId(b._id)} style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer', marginRight: '8px' }}>
+                      <Eye size={18} />
+                    </button>
+                    <button style={{ border: 'none', background: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
+                      <MoreVertical size={18} />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" style={{ padding: '40px', textAlign: 'center', color: 'var(--text-muted)' }}>
+                  No bookings found yet.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
+
+      {selectedBookingId && (
+        <BookingDetailsModal 
+          bookingId={selectedBookingId} 
+          onClose={() => setSelectedBookingId(null)} 
+        />
+      )}
     </div>
   );
 };

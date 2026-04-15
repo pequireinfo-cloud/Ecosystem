@@ -7,11 +7,7 @@ const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/pequire';
     
-    const conn = await mongoose.connect(mongoURI, {
-      // Modern mongoose usually doesn't need these but good for compatibility
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    const conn = await mongoose.connect(mongoURI);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {

@@ -9,6 +9,16 @@ exports.getServices = async (req, res) => {
   }
 };
 
+exports.getServicesByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+    const services = await Service.find({ categoryId }).populate('providerId');
+    res.json(services);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.createService = async (req, res) => {
   try {
     const service = new Service(req.body);
@@ -25,6 +35,16 @@ exports.updateService = async (req, res) => {
     res.json(service);
   } catch (error) {
     res.status(400).json({ error: error.message });
+  }
+};
+
+exports.updateService = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const service = await Service.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(service);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };
 

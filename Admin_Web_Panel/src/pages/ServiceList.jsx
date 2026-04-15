@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Layers, Star, IndianRupee, Tag, Trash2, Eye } from 'lucide-react';
+import { Layers, Star, IndianRupee, Tag, Trash2, Eye, Edit2 } from 'lucide-react';
+import ServiceEditModal from '../components/ServiceEditModal';
 
 const ServiceList = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedService, setSelectedService] = useState(null);
 
   const fetchServices = async () => {
     try {
@@ -91,7 +93,12 @@ const ServiceList = () => {
                     {service.discount > 0 && <span style={{ fontSize: '12px', color: '#10B981', marginLeft: '8px', fontWeight: '700' }}>{service.discount}% OFF</span>}
                    </div>
                    <div style={{ display: 'flex', gap: '8px' }}>
-                    <button style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)' }}><Eye size={16} /></button>
+                    <button 
+                      onClick={() => setSelectedService(service)}
+                      style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+                    >
+                      <Edit2 size={16} />
+                    </button>
                     <button 
                       onClick={() => handleDelete(service._id)}
                       style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: '#EF4444' }}
@@ -109,6 +116,14 @@ const ServiceList = () => {
             </div>
           )}
         </div>
+      )}
+
+      {selectedService && (
+        <ServiceEditModal 
+          service={selectedService} 
+          onClose={() => setSelectedService(null)} 
+          onUpdate={fetchServices}
+        />
       )}
     </div>
   );

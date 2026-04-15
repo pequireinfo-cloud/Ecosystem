@@ -26,16 +26,16 @@ class _PaymentPageState extends State<PaymentPage> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<DocumentSnapshot>(
+    return StreamBuilder<Map<String, dynamic>>(
       stream: widget.session.bookingId != null 
           ? BookingService().watchBooking(widget.session.bookingId!)
           : null,
       builder: (context, snapshot) {
-        String displayPrice = '1,200';
+        String displayPrice = widget.session.price?.toInt().toString() ?? '1,200';
         bool isFinalPayment = false;
 
-        if (snapshot.hasData && snapshot.data!.exists) {
-          final data = snapshot.data!.data() as Map<String, dynamic>;
+        if (snapshot.hasData) {
+          final data = snapshot.data!;
           if (data['finalPrice'] != null) {
             displayPrice = (data['finalPrice'] as num).toInt().toString();
             isFinalPayment = true;
@@ -144,12 +144,12 @@ class _PaymentPageState extends State<PaymentPage> {
                         } else {
                           // Initial Booking logic
                           final bookingId = await BookingService().createBooking(
-                            userId: 'test_user_123',
-                            serviceType: 'Plumbing',
-                            lat: 28.6139,
-                            lng: 77.2090,
-                            address: '123, Green Park, New Delhi',
-                            estimatedPrice: 1200,
+                            userId: widget.session.userId ?? 'temp_user_789',
+                            serviceType: widget.session.category ?? 'General Service',
+                            lat: widget.session.pickupLocation?.latitude ?? 28.6139,
+                            lng: widget.session.pickupLocation?.longitude ?? 77.2090,
+                            address: widget.session.pickupAddress ?? 'Current Location',
+                            estimatedPrice: widget.session.price ?? 1200,
                             isWaitAndSave: widget.isWaitAndSave,
                           );
 

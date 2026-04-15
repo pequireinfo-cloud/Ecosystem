@@ -1,8 +1,17 @@
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
 // Middleware
 app.use(cors());
@@ -29,8 +38,29 @@ app.get('/', (req, res) => {
   res.json({ message: 'Pequire Backend API is running' });
 });
 
-const PORT = process.env.PORT || 3000;
+// Socket.io basic setup
+io.on('connection', (socket) => {
+  console.log('A user connected:', socket.id);
+  
+  // Mobile app joins a specific order room for tracking
+  socket.on('join_order', (orderId) => {
+    socket.join(orderId);
+    console.log(`Socket ${socket.id} joined room: ${orderId}`);
+  });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  // Providers broadcast their location to a specific order room
+  socket.on('update_location', (data) => {
+    const { orderId, latitude, longitude } = data;
+    io.to(orderId).emit('location_received', { latitude, longitude, timestamp: new Date() });
+    console.log(`Location updated for order ${orderId}: ${latitude}, ${longitude}`);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`Pequire Server running on port ${PORT}`);
 });
