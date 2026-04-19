@@ -49,3 +49,22 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Secrets & Configs
+**/local.properties
+**/lib/core/config/app_config.dart
+**/ios/Runner/Secrets.plist
+**/google-services.json
+**/GoogleService-Info.plist
+**/ios/Runner/GoogleService-Info.plist
+
+# Logs and Reports
+*.log
+flutter_doctor_full.txt
+build_verbose.txt
+build_error_mobile.txt
+outdated.txt
+analyze.txt
+run_log_final.txt
+build_log*.txt
+gradle_build_report.txt

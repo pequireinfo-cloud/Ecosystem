@@ -15,6 +15,7 @@ import 'package:pequire_provider_app/core/services/booking_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_provider_app/features/home/widgets/active_job_panel.dart';
 import 'package:pequire_provider_app/core/services/tracking_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -42,6 +43,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _activeBookingId;
   String? _activeServiceType;
   String? _activeAddress;
+  bool _isSimulation = false;
   final List<LatLng> _hotspots = [
     const LatLng(28.6129, 77.2295), // Connaught Place area
     const LatLng(28.5272, 77.2602), // Okhla area
@@ -303,6 +305,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         bookingId: _activeBookingId!,
                         serviceType: _activeServiceType ?? 'Service',
                         address: _activeAddress ?? 'Nearby',
+                        isSimulation: _isSimulation,
                         onComplete: () {
                           setState(() {
                             _activeBookingId = null;
@@ -486,14 +489,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await BookingService().acceptBooking(bookingId);
+                final providerId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown_provider';
+                await BookingService().acceptBooking(bookingId, providerId);
                 if (mounted) {
-                  setState(() {
-                    _activeBookingId = bookingId;
-                    _activeServiceType = serviceType;
-                    _activeAddress = address;
-                    _activeJobDestination = LatLng(lat, lon);
-                  });
+                    setState(() {
+                      _activeBookingId = bookingId;
+                      _activeServiceType = serviceType;
+                      _activeAddress = address;
+                      _activeJobDestination = LatLng(lat, lon);
+                      _isSimulation = false;
+                    });
                   // Start Firestore tracking
                   TrackingService().startTracking(bookingId);
 
@@ -570,7 +575,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
-              setState(() => _activeJobDestination = LatLng(lat, lon));
+              setState(() {
+                _activeBookingId = 'sim_\${DateTime.now().millisecondsSinceEpoch}';
+                _activeServiceType = 'Electrician • Fan Repair';
+                _activeAddress = addressName;
+                _activeJobDestination = LatLng(lat, lon);
+                _isSimulation = true;
+              });
               final providerLocation = ref.read(locationProvider).value;
               if (providerLocation != null) {
                 _fetchRoute(LatLng(providerLocation.latitude, providerLocation.longitude), LatLng(lat, lon));

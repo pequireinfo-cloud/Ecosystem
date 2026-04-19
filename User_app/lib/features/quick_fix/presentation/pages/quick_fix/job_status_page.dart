@@ -9,6 +9,8 @@ import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/tracking_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/payment_page.dart';
 
+import 'package:pequire_user_app/features/quick_fix/presentation/widgets/booking_simulator.dart';
+
 class JobStatusPage extends StatefulWidget {
   final BookingSession session;
   const JobStatusPage({super.key, required this.session});
@@ -20,74 +22,83 @@ class JobStatusPage extends StatefulWidget {
 class _JobStatusPageState extends State<JobStatusPage> {
   @override
   Widget build(BuildContext context) {
-    return QuickFixBaseLayout(
-      title: 'Job Status',
-      initialSheetSize: 0.8,
-      background: TrackerMapContainer(session: widget.session),
-      child: StreamBuilder<Map<String, dynamic>>(
-        stream: BookingService().watchBooking(widget.session.bookingId ?? ''),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
-            return const Center(child: Padding(
-              padding: EdgeInsets.all(40.0),
-              child: CircularProgressIndicator(),
-            ));
-          }
-          if (!snapshot.hasData) {
-            return const Center(child: Padding(
-              padding: EdgeInsets.all(40.0),
-              child: Text('Connecting to service...'),
-            ));
-          }
-
-          final data = snapshot.data!;
-          final status = data['status'] ?? 'pending';
-          final diagnosis = data['diagnosis'] as Map<String, dynamic>?;
-          final finalPrice = (data['finalPrice'] ?? 0.0).toDouble();
-
-          // Handle Completion Navigation
-          if (status == 'completed' && mounted) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Navigator.pushReplacement(
-                context, 
-                MaterialPageRoute(builder: (context) => PaymentPage(session: widget.session))
-              );
-            });
-          }
-
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                _buildProviderCard(data),
-                const SizedBox(height: 24),
-                
-                // Dynamic Content based on Status
-                if (status == 'accepted') 
-                  _buildArrivalStatus(data)
-                else if (status == 'diagnosing')
-                  _buildDiagnosingStatus()
-                else if (status == 'waiting_approval' && diagnosis != null)
-                  DiagnosisApprovalPanel(
-                    bookingId: widget.session.bookingId!,
-                    appliance: diagnosis['appliance'] ?? 'Appliance',
-                    problem: diagnosis['problem'] ?? 'Problem',
-                    finalPrice: finalPrice,
-                  )
-                else if (status == 'working')
-                  _buildWorkingStatus(data)
-                else
-                  _buildDefaultStatus(status),
-
-                const SizedBox(height: 32),
-                const Divider(),
-                const SizedBox(height: 40),
-              ],
-            ),
-          );
-        },
+    return BookingSimulator(
+      session: widget.session,
+      child: QuickFixBaseLayout(
+        title: 'Job Status',
+        initialSheetSize: 0.8,
+        background: TrackerMapContainer(session: widget.session),
+        child: StreamBuilder<Map<String, dynamic>>(
+          stream: widget.session.isSimulation 
+            ? Stream.value({
+                'status': 'accepted',
+                'arrivalOtp': '4920',
+                'providerId': {'fullName': 'Rahul Sharma (Simulated)'}
+              })
+            : BookingService().watchBooking(widget.session.bookingId ?? ''),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
+              return const Center(child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: CircularProgressIndicator(),
+              ));
+            }
+            if (!snapshot.hasData) {
+              return const Center(child: Padding(
+                padding: EdgeInsets.all(40.0),
+                child: Text('Connecting to service...'),
+              ));
+            }
+  
+            final data = snapshot.data!;
+            final status = data['status'] ?? 'pending';
+            final diagnosis = data['diagnosis'] as Map<String, dynamic>?;
+            final finalPrice = (data['finalPrice'] ?? 0.0).toDouble();
+  
+            // Handle Completion Navigation
+            if (status == 'completed' && mounted) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context, 
+                  MaterialPageRoute(builder: (context) => PaymentPage(session: widget.session))
+                );
+              });
+            }
+  
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  _buildProviderCard(data),
+                  const SizedBox(height: 24),
+                  
+                  // Dynamic Content based on Status
+                  if (status == 'accepted') 
+                    _buildArrivalStatus(data)
+                  else if (status == 'diagnosing')
+                    _buildDiagnosingStatus()
+                  else if (status == 'waiting_approval' && diagnosis != null)
+                    DiagnosisApprovalPanel(
+                      bookingId: widget.session.bookingId ?? 'mock_id',
+                      appliance: diagnosis['appliance'] ?? 'Appliance',
+                      problem: diagnosis['problem'] ?? 'Problem',
+                      finalPrice: finalPrice,
+                    )
+                  else if (status == 'working')
+                    _buildWorkingStatus(data)
+                  else
+                    _buildDefaultStatus(status),
+  
+                  const SizedBox(height: 32),
+                  const Divider(),
+                  const SizedBox(height: 40),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -246,6 +257,45 @@ class _JobStatusPageState extends State<JobStatusPage> {
         _stepperDivider(currentStep > 3),
         _stepperRow('Job Completed', currentStep >= 4),
       ],
+    );
+  }
+
+  Widget _buildDefaultStatus(String status) {
+    return Column(
+      children: [
+        const SizedBox(height: 24),
+        _buildStatusStepper(status),
+      ],
+    );
+  }
+
+  Widget _stepperRow(String label, bool isDone) {
+    return Row(
+      children: [
+        Icon(
+          isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+          color: isDone ? Colors.green : Colors.grey.shade300,
+          size: 20,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          label,
+          style: TextStyle(
+            color: isDone ? const Color(0xFF001233) : Colors.grey,
+            fontWeight: isDone ? FontWeight.bold : FontWeight.normal,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _stepperDivider(bool isDone) {
+    return Container(
+      margin: const EdgeInsets.only(left: 9),
+      height: 20,
+      width: 2,
+      color: isDone ? Colors.green : Colors.grey.shade200,
     );
   }
 }

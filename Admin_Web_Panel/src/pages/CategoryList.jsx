@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 import CategoryForm from './CategoryForm';
 import { Layers, Plus, Tag } from 'lucide-react';
 
@@ -10,7 +10,7 @@ const CategoryList = () => {
 
   const fetchCategories = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/categories');
+      const res = await api.get('/categories');
       setCategories(res.data);
     } catch (err) {
       console.error(err);

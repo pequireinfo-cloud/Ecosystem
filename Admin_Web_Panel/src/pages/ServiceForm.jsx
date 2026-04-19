@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Save, Image as ImageIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const ServiceForm = () => {
   const [formData, setFormData] = useState({
@@ -23,8 +23,8 @@ const ServiceForm = () => {
     const fetchData = async () => {
       try {
         const [provRes, catRes] = await Promise.all([
-          axios.get('http://localhost:3000/api/admin/providers'),
-          axios.get('http://localhost:3000/api/categories')
+          api.get('/admin/providers'),
+          api.get('/categories')
         ]);
         setProviders(provRes.data);
         setCategories(catRes.data);
@@ -54,7 +54,7 @@ const ServiceForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:3000/api/services', formData);
+      await api.post('/services', formData);
       setMessage('Service created successfully!');
       setFormData({
         name: '', providerId: '', categoryId: '', price: '', discount: '', imageUrl: '', coveragePoints: ['']

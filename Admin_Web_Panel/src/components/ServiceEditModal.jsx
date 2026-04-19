@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save, Info } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const ServiceEditModal = ({ service, onClose, onUpdate }) => {
   const [formData, setFormData] = useState({
@@ -28,7 +28,7 @@ const ServiceEditModal = ({ service, onClose, onUpdate }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/categories');
+        const res = await api.get('/categories');
         setCategories(res.data);
       } catch (err) {
         console.error('Error fetching categories:', err);

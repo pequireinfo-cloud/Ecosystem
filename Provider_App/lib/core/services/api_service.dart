@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'http://10.0.2.2:3000/api', // Use 10.0.2.2 for Android Emulator, your IP for physical
+    baseUrl: 'http://10.46.122.48:3000/api', // Use local IP for physical device connectivity
     connectTimeout: const Duration(seconds: 5),
     receiveTimeout: const Duration(seconds: 3),
   ));

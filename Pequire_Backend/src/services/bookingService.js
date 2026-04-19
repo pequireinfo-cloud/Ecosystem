@@ -3,9 +3,29 @@ const Booking = require('../models/Booking');
 const Provider = require('../models/Provider');
 
 /**
- * Service to handle booking operations using MongoDB and Socket.io bridge logic.
+ * Service to handle booking operations using MongoDB and real-time bridges.
  */
 class BookingService {
+  constructor() {
+    this.io = null;
+    this.firestore = null;
+    try {
+      const admin = require('firebase-admin');
+      if (admin.apps.length === 0) {
+        // Mock init if no key is found, avoid crash
+        admin.initializeApp({
+          projectId: 'pequire-provider-mock'
+        });
+      }
+      this.firestore = admin.firestore();
+    } catch (e) {
+      console.warn('Firebase Admin not initialized - real-time Provider updates will skip Firestore sync.');
+    }
+  }
+
+  setIO(io) {
+    this.io = io;
+  }
   /**
    * Create a new booking.
    */
@@ -25,8 +45,17 @@ class BookingService {
 
     await newBooking.save();
     
-    // Trigger notifications for nearby providers
+    // Trigger real-time notifications
     this.notifyNearbyProviders(newBooking).catch(err => console.error('Notification Error:', err));
+    
+    // Broadcast to Admin and User
+    if (this.io) {
+      this.io.emit('new_booking', newBooking);
+      console.log('Socket: Emitted new_booking for', newBooking.bookingId);
+    }
+
+    // Sync to Firestore for Provider App
+    this._syncToFirestore(newBooking);
 
     return newBooking;
   }
@@ -65,6 +94,8 @@ class BookingService {
     booking.timeline.push({ status: 'accepted', timestamp: new Date() });
     
     await booking.save();
+    this._broadcastStatusUpdate(booking);
+    this._syncToFirestore(booking);
     return booking;
   }
 
@@ -80,6 +111,8 @@ class BookingService {
     booking.timeline.push({ status: 'at_location', timestamp: new Date() });
     
     await booking.save();
+    this._broadcastStatusUpdate(booking);
+    this._syncToFirestore(booking);
     return booking;
   }
 
@@ -100,6 +133,8 @@ class BookingService {
     booking.timeline.push({ status: 'diagnosed', timestamp: new Date() });
 
     await booking.save();
+    this._broadcastStatusUpdate(booking);
+    this._syncToFirestore(booking);
     return booking;
   }
 
@@ -115,6 +150,8 @@ class BookingService {
     booking.timeline.push({ status: 'working', timestamp: new Date() });
 
     await booking.save();
+    this._broadcastStatusUpdate(booking);
+    this._syncToFirestore(booking);
     return booking;
   }
 
@@ -130,6 +167,8 @@ class BookingService {
     booking.timeline.push({ status: 'completed', timestamp: new Date() });
 
     await booking.save();
+    this._broadcastStatusUpdate(booking);
+    this._syncToFirestore(booking);
     return booking;
   }
 
@@ -163,6 +202,43 @@ class BookingService {
 
   _generateOtp() {
     return Math.floor(1000 + Math.random() * 9000).toString();
+  }
+
+  _broadcastStatusUpdate(booking) {
+    if (this.io) {
+      this.io.emit('booking_status_update', {
+        id: booking._id,
+        bookingId: booking.bookingId,
+        status: booking.status,
+        providerId: booking.providerId
+      });
+      // Also notify the specific user room
+      this.io.to(booking.bookingId).emit('status_received', booking);
+    }
+  }
+
+  async _syncToFirestore(booking) {
+    if (!this.firestore) return;
+    try {
+      await this.firestore.collection('bookings').doc(booking._id.toString()).set({
+        bookingId: booking.bookingId,
+        userId: booking.userId,
+        status: booking.status,
+        serviceType: booking.serviceType,
+        address: booking.address || 'Nearby',
+        location: {
+          latitude: booking.location.latitude,
+          longitude: booking.location.longitude
+        },
+        estimatedPrice: booking.estimatedPrice,
+        finalPrice: booking.finalPrice,
+        providerId: booking.providerId,
+        updatedAt: new Date()
+      }, { merge: true });
+      console.log('Firestore: Synced booking', booking.bookingId);
+    } catch (e) {
+      console.error('Firestore Sync Error:', e.message);
+    }
   }
 }
 

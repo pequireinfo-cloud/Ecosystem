@@ -4,10 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../config/app_config.dart';
+
 class RoutingService {
-  // TODO: Replace this with your actual Google Maps Directions API key, or load from environment
-  // Needs to be enabled in Google Cloud Console with Directions API.
-  static const String apiKey = 'YOUR_GOOGLE_MAPS_SERVER_API_KEY_HERE';
+  // Configured in Google Cloud Console with Directions API.
+  static const String apiKey = AppConfig.mapsApiKey;
 
   /// Fetches polyline points and distance from Google Directions API
   static Future<Map<String, dynamic>> getDirections(LatLng start, LatLng end) async {

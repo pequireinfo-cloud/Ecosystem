@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, MapPin, User, CheckCircle2, Clock, Navigation, CheckSquare } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const BookingDetailsModal = ({ bookingId, onClose }) => {
   const [booking, setBooking] = useState(null);

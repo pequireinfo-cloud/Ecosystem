@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, User, FileText, CheckCircle, AlertCircle, MapPin, Phone, Star } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false);

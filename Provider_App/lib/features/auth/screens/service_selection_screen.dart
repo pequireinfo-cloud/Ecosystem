@@ -18,8 +18,6 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
     const _Service(Icons.water_drop_rounded, 'Plumbing'),
     const _Service(Icons.chair_rounded, 'Carpentry'),
     const _Service(Icons.local_laundry_service_rounded, 'Laundry'),
-    const _Service(Icons.cleaning_services_rounded, 'Cleaning'),
-    const _Service(Icons.pest_control_rounded, 'Pest Control'),
   ];
 
   @override

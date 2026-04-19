@@ -25,9 +25,43 @@ class _QuickFixCategoriesPageState extends State<QuickFixCategoriesPage> {
   }
 
   Future<List<Map<String, dynamic>>> _fetchCategories() async {
+    final List<Map<String, dynamic>> defaultCategories = [
+      {
+        'id': 'fallback_1',
+        'label': 'Plumbing Services',
+        'icon': Icons.plumbing_rounded,
+        'color': AppColors.primary,
+        'description': 'Leaky pipes, taps, and toilets fixed'
+      },
+      {
+        'id': 'fallback_2',
+        'label': 'Electrical Works',
+        'icon': Icons.electrical_services_rounded,
+        'color': AppColors.secondary,
+        'description': 'Wiring, switches and appliance repairs'
+      },
+      {
+        'id': 'fallback_3',
+        'label': 'Laundry & Dry Clean',
+        'icon': Icons.local_laundry_service_rounded,
+        'color': AppColors.primary,
+        'description': 'Wash, fold and dry cleaning services'
+      },
+      {
+        'id': 'fallback_4',
+        'label': 'Carpentry',
+        'icon': Icons.carpenter_rounded,
+        'color': AppColors.secondary,
+        'description': 'Furniture repair and woodwork'
+      },
+    ];
+
     try {
       final response = await ApiService().get('/categories');
       final List data = response.data;
+      
+      if (data.isEmpty) return defaultCategories;
+
       return data.map((cat) => {
         'id': cat['_id'],
         'label': cat['name'],
@@ -37,7 +71,8 @@ class _QuickFixCategoriesPageState extends State<QuickFixCategoriesPage> {
       }).toList();
     } catch (e) {
       debugPrint('Error fetching categories: $e');
-      return [];
+      // If API fails, return the default categories so the UI is not empty
+      return defaultCategories;
     }
   }
 
@@ -45,7 +80,6 @@ class _QuickFixCategoriesPageState extends State<QuickFixCategoriesPage> {
     final n = name.toLowerCase();
     if (n.contains('plumb')) return Icons.plumbing_rounded;
     if (n.contains('electr')) return Icons.electrical_services_rounded;
-    if (n.contains('clean')) return Icons.cleaning_services_rounded;
     if (n.contains('laundry')) return Icons.local_laundry_service_rounded;
     if (n.contains('carpent')) return Icons.carpenter_rounded;
     return Icons.home_repair_service_rounded;

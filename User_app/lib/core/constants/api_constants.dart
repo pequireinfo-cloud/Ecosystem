@@ -1,3 +1,3 @@
 class ApiConstants {
-  static const String socketServerUrl = 'http://localhost:3000';
+  static const String socketServerUrl = 'http://10.46.122.48:3000';
 }

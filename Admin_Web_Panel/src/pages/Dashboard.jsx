@@ -1,42 +1,60 @@
 import React, { useState, useEffect } from 'react';
-import { Users, BookOpen, Clock, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import axios from 'axios';
+import { Users, BookOpen, Clock, TrendingUp, ArrowUpRight, ArrowDownRight, IndianRupee, UserCheck } from 'lucide-react';
+import api from '../utils/api';
+import socket from '../utils/socket';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
     totalProviders: 0,
-    totalServices: 0,
-    activeBookings: 0,
+    totalUsers: 0,
+    totalBookings: 0,
     revenue: 0
   });
 
+  const fetchStats = async () => {
+    try {
+      const [provs, usersData, books] = await Promise.all([
+        api.get('/admin/providers'),
+        api.get('/admin/users'),
+        api.get('/bookings')
+      ]);
+      
+      setStats({
+        totalProviders: provs.data.length,
+        totalUsers: usersData.data.stats.total,
+        totalBookings: books.data.length,
+        revenue: books.data.reduce((acc, curr) => acc + (curr.estimatedPrice || 0), 0)
+      });
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [provs, servs, books] = await Promise.all([
-          axios.get('http://localhost:3000/api/admin/providers'),
-          axios.get('http://localhost:3000/api/services'),
-          axios.get('http://localhost:3000/api/bookings')
-        ]);
-        
-        setStats({
-          totalProviders: provs.data.length,
-          totalServices: servs.data.length,
-          activeBookings: books.data.filter(b => b.status === 'pending' || b.status === 'accepted').length,
-          revenue: books.data.reduce((acc, curr) => acc + (curr.estimatedPrice || 0), 0)
-        });
-      } catch (err) {
-        console.error('Error fetching stats:', err);
-      }
-    };
     fetchStats();
+
+    // Listen for real-time updates
+    socket.on('new_booking', (data) => {
+      console.log('Real-time: New booking received', data);
+      fetchStats();
+    });
+
+    socket.on('booking_status_update', (data) => {
+      console.log('Real-time: Status updated', data);
+      fetchStats();
+    });
+
+    return () => {
+      socket.off('new_booking');
+      socket.off('booking_status_update');
+    };
   }, []);
 
   const statsData = [
-    { label: 'Total Providers', value: stats.totalProviders.toString(), icon: Users, color: '#3B82F6', change: '+12%' },
-    { label: 'Total Services', value: stats.totalServices.toString(), icon: BookOpen, color: '#10B981', change: '+5%' },
-    { label: 'Active Bookings', value: stats.activeBookings.toString(), icon: Clock, color: '#F59E0B', change: '+18%' },
-    { label: 'Total Revenue', value: `₹${stats.revenue.toLocaleString()}`, icon: TrendingUp, color: '#6366F1', change: '+25%' },
+    { label: 'Total Providers', value: stats.totalProviders.toLocaleString(), icon: UserCheck, color: '#3B82F6', change: '+12%' },
+    { label: 'Total Users', value: stats.totalUsers.toLocaleString(), icon: Users, color: '#10B981', change: '+8%' },
+    { label: 'Total Bookings', value: stats.totalBookings.toLocaleString(), icon: BookOpen, color: '#F59E0B', change: '+15%' },
+    { label: 'Total Revenue', value: `₹${stats.revenue.toLocaleString()}`, icon: IndianRupee, color: '#EF4444', change: '+20%' },
   ];
 
   return (
@@ -53,9 +71,9 @@ const Dashboard = () => {
         gap: '24px',
         marginBottom: '42px'
       }}>
-        {stats.map((stat, i) => {
+        {statsData.map((stat, i) => {
           const Icon = stat.icon;
-          const isUp = stat.trend.startsWith('+');
+          const isUp = stat.change.startsWith('+');
           return (
             <div key={i} className="glass-card" style={{ padding: '24px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
@@ -78,7 +96,7 @@ const Dashboard = () => {
                   color: isUp ? '#03543F' : '#9B1C1C'
                 }}>
                   {isUp ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                  {stat.trend}
+                  {stat.change}
                 </div>
               </div>
               <p style={{ color: 'var(--text-muted)', fontSize: '14px', fontWeight: '500' }}>{stat.label}</p>

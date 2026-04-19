@@ -7,8 +7,8 @@ plugins {
 
 android {
     namespace = "com.pequire.provider.pequire_provider_app"
-    compileSdk = 33
-    buildToolsVersion = "33.0.2"
+    compileSdk = 35
+    buildToolsVersion = "35.0.0"
     ndkVersion = "26.1.10909125"
 
     compileOptions {
@@ -25,10 +25,18 @@ android {
         applicationId = "com.pequire.provider.pequire_provider_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
-        targetSdk = 33
+        minSdk = 23
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        val localProperties = java.util.Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { localProperties.load(it) }
+        }
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {

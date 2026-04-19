@@ -140,80 +140,91 @@ class _LoginPageState extends State<LoginPage> {
             ),
             
             SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    // Top Logo & Back Button Row
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            Image.asset('assets/logo.png', width: 32, height: 32),
-                            const SizedBox(width: 12),
-                            const Text(
-                              'PEQUIRE.',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 1.5,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                      child: IntrinsicHeight(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              // Top Logo & Back Button Row
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Image.asset('assets/logo.png', width: 32, height: 32),
+                                      const SizedBox(width: 12),
+                                      const Text(
+                                        'PEQUIRE.',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: 1.5,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (_isOtpSent)
+                                    IconButton(
+                                      onPressed: () => setState(() => _isOtpSent = false),
+                                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+                                    ),
+                                ],
                               ),
-                            ),
-                          ],
+                              
+                              const Spacer(),
+                              
+                              // Animated Content Area (Bottom Bottom)
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 350),
+                                transitionBuilder: (Widget child, Animation<double> animation) {
+                                  return FadeTransition(
+                                    opacity: animation,
+                                    child: SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: const Offset(0.1, 0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child,
+                                    ),
+                                  );
+                                },
+                                child: _isOtpSent ? _buildOtpView() : _buildPhoneView(),
+                              ),
+                              
+                              const SizedBox(height: 24),
+                              
+                              // Terms and Privacy
+                              Center(
+                                child: Column(
+                                  children: const [
+                                    Text(
+                                      'By signing up, you agree to the Terms of Service',
+                                      style: TextStyle(color: Colors.white30, fontSize: 11),
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      'and Data Processing Agreement',
+                                      style: TextStyle(color: Colors.white30, fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 40),
+                            ],
+                          ),
                         ),
-                        if (_isOtpSent)
-                          IconButton(
-                            onPressed: () => setState(() => _isOtpSent = false),
-                            icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                          ),
-                      ],
-                    ),
-                    
-                    const Spacer(),
-                    
-                    // Animated Content Area (Bottom Bottom)
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 350),
-                      transitionBuilder: (Widget child, Animation<double> animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: SlideTransition(
-                            position: Tween<Offset>(
-                              begin: const Offset(0.1, 0),
-                              end: Offset.zero,
-                            ).animate(animation),
-                            child: child,
-                          ),
-                        );
-                      },
-                      child: _isOtpSent ? _buildOtpView() : _buildPhoneView(),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Terms and Privacy
-                    Center(
-                      child: Column(
-                        children: const [
-                          Text(
-                            'By signing up, you agree to the Terms of Service',
-                            style: TextStyle(color: Colors.white30, fontSize: 11),
-                          ),
-                          SizedBox(height: 4),
-                          Text(
-                            'and Data Processing Agreement',
-                            style: TextStyle(color: Colors.white30, fontSize: 11),
-                          ),
-                        ],
                       ),
                     ),
-                    const SizedBox(height: 40),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
           ],

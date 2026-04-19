@@ -33,13 +33,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        home: const HomePage(
-          user: UserEntity(
-            id: 'test_user_789',
-            email: 'demo@pequire.com',
-            role: LoginRole.user,
-          ),
-        ),
+        home: const OnboardingPage(),
       ),
     );
   }

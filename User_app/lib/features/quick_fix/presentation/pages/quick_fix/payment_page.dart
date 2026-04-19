@@ -6,6 +6,7 @@ import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_f
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/rating_feedback_page.dart';
 import 'searching_provider_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/widgets/booking_simulator.dart';
 
 class PaymentPage extends StatefulWidget {
   final BookingSession session;
@@ -42,149 +43,163 @@ class _PaymentPageState extends State<PaymentPage> {
           }
         }
 
-        return QuickFixBaseLayout(
-          title: isFinalPayment ? 'Final Payment' : 'Select Payment Method',
-          initialSheetSize: 0.8,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 12),
-                // Total Card
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.grey.shade200),
+        return BookingSimulator(
+          session: widget.session,
+          child: QuickFixBaseLayout(
+            title: isFinalPayment ? 'Final Payment' : 'Select Payment Method',
+            initialSheetSize: 0.8,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 12),
+                  // Total Card
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isFinalPayment ? 'FINAL AMOUNT' : 'TOTAL TO PAY',
+                                style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                '₹$displayPrice',
+                                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF001233)),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'View Price Breakdown',
+                                style: TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            isFinalPayment ? Icons.verified_rounded : Icons.account_balance_wallet_rounded, 
+                            color: AppColors.primary, 
+                            size: 30
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isFinalPayment ? 'FINAL AMOUNT' : 'TOTAL TO PAY',
-                              style: const TextStyle(color: Colors.grey, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                  
+                  const SizedBox(height: 24),
+                  
+                  const Text('Recommended', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
+                  const SizedBox(height: 16),
+                  
+                  _buildPaymentOption('Google Pay UPI', 'Fastest way to pay', Icons.account_balance_wallet_rounded, Colors.green),
+                  const SizedBox(height: 12),
+                  _buildPaymentOption('PhonePe UPI', 'Secure payment', Icons.payments_rounded, Colors.purple),
+                  
+                  const SizedBox(height: 24),
+                  
+                  const Text('Other Options', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
+                  const SizedBox(height: 16),
+                  _buildPaymentOption('Cash after service', 'Pay cash or QR code', Icons.money_rounded, Colors.orange),
+                  
+                  const SizedBox(height: 32),
+                  
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        // In simulation mode, just go to next step
+                        if (widget.session.isSimulation) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RatingFeedbackPage(session: widget.session),
                             ),
-                            const SizedBox(height: 4),
-                            Text(
-                              '₹$displayPrice',
-                              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF001233)),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'View Price Breakdown',
-                              style: TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Icon(
-                          isFinalPayment ? Icons.verified_rounded : Icons.account_balance_wallet_rounded, 
-                          color: AppColors.primary, 
-                          size: 30
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                const Text('Recommended', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
-                const SizedBox(height: 16),
-                
-                _buildPaymentOption('Google Pay UPI', 'Fastest way to pay', Icons.account_balance_wallet_rounded, Colors.green),
-                const SizedBox(height: 12),
-                _buildPaymentOption('PhonePe UPI', 'Secure payment', Icons.payments_rounded, Colors.purple),
-                
-                const SizedBox(height: 24),
-                
-                const Text('Other Options', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
-                const SizedBox(height: 16),
-                _buildPaymentOption('Cash after service', 'Pay cash or QR code', Icons.money_rounded, Colors.orange),
-                
-                const SizedBox(height: 32),
-                
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Show loading
-                      showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => const Center(child: CircularProgressIndicator()),
-                      );
-
-                      try {
-                        if (isFinalPayment) {
-                           // Final Payment logic
-                           await Future.delayed(const Duration(seconds: 2)); // Mock payment processing
-                           if (mounted) {
-                             Navigator.pop(context); // Close loading
-                             Navigator.pushReplacement(
-                               context,
-                               MaterialPageRoute(
-                                 builder: (context) => RatingFeedbackPage(session: widget.session),
-                               ),
-                             );
-                           }
-                        } else {
-                          // Initial Booking logic
-                          final bookingId = await BookingService().createBooking(
-                            userId: widget.session.userId ?? 'temp_user_789',
-                            serviceType: widget.session.category ?? 'General Service',
-                            lat: widget.session.pickupLocation?.latitude ?? 28.6139,
-                            lng: widget.session.pickupLocation?.longitude ?? 77.2090,
-                            address: widget.session.pickupAddress ?? 'Current Location',
-                            estimatedPrice: widget.session.price ?? 1200,
-                            isWaitAndSave: widget.isWaitAndSave,
                           );
+                          return;
+                        }
 
-                          widget.session.bookingId = bookingId;
-
+                        // Show loading
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (context) => const Center(child: CircularProgressIndicator()),
+                        );
+  
+                        try {
+                          if (isFinalPayment) {
+                             // Final Payment logic
+                             await Future.delayed(const Duration(seconds: 2)); // Mock payment processing
+                             if (mounted) {
+                               Navigator.pop(context); // Close loading
+                               Navigator.pushReplacement(
+                                 context,
+                                 MaterialPageRoute(
+                                   builder: (context) => RatingFeedbackPage(session: widget.session),
+                                 ),
+                               );
+                             }
+                          } else {
+                            // Initial Booking logic
+                            final bookingId = await BookingService().createBooking(
+                              userId: widget.session.userId ?? 'temp_user_789',
+                              serviceType: widget.session.category ?? 'General Service',
+                              lat: widget.session.pickupLocation?.latitude ?? 28.6139,
+                              lng: widget.session.pickupLocation?.longitude ?? 77.2090,
+                              address: widget.session.pickupAddress ?? 'Current Location',
+                              estimatedPrice: widget.session.price ?? 1200,
+                              isWaitAndSave: widget.isWaitAndSave,
+                            );
+  
+                            widget.session.bookingId = bookingId;
+  
+                            if (mounted) {
+                              Navigator.pop(context); // Close loading
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SearchingProviderPage(session: widget.session),
+                                ),
+                              );
+                            }
+                          }
+                        } catch (e) {
                           if (mounted) {
                             Navigator.pop(context); // Close loading
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SearchingProviderPage(session: widget.session),
-                              ),
-                            );
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Action failed: $e')));
                           }
                         }
-                      } catch (e) {
-                        if (mounted) {
-                          Navigator.pop(context); // Close loading
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Action failed: $e')));
-                        }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isFinalPayment ? Colors.green : AppColors.primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 0,
-                    ),
-                    child: Text(
-                      isFinalPayment ? 'Pay & Complete' : 'Book Service', 
-                      style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isFinalPayment ? Colors.green : AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                      ),
+                      child: Text(
+                        isFinalPayment ? 'Pay & Complete' : 'Book Service', 
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white)
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 48),
-              ],
+                  const SizedBox(height: 48),
+                ],
+              ),
             ),
           ),
         );

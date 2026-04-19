@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import logo from '../assets/logo.png';
+import wordmark from '../assets/wordmark.png';
 import { 
   LayoutDashboard, 
   Users, 
@@ -14,7 +16,7 @@ import {
   Layers
 } from 'lucide-react';
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
   const [expandedMenus, setExpandedMenus] = useState({
     providers: true,
     services: true,
@@ -57,7 +59,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       ]
     },
     { id: 'bookings', icon: BookOpen, label: 'Bookings', type: 'link' },
-    { id: 'live-map', icon: MapIcon, label: 'Live Map', type: 'link' },
+    { id: 'users', icon: Users, label: 'Users', type: 'link' },
   ];
 
   const isActive = (id) => activeTab === id || activeTab.startsWith(id + '-');
@@ -83,19 +85,9 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         padding: '0 8px 32px 8px',
         gap: '12px'
       }}>
-        <div style={{
-          width: '32px',
-          height: '32px',
-          backgroundColor: 'var(--primary)',
-          borderRadius: '8px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontWeight: 'bold',
-          fontSize: '18px'
-        }}>P</div>
-        <div>
-          <h2 style={{ fontSize: '20px', fontWeight: '800', letterSpacing: '0.5px' }}>PEQUIRE</h2>
+        <img src={logo} alt="Pequire Logo" style={{ height: '32px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <img src={wordmark} alt="Pequire" style={{ height: '18px', width: 'auto', filter: 'brightness(0) invert(1)' }} />
           <span style={{ 
             fontSize: '10px', 
             fontWeight: '800', 
@@ -103,7 +95,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
             color: '#60A5FA',
             backgroundColor: 'rgba(30, 64, 175, 0.3)',
             padding: '2px 6px',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            width: 'fit-content'
           }}>ADMIN</span>
         </div>
       </div>
@@ -188,15 +181,18 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           <Settings size={20} style={{ marginRight: '16px' }} />
           <span>Settings</span>
         </div>
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          padding: '12px 16px',
-          color: '#F87171',
-          cursor: 'pointer',
-          borderRadius: '10px',
-          marginTop: '4px'
-        }}>
+        <div 
+          onClick={onLogout}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            padding: '12px 16px',
+            color: '#F87171',
+            cursor: 'pointer',
+            borderRadius: '10px',
+            marginTop: '4px'
+          }}
+        >
           <LogOut size={20} style={{ marginRight: '16px' }} />
           <span>Logout</span>
         </div>

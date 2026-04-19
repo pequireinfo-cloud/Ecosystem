@@ -13,6 +13,9 @@ const io = new Server(server, {
   }
 });
 
+// Export io for use in services
+module.exports = { app, server, io };
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -22,10 +25,17 @@ const jobRoutes = require('./src/routes/spRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const serviceRoutes = require('./src/routes/serviceRoutes');
 const providerRoutes = require('./src/routes/providerRoutes');
+const adminAuthRoutes = require('./src/routes/adminAuthRoutes');
+const adminUserRoutes = require('./src/routes/adminUserRoutes');
+const adminStatsRoutes = require('./src/routes/adminStatsRoutes');
 const connectDB = require('./src/config/db');
 
 // Connect to MongoDB
 connectDB();
+
+// Initialize Real-time Service
+const bookingService = require('./src/services/bookingService');
+bookingService.setIO(io);
 
 // Routes
 app.use('/api/bookings', bookingRoutes);
@@ -33,6 +43,9 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/admin/providers', providerRoutes);
+app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/admin/users', adminUserRoutes);
+app.use('/api/admin/stats', adminStatsRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Pequire Backend API is running' });

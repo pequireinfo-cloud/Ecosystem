@@ -3,11 +3,12 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../config/app_config.dart';
 import 'location_service.dart';
 
 class LocationServiceIO implements LocationService {
   final Dio _dio = Dio();
-  final String _apiKey = 'AIzaSyCBZXciAs5hh654Z78GNgwom7HucBZsGzQ';
+  final String _apiKey = AppConfig.mapsApiKey;
 
   @override
   Future<Position?> getCurrentLocation() async {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Save, Image as ImageIcon } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const CategoryForm = ({ onCategoryAdded }) => {
   const [formData, setFormData] = useState({ name: '', description: '', imageUrl: '' });
@@ -11,7 +11,7 @@ const CategoryForm = ({ onCategoryAdded }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post('http://localhost:3000/api/categories', formData);
+      await api.post('/categories', formData);
       setMessage('Category added successfully!');
       setFormData({ name: '', description: '', imageUrl: '' });
       if (onCategoryAdded) onCategoryAdded();

@@ -11,8 +11,22 @@ class BookingSession {
 
   // Booking context
   String? bookingId;
+  String? userId;
+  double? price;
+  dynamic pickupLocation;
+  String? pickupAddress;
 
-  BookingSession({required this.category});
+  // Simulation support
+  bool isSimulation = false;
+
+  BookingSession({
+    required this.category, 
+    this.isSimulation = false,
+    this.price,
+    this.userId,
+    this.pickupLocation,
+    this.pickupAddress,
+  });
 }
 
 class LaundryItem {

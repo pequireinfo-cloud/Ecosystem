@@ -1,9 +1,18 @@
 import 'package:pequire_provider_app/core/services/api_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class BookingService {
   static final BookingService _instance = BookingService._internal();
   factory BookingService() => _instance;
   BookingService._internal();
+
+  /// Listen for new bookings using Firestore
+  Stream<QuerySnapshot> listenForBookings() {
+    return FirebaseFirestore.instance
+        .collection('bookings')
+        .where('status', isEqualTo: 'pending')
+        .snapshots();
+  }
 
   /// Fetch pending bookings for the professional
   Future<List<Map<String, dynamic>>> getPendingBookings() async {

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pequire_provider_app/core/services/api_service.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
@@ -12,6 +13,7 @@ class ActiveJobPanel extends StatefulWidget {
   final String serviceType;
   final String address;
   final VoidCallback onComplete;
+  final bool isSimulation;
 
   const ActiveJobPanel({
     super.key,
@@ -19,6 +21,7 @@ class ActiveJobPanel extends StatefulWidget {
     required this.serviceType,
     required this.address,
     required this.onComplete,
+    this.isSimulation = false,
   });
 
   @override
@@ -45,6 +48,7 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
   }
 
   void _startPolling() async {
+    if (widget.isSimulation) return;
     while (mounted) {
       try {
         final response = await ApiService().get('/bookings/${widget.bookingId}');
@@ -65,6 +69,11 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     final otp = await _showOtpDialog('Arrival OTP');
     if (otp == null) return;
 
+    if (widget.isSimulation) {
+      setState(() => _currentStatus = 'diagnosing');
+      return;
+    }
+
     setState(() => _isSubmitting = true);
     try {
       await BookingService().verifyArrivalOtp(widget.bookingId, otp);
@@ -78,6 +87,11 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
   Future<void> _submitDiagnosis() async {
     if (_priceController.text.isEmpty) {
       _showError('Please enter a final price.');
+      return;
+    }
+
+    if (widget.isSimulation) {
+      setState(() => _currentStatus = 'working');
       return;
     }
 
@@ -105,6 +119,11 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
 
     final otp = await _showOtpDialog('Completion OTP');
     if (otp == null) return;
+
+    if (widget.isSimulation) {
+       widget.onComplete();
+       return;
+    }
 
     setState(() => _isSubmitting = true);
     try {
@@ -221,7 +240,8 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
       children: [
         Text('DIAGNOSIS REPORT', style: AppTypography.label.copyWith(fontSize: 11)),
         const SizedBox(height: 12),
-        _buildField('Appliance Model/Type', _applianceController),
+        if (!widget.serviceType.toLowerCase().contains('laundry'))
+          _buildField('Appliance Model/Type', _applianceController),
         _buildField('Problem Found', _problemController),
         _buildField('Suggested Solution', _solutionController),
         _buildField('Final Quotation (₹)', _priceController, isNum: true),

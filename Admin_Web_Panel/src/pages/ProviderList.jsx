@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Star, Eye, Edit2, ShieldCheck, Clock, XCircle, MoreVertical } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import ProviderDetailsModal from '../components/ProviderDetailsModal';
 
 const ProviderList = () => {
@@ -11,7 +11,7 @@ const ProviderList = () => {
 
   const fetchProviders = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/admin/providers');
+      const res = await api.get('/admin/providers');
       setProviders(res.data);
     } catch (err) {
       console.error(err);

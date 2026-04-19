@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Download, Calendar, MapPin, MoreVertical, Eye } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
+import socket from '../utils/socket';
 import BookingDetailsModal from '../components/BookingDetailsModal';
 
 const BookingManagement = () => {
@@ -10,7 +11,7 @@ const BookingManagement = () => {
 
   const fetchBookings = async () => {
     try {
-      const res = await axios.get('http://localhost:3000/api/bookings');
+      const res = await api.get('/bookings');
       setBookings(res.data);
     } catch (err) {
       console.error('Error fetching bookings:', err);
@@ -20,6 +21,22 @@ const BookingManagement = () => {
 
   useEffect(() => {
     fetchBookings();
+
+    // Listen for real-time updates
+    socket.on('new_booking', (data) => {
+      console.log('Real-time: New booking added to table', data);
+      fetchBookings();
+    });
+
+    socket.on('booking_status_update', (data) => {
+      console.log('Real-time: Booking status changed in table', data);
+      fetchBookings();
+    });
+
+    return () => {
+      socket.off('new_booking');
+      socket.off('booking_status_update');
+    };
   }, []);
 
   const getStatusColor = (status) => {
