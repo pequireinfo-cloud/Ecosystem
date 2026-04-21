@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Provider = require('../models/Provider');
+const matchingService = require('./MatchingService');
 
 /**
  * Service to handle booking operations using MongoDB and real-time bridges.
@@ -61,24 +62,45 @@ class BookingService {
   }
 
   /**
-   * Find and notify nearby providers via MongoDB geospatial query.
+   * Find and notify nearby providers via Smart Matching Engine.
    */
   async notifyNearbyProviders(booking) {
-    console.log(`Searching for providers for category: ${booking.serviceType}`);
+    console.log(`Matching: Triggering engine for category: ${booking.serviceType}`);
     
-    const providers = await Provider.find({
-      serviceType: booking.serviceType,
-      status: 'Online',
-      location: {
-        $near: {
-          $geometry: { type: "Point", coordinates: [booking.location.longitude, booking.location.latitude] },
-          $maxDistance: 10000 // 10km radius
-        }
+    // Step 1, 2, 4: Hard Filters + Ranking + Fallback Radius
+    const { providers, searchRadius, fallbackCount } = await matchingService.findBestProviders(booking);
+
+    if (providers.length === 0) {
+      this.io?.emit('no_provider_found', { bookingId: booking.bookingId });
+      return;
+    }
+
+    // Update booking metadata with matching results
+    booking.matchingMetadata = {
+      notifiedProviderIds: providers.slice(0, 3).map(p => p._id),
+      searchRadiusKm: searchRadius / 1000,
+      matchingScores: providers.slice(0, 3).map(p => ({ providerId: p._id, score: p.matchingScore })),
+      fallbacksUsed: fallbackCount
+    };
+    await booking.save();
+
+    // Step 3: Dispatch Logic (Mode B: Simultaneous Top 3)
+    console.log(`Matching: Notifying Top ${Math.min(3, providers.length)} providers.`);
+    
+    providers.slice(0, 3).forEach(provider => {
+      if (this.io) {
+        // Emit to the specific provider's room or general channel
+        this.io.emit('new_assignment', {
+          bookingId: booking._id,
+          publicId: booking.bookingId,
+          score: provider.matchingScore,
+          distance: provider.currentDistanceKm
+        });
       }
     });
 
-    console.log(`Found ${providers.length} nearby online providers.`);
-    // Real-time: Emit to socket.io rooms here in future enhancement
+    // Real-time: Sync to Firestore for the Provider App view
+    this._syncToFirestore(booking);
   }
 
   /**
@@ -87,6 +109,10 @@ class BookingService {
   async acceptBooking(bookingId, providerId) {
     const booking = await Booking.findById(bookingId);
     if (!booking) throw new Error('Booking not found');
+
+    if (booking.status !== 'pending') {
+      throw new Error('Booking already accepted by another provider');
+    }
 
     booking.status = 'accepted';
     booking.providerId = providerId;

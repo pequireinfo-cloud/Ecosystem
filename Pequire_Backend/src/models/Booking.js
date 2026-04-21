@@ -27,7 +27,14 @@ const bookingSchema = new mongoose.Schema({
     status: String,
     timestamp: { type: Date, default: Date.now }
   }],
+  matchingMetadata: {
+    notifiedProviderIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Provider' }],
+    searchRadiusKm: { type: Number },
+    matchingScores: [mongoose.Schema.Types.Mixed], // array of {providerId, score}
+    fallbacksUsed: { type: Number, default: 0 }
+  },
   createdAt: { type: Date, default: Date.now }
 });
+
 
 module.exports = mongoose.model('Booking', bookingSchema);
