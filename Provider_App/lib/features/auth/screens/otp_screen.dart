@@ -7,6 +7,7 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:flutter/services.dart';
 
 import 'package:pequire_provider_app/core/services/firebase_service.dart';
+import 'package:dio/dio.dart';
 
 class OtpScreen extends StatefulWidget {
   final String? verificationId;
@@ -17,12 +18,13 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final List<TextEditingController> _controllers = List.generate(4, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(4, (_) => FocusNode());
+  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   int _countdown = 30;
   Timer? _timer;
   bool _canResend = false;
   bool _isLoading = false;
+  final Dio _dio = Dio();
 
   @override
   void initState() {
@@ -72,38 +74,51 @@ class _OtpScreenState extends State<OtpScreen> {
     try {
       final smsCode = _controllers.map((c) => c.text).join();
 
-      // Mock Bypass Logic
-      if (widget.verificationId == 'mock_verification_id') {
-        debugPrint("Verifying Mock OTP: $smsCode");
-        await Future.delayed(const Duration(milliseconds: 800)); // Simulate network
-        if (mounted) {
-          context.go('/service-selection');
-        }
-        return;
-      }
-
+      // 1. Verify with Firebase
       final credential = PhoneAuthProvider.credential(
         verificationId: widget.verificationId!,
         smsCode: smsCode,
       );
 
-      await FirebaseService().auth.signInWithCredential(credential);
-      
-      if (mounted) {
-        context.go('/service-selection');
-      }
-    } catch (e) {
-      debugPrint("OTP Verification Error: $e");
-      setState(() => _isLoading = false);
-      
-      // Fallback for dev: allow any OTP if it fails with config issues
-      if (e.toString().contains('api-key-not-valid') || e.toString().contains('unauthorized-domain')) {
-         if (mounted) context.go('/service-selection');
-         return;
+      final userCredential = await FirebaseService().auth.signInWithCredential(credential);
+      final idToken = await userCredential.user?.getIdToken();
+
+      if (idToken == null) {
+        throw Exception('Failed to get identity token');
       }
 
+      // 2. Verify with our Backend (Using local IP for Android connectivity)
+      const String baseUrl = 'http://10.46.122.48:4000/api';
+      final response = await _dio.post(
+        '$baseUrl/auth/user/verify-otp',
+        data: {
+          'idToken': idToken,
+          'role': 'provider', // Explicitly setting role as provider
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Handle success (save token, navigate)
+        debugPrint("Backend Auth Success: ${response.data}");
+        if (mounted) {
+          context.go('/service-selection');
+        }
+      } else {
+        throw Exception(response.data['message'] ?? 'Backend verification failed');
+      }
+
+    } catch (e) {
+      debugPrint("OTP Verification Error: $e");
+      String errorMessage = e.toString();
+      
+      if (e is DioException) {
+        errorMessage = e.response?.data['message'] ?? 'Backend connection error';
+      }
+
+      setState(() => _isLoading = false);
+      
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.redAccent),
+        SnackBar(content: Text(errorMessage), backgroundColor: Colors.redAccent),
       );
     }
   }
@@ -194,16 +209,16 @@ class _OtpScreenState extends State<OtpScreen> {
               // OTP Input Matrix
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(4, (index) {
+                children: List.generate(6, (index) {
                   final hasValue = _controllers[index].text.isNotEmpty;
                   final hasFocus = _focusNodes[index].hasFocus;
                   return AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
-                    width: 64,
-                    height: 72,
+                    width: 48, // Reduced width to fit 6 fields
+                    height: 64,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                       boxShadow: hasFocus ? AppColors.primaryGlow : AppColors.softShadow,
                       border: Border.all(
                         color: hasFocus ? AppColors.primary : (hasValue ? AppColors.primary.withOpacity(0.3) : const Color(0xFFF1F5F9)),
@@ -222,15 +237,19 @@ class _OtpScreenState extends State<OtpScreen> {
                         ],
                         onChanged: (val) {
                           setState(() {});
-                          if (val.isNotEmpty && index < 3) {
+                          if (val.isNotEmpty && index < 5) {
                             _focusNodes[index + 1].requestFocus();
                           }
                           if (val.isEmpty && index > 0) {
                             _focusNodes[index - 1].requestFocus();
                           }
+                          if (val.isNotEmpty && index == 5) {
+                            // Automatically trigger verification on last digit
+                            _verifyOtp();
+                          }
                         },
                         style: AppTypography.h1.copyWith(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.w800,
                           color: const Color(0xFF0F172A),
                         ),

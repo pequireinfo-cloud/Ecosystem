@@ -12,7 +12,7 @@ class SocketService {
     // Replace with your server IP if not running on localhost/emulator
     // For Android Emulator, use 10.0.2.2
     // For physical device, use the server's local IP (e.g., 192.168.x.x)
-    const String serverUrl = 'http://192.168.43.96:3000'; 
+    const String serverUrl = 'http://10.46.122.48:4000'; 
 
     socket = IO.io(serverUrl, IO.OptionBuilder()
       .setTransports(['websocket'])

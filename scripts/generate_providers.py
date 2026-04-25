@@ -17,9 +17,9 @@ LAST_NAMES = ["Sharma", "Verma", "Singh", "Gupta", "Yadav", "Khan", "Ahmad", "Mi
               "Pandey", "Saini", "Jain", "Agarwal", "Shukla", "Maurya", "Kushwaha", "Chauhan", "Rathore", "Kapoor"]
 
 CATEGORIES = {
-    "Carpentry": ["door repair", "cabinet", "bed repair", "furniture polish", "modular kitchen", "window repair", "sofa repair"],
-    "Plumbing": ["pipe leak", "geyser", "tap fitting", "toilet blockage", "water tank cleaning", "shower repair", "sink repair"],
-    "Electrical": ["AC repair", "fan repair", "wiring", "inverter", "refrigerator", "washing machine", "geyser repair", "LED lighting"],
+    "Carpentry": ["door repair", "cabinet fix", "bed repair", "furniture polish", "modular kitchen", "window repair", "sofa repair", "lock fix"],
+    "Plumbing": ["pipe leak", "geyser repair", "tap fitting", "toilet blockage", "water tank cleaning", "shower repair", "sink repair"],
+    "Electrical": ["ac repair", "fan repair", "wiring", "inverter", "refrigerator", "washing machine", "switchboard", "led light"],
     "Laundry": ["dry clean", "stain removal", "bridal wear", "woolens", "steam iron", "curtain cleaning", "carpet cleaning"]
 }
 

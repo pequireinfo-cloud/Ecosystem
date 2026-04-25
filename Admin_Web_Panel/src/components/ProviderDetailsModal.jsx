@@ -8,7 +8,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
   const handleKycAction = async (status) => {
     setLoading(true);
     try {
-      await axios.put(`http://localhost:3000/api/admin/providers/${provider._id}/kyc`, { kycStatus: status });
+      await axios.put(`http://localhost:4000/api/admin/providers/${provider._id}/kyc`, { kycStatus: status });
       onUpdate();
       onClose();
     } catch (err) {

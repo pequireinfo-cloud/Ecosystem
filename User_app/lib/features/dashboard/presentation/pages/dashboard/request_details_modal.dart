@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 class RequestDetailsModal extends StatefulWidget {
@@ -86,11 +86,24 @@ class _RequestDetailsModalState extends State<RequestDetailsModal> {
             const SizedBox(height: 12),
             ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Image.file(
-                File(widget.image.path),
-                height: 200,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              child: FutureBuilder<Uint8List>(
+                future: widget.image.readAsBytes(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Image.memory(
+                      snapshot.data!,
+                      height: 200,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    );
+                  }
+                  return Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey.shade100,
+                    child: const Center(child: CircularProgressIndicator()),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),

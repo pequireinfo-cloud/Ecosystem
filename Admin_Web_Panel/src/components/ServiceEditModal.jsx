@@ -57,7 +57,7 @@ const ServiceEditModal = ({ service, onClose, onUpdate }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.put(`http://localhost:3000/api/services/${service._id}`, {
+      await axios.put(`http://localhost:4000/api/services/${service._id}`, {
         ...formData,
         price: Number(formData.price),
         categoryId: formData.category

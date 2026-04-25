@@ -22,12 +22,44 @@ abstract class AuthRemoteDataSource {
     required double lng,
     required String address,
   });
+
+  Future<AuthModel> verifyOtp({
+    required String idToken,
+    required String role,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
 
   AuthRemoteDataSourceImpl({required this.dio});
+
+  // Base URL for API (Using local IP for Android connectivity)
+  static const String baseUrl = 'http://10.46.122.48:4000/api';
+
+  @override
+  Future<AuthModel> verifyOtp({
+    required String idToken,
+    required String role,
+  }) async {
+    final response = await dio.post(
+      '$baseUrl/auth/user/verify-otp',
+      data: {
+        'idToken': idToken,
+        'role': role,
+      },
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return AuthModel.fromJson(response.data['user']);
+    } else {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        type: DioExceptionType.badResponse,
+      );
+    }
+  }
 
   @override
   Future<AuthModel> login({

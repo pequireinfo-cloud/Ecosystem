@@ -1,36 +1,71 @@
 const mongoose = require('mongoose');
 
 const providerSchema = new mongoose.Schema({
-  fullName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  phoneNumber: { type: String, required: true },
-  serviceType: { type: String, required: true, enum: ['Carpentry', 'Plumbing', 'Electrical', 'Laundry'] },
+  fullName: { 
+    type: String, 
+    required: [true, 'Full name is required'],
+    trim: true 
+  },
+  email: { 
+    type: String, 
+    unique: true,
+    sparse: true,
+    lowercase: true,
+    trim: true
+  },
+  phoneNumber: { 
+    type: String, 
+    required: [true, 'Phone number is required'], 
+    unique: true,
+    index: true 
+  },
+  serviceType: { 
+    type: String, 
+    required: true,
+    // Flexible enum allowing current values plus growth
+    enum: ['Carpentry', 'Plumbing', 'Electrical', 'Laundry', 'Cleaning', 'AC Repair', 'Painting'] 
+  },
   expertise: [{ type: String }],
   experienceYears: { type: Number, default: 0 },
-  status: { type: String, enum: ['Online', 'Offline', 'Busy', 'Blocked'], default: 'Offline' },
-  kycStatus: { type: String, enum: ['Pending', 'Verified', 'Rejected', 'In Review'], default: 'Pending' },
-  rating: { type: Number, default: 4.0 },
+  status: { 
+    type: String, 
+    enum: ['Online', 'Offline', 'Busy', 'Blocked'], 
+    default: 'Offline' 
+  },
+  kycStatus: { 
+    type: String, 
+    enum: ['Pending', 'Verified', 'Rejected', 'In Review'], 
+    default: 'Pending' 
+  },
+  rating: { type: Number, default: 5.0 },
   totalJobsCompleted: { type: Number, default: 0 },
-  acceptanceRate: { type: Number, default: 100 },
-  cancellationRate: { type: Number, default: 0 },
-  avgResponseSeconds: { type: Number, default: 600 },
-  serviceRadiusKm: { type: Number, default: 10 },
+  earnings: {
+    total: { type: Number, default: 0 },
+    pending: { type: Number, default: 0 }
+  },
+  serviceRadiusKm: { type: Number, default: 15 },
   priceLevel: { type: String, enum: ['budget', 'standard', 'premium'], default: 'standard' },
   location: {
-    latitude: { type: Number, required: true },
-    longitude: { type: Number, required: true },
+    latitude: { type: Number },
+    longitude: { type: Number },
     geo: {
       type: { type: String, enum: ['Point'], default: 'Point' },
       coordinates: { type: [Number], index: '2dsphere' } // [longitude, latitude]
     },
-    address: String,
-    distance_km: Number
+    address: String
   },
-  languages: [{ type: String }],
-  availableSlots: [{ type: String }],
   fcmToken: { type: String },
-  createdAt: { type: Date, default: Date.now }
+  lastActive: Date
+}, {
+  timestamps: true
 });
 
+// Middleware to keep geo coordinates updated if lat/lng changes
+providerSchema.pre('save', function(next) {
+  if (this.location.latitude && this.location.longitude) {
+    this.location.geo.coordinates = [this.location.longitude, this.location.latitude];
+  }
+  next();
+});
 
 module.exports = mongoose.model('Provider', providerSchema);

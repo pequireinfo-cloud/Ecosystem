@@ -15,6 +15,14 @@ class MatchingService {
     };
     this.MAX_RADIUS = 20000; // 20km in meters
     this.STEP_RADII = [5000, 10000, 20000]; // 5km, 10km, 20km
+    
+    // Skill keywords for extraction from problem description
+    this.SKILL_KEYWORDS = {
+      'Carpentry': ['door', 'cabinet', 'bed', 'furniture', 'kitchen', 'window', 'sofa', 'lock', 'polish'],
+      'Plumbing': ['leak', 'geyser', 'tap', 'toilet', 'blockage', 'tank', 'shower', 'sink', 'pipe'],
+      'Electrical': ['ac', 'fan', 'wiring', 'inverter', 'refrigerator', 'washing', 'switchboard', 'light', 'meter'],
+      'Laundry': ['dry clean', 'stain', 'bridal', 'woolen', 'iron', 'curtain', 'carpet', 'wash']
+    };
   }
 
   /**
@@ -25,21 +33,34 @@ class MatchingService {
     let searchRadius = 0;
     let fallbackCount = 0;
 
-    for (const radius of this.STEP_RADII) {
-      searchRadius = radius;
-      console.log(`Matching: Searching in radius ${radius / 1000}km...`);
-      
-      providers = await this._getEligibleProviders(booking, radius);
-      
-      if (providers.length > 0) {
-        console.log(`Matching: Found ${providers.length} eligible providers at ${radius / 1000}km.`);
-        break;
+    // Step 0: Identify specific skills from problem description
+    const requestedSkills = this._extractSkills(booking.problemDescription, booking.serviceType);
+    console.log(`Matching: Identified skills: [${requestedSkills.join(', ')}]`);
+
+    // Phase 1: Search for Specialists (Providers with matching expertise)
+    if (requestedSkills.length > 0) {
+      console.log('Matching Phase: Searching for Specialists...');
+      for (const radius of this.STEP_RADII) {
+        searchRadius = radius;
+        providers = await this._getEligibleProviders(booking, radius, requestedSkills);
+        if (providers.length > 0) break;
+        fallbackCount++;
       }
-      fallbackCount++;
+    }
+
+    // Phase 2: Search for Generalists (Fallback to anyone in category)
+    if (providers.length === 0) {
+      console.log(`Matching Phase: No specialists found. Falling back to Generalists in ${booking.serviceType}...`);
+      for (const radius of this.STEP_RADII) {
+        searchRadius = radius;
+        providers = await this._getEligibleProviders(booking, radius, []);
+        if (providers.length > 0) break;
+        fallbackCount++;
+      }
     }
 
     if (providers.length === 0) {
-      console.log('Matching: No matching providers found within 20km.');
+      console.log('Matching: No matching providers found within 20km even in fallback.');
       return { providers: [], searchRadius, fallbackCount };
     }
 
@@ -56,7 +77,7 @@ class MatchingService {
   /**
    * Hard Filters (Step 1)
    */
-  async _getEligibleProviders(booking, radius) {
+  async _getEligibleProviders(booking, radius, requiredSkills) {
     const query = {
       serviceType: booking.serviceType,
       status: 'Online',
@@ -72,11 +93,26 @@ class MatchingService {
       }
     };
 
-    // If a specific task was mentioned, try to match expertise
-    // Note: In fallback mode, we might loosen this, but Step 1 keeps it strict per requirement
-    // Search category safety is strict as per rules
+    // Strict expertise filter if skills are identified
+    if (requiredSkills && requiredSkills.length > 0) {
+      query.expertise = { $in: requiredSkills };
+    }
     
     return await Provider.find(query);
+  }
+
+  /**
+   * Identifies relevant skills from a textual description.
+   */
+  _extractSkills(description, category) {
+    if (!description || !this.SKILL_KEYWORDS[category]) return [];
+    
+    const descLower = description.toLowerCase();
+    const skills = this.SKILL_KEYWORDS[category].filter(skill => 
+      descLower.includes(skill)
+    );
+    
+    return skills;
   }
 
   /**

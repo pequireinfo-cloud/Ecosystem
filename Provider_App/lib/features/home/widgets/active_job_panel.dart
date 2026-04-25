@@ -1,8 +1,7 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:pequire_provider_app/core/services/api_service.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/core/services/booking_service.dart';
@@ -29,8 +28,8 @@ class ActiveJobPanel extends StatefulWidget {
 }
 
 class _ActiveJobPanelState extends State<ActiveJobPanel> {
-  File? _beforeImage;
-  File? _afterImage;
+  XFile? _beforeImage;
+  XFile? _afterImage;
   bool _isSubmitting = false;
   String _currentStatus = 'accepted';
   Map<String, dynamic>? _bookingData;
@@ -59,7 +58,7 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
           });
         }
       } catch (e) {
-        print('Polling error: $e');
+        debugPrint('Polling error: $e');
       }
       await Future.delayed(const Duration(seconds: 3));
     }
@@ -144,8 +143,8 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
         title: Text(title, style: AppTypography.h3),
         content: TextField(
           keyboardType: TextInputType.number,
-          maxLength: 4,
-          decoration: const InputDecoration(hintText: 'Enter 4-digit OTP'),
+          maxLength: 6,
+          decoration: const InputDecoration(hintText: 'Enter 6-digit OTP'),
           onChanged: (v) => otpValue = v,
         ),
         actions: [
@@ -165,8 +164,8 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     final pickedFile = await picker.pickImage(source: ImageSource.camera, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
-        if (isBefore) _beforeImage = File(pickedFile.path);
-        else _afterImage = File(pickedFile.path);
+        if (isBefore) _beforeImage = pickedFile;
+        else _afterImage = pickedFile;
       });
     }
   }
@@ -332,7 +331,7 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     );
   }
 
-  Widget _photoSlot(String label, File? image, VoidCallback onTap) {
+  Widget _photoSlot(String label, XFile? image, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -345,11 +344,21 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
                 color: const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2E8F0), style: BorderStyle.solid),
-                image: image != null ? DecorationImage(image: FileImage(image), fit: BoxFit.cover) : null,
               ),
               child: image == null
                   ? const Center(child: Icon(Icons.add_a_photo_outlined, color: Color(0xFF94A3B8), size: 28))
-                  : const SizedBox.shrink(),
+                  : ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: FutureBuilder<Uint8List>(
+                        future: image.readAsBytes(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return Image.memory(snapshot.data!, fit: BoxFit.cover);
+                          }
+                          return const Center(child: CircularProgressIndicator());
+                        },
+                      ),
+                    ),
             ),
             const SizedBox(height: 8),
             Text(label, style: AppTypography.bodySmall.copyWith(fontSize: 12, fontWeight: FontWeight.w600)),

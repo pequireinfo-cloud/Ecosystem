@@ -75,4 +75,23 @@ class AuthRepositoryImpl implements AuthRepository {
       return const Left(ServerFailure('An unexpected error occurred'));
     }
   }
+
+  @override
+  Future<Either<Failure, UserEntity>> verifyOtpWithBackend({
+    required String idToken,
+    required String role,
+  }) async {
+    try {
+      final authModel = await remoteDataSource.verifyOtp(
+        idToken: idToken,
+        role: role,
+      );
+      return Right(authModel);
+    } on DioException catch (e) {
+      final message = e.response?.data['message'] ?? 'OTP verification failed';
+      return Left(ServerFailure(message));
+    } catch (e) {
+      return const Left(ServerFailure('An unexpected error occurred'));
+    }
+  }
 }

@@ -22,4 +22,9 @@ abstract class AuthRepository {
     required double lng,
     required String address,
   });
+
+  Future<Either<Failure, UserEntity>> verifyOtpWithBackend({
+    required String idToken,
+    required String role,
+  });
 }

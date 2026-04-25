@@ -21,28 +21,29 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_YOUR_API_KEY',
-    appId: 'REPLACE_WITH_YOUR_APP_ID',
-    messagingSenderId: 'REPLACE_WITH_YOUR_MESSAGING_SENDER_ID',
-    projectId: 'pequire-provider-mock',
-    authDomain: 'pequire-provider-mock.firebaseapp.com',
-    storageBucket: 'pequire-provider-mock.appspot.com',
+    apiKey: 'AIzaSyBYy8zfts9TjBJGmlyCu3W_do9Kp8QjfM0',
+    appId: '1:300732475377:web:7e10d4cc3035c808778650',
+    messagingSenderId: '300732475377',
+    projectId: 'pequire-a5303',
+    authDomain: 'pequire-a5303.firebaseapp.com',
+    storageBucket: 'pequire-a5303.firebasestorage.app',
+    measurementId: 'G-83P217FQTK',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_YOUR_API_KEY',
-    appId: 'REPLACE_WITH_YOUR_APP_ID',
-    messagingSenderId: 'REPLACE_WITH_YOUR_MESSAGING_SENDER_ID',
-    projectId: 'pequire-provider-mock',
-    storageBucket: 'pequire-provider-mock.appspot.com',
+    apiKey: 'AIzaSyCot5vXpmaKfWIrcpvq7rPRkkPlJ0jO9Gk',
+    appId: '1:300732475377:android:4d1c4c3dea48927f778650',
+    messagingSenderId: '300732475377',
+    projectId: 'pequire-a5303',
+    storageBucket: 'pequire-a5303.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_YOUR_API_KEY',
-    appId: 'REPLACE_WITH_YOUR_APP_ID',
-    messagingSenderId: 'REPLACE_WITH_YOUR_MESSAGING_SENDER_ID',
-    projectId: 'pequire-provider-mock',
-    storageBucket: 'pequire-provider-mock.appspot.com',
+    apiKey: 'AIzaSyCot5vXpmaKfWIrcpvq7rPRkkPlJ0jO9Gk',
+    appId: '1:300732475377:ios:7e10d4cc3035c808778650',
+    messagingSenderId: '300732475377',
+    projectId: 'pequire-a5303',
+    storageBucket: 'pequire-a5303.firebasestorage.app',
     iosBundleId: 'com.pequire.provider',
   );
 }

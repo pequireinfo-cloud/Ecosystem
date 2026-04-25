@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final _phoneController = TextEditingController();
   final _otpController = TextEditingController();
   bool _isOtpSent = false;
+  String _verificationId = '';
   String _selectedCountryCode = '+91';
   String _selectedFlag = '🇮🇳';
 
@@ -105,6 +106,11 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (_) => HomePage(user: state.user)),
             (route) => false,
           );
+        } else if (state is OtpSent) {
+          setState(() {
+            _isOtpSent = true;
+            _verificationId = state.verificationId;
+          });
         } else if (state is AuthError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message), backgroundColor: AppColors.error),
@@ -279,7 +285,16 @@ class _LoginPageState extends State<LoginPage> {
           width: double.infinity,
           height: 60,
           child: ElevatedButton(
-            onPressed: () => setState(() => _isOtpSent = true),
+            onPressed: () {
+              if (_phoneController.text.length >= 10) {
+                final fullPhone = '$_selectedCountryCode${_phoneController.text.trim()}';
+                context.read<AuthBloc>().add(SendOtp(fullPhone));
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please enter a valid phone number')),
+                );
+              }
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -342,17 +357,17 @@ class _LoginPageState extends State<LoginPage> {
           height: 60,
           child: ElevatedButton(
             onPressed: () {
-              if (_otpController.text.length >= 4) {
+              if (_otpController.text.length == 6) {
                 context.read<AuthBloc>().add(
-                  const LoginSubmitted(
-                    email: 'demo@example.com', // Using demo values as per legacy OTP page
-                    password: 'password123',
-                    role: LoginRole.user,
-                  ),
-                );
+                      VerifyOtp(
+                        verificationId: _verificationId,
+                        smsCode: _otpController.text,
+                        role: 'user',
+                      ),
+                    );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter the verification code')),
+                  const SnackBar(content: Text('Please enter the 6-digit verification code')),
                 );
               }
             },

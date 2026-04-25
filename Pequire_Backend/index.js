@@ -26,6 +26,7 @@ const categoryRoutes = require('./src/routes/categoryRoutes');
 const serviceRoutes = require('./src/routes/serviceRoutes');
 const providerRoutes = require('./src/routes/providerRoutes');
 const adminAuthRoutes = require('./src/routes/adminAuthRoutes');
+const userAuthRoutes = require('./src/routes/userAuthRoutes');
 const adminUserRoutes = require('./src/routes/adminUserRoutes');
 const adminStatsRoutes = require('./src/routes/adminStatsRoutes');
 const connectDB = require('./src/config/db');
@@ -44,6 +45,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/admin/providers', providerRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/auth/user', userAuthRoutes);
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/stats', adminStatsRoutes);
 

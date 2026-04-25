@@ -43,17 +43,26 @@ class _LoginScreenState extends State<LoginScreen> {
       await FirebaseService().auth.verifyPhoneNumber(
         phoneNumber: phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseService().auth.signInWithCredential(credential);
-          if (mounted) context.go('/service-selection');
+          // This only triggers on some Android devices with automatic verification
+          final userCredential = await FirebaseService().auth.signInWithCredential(credential);
+          final idToken = await userCredential.user?.getIdToken();
+          
+          if (idToken != null && mounted) {
+            // Verify with backend (Using local IP for Android connectivity)
+            const String baseUrl = 'http://10.46.122.48:4000/api';
+            await Dio().post('$baseUrl/auth/user/verify-otp', data: {
+              'idToken': idToken,
+              'role': 'provider',
+            });
+            context.go('/service-selection');
+          }
         },
         verificationFailed: (FirebaseAuthException e) {
           debugPrint("Phone Auth Failed: ${e.code} - ${e.message}");
-          
-          // In development mode, we bypass ALL Auth errors to allow testing the rest of the app
-          debugPrint("Entering Mock Auth Mode due to Error: ${e.code}");
           setState(() => _isLoading = false);
-          // Bypass to OTP screen with mock ID
-          context.push('/login/otp', extra: 'mock_verification_id');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(e.message ?? 'Verification failed'), backgroundColor: Colors.redAccent),
+          );
         },
         codeSent: (String verificationId, int? resendToken) {
           debugPrint("OTP Sent: $verificationId");
@@ -66,9 +75,10 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } catch (e) {
       debugPrint("Login General Error: $e");
-      // Generic fallback for any other error (like network or config)
       setState(() => _isLoading = false);
-      context.push('/login/otp', extra: 'mock_verification_id');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An error occurred. Please check your connection.'), backgroundColor: Colors.redAccent),
+      );
     }
   }
 
