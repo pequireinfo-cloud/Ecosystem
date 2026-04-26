@@ -36,16 +36,16 @@ class CategoriesPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text(
+        title: Text(
           'All Categories',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
@@ -106,7 +106,7 @@ class _AnimatedCategoryListTileState extends State<_AnimatedCategoryListTile> {
           transform: Matrix4.identity()
             ..scale(_isPressed ? 0.98 : (_isHovering ? 1.02 : 1.0)),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: _isHovering ? color.withOpacity(0.3) : Colors.transparent,
@@ -146,19 +146,19 @@ class _AnimatedCategoryListTileState extends State<_AnimatedCategoryListTile> {
                     children: [
                       Text(
                         widget.category['label'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 17,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: -0.3,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
                         widget.category['description'] as String,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13,
-                          color: Colors.black54,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                           height: 1.4,
                         ),
                         maxLines: 2,
@@ -173,12 +173,12 @@ class _AnimatedCategoryListTileState extends State<_AnimatedCategoryListTile> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: _isHovering ? color.withOpacity(0.1) : const Color(0xFFF8F9FE),
+                    color: _isHovering ? color.withOpacity(0.1) : (Theme.of(context).brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF8F9FE)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(
                     Icons.arrow_forward_ios_rounded,
-                    color: _isHovering ? color : Colors.black38,
+                    color: _isHovering ? color : (Theme.of(context).brightness == Brightness.dark ? Colors.white24 : Colors.black38),
                     size: 16,
                   ),
                 ),

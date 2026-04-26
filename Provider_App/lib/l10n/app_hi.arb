@@ -1,0 +1,20 @@
+{
+  "@@locale": "hi",
+  "appName": "पिक्वॉयर पार्टनर",
+  "welcome": "स्वागत है",
+  "login": "लॉगिन",
+  "phoneNumber": "फ़ोन नंबर",
+  "getOtp": "ओटीपी प्राप्त करें",
+  "enterOtp": "ओटीपी दर्ज करें",
+  "verify": "सत्यापित करें",
+  "home": "होम",
+  "profile": "प्रोफ़ाइल",
+  "settings": "सेटिंग्स",
+  "language": "भाषा",
+  "logout": "लॉगआउट",
+  "selectLanguage": "भाषा चुनें",
+  "hindi": "हिंदी",
+  "english": "अंग्रेज़ी",
+  "earnings": "कमाई",
+  "activeJobs": "सक्रिय कार्य"
+}

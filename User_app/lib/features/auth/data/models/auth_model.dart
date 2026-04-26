@@ -10,6 +10,8 @@ class AuthModel extends UserEntity {
     super.lastLat,
     super.lastLng,
     super.lastAddress,
+    super.currentStreak = 0,
+    super.rewardPoints = 0,
   });
 
   factory AuthModel.fromJson(Map<String, dynamic> json) {
@@ -21,6 +23,8 @@ class AuthModel extends UserEntity {
       lastLat: json['lastLat']?.toDouble(),
       lastLng: json['lastLng']?.toDouble(),
       lastAddress: json['lastAddress'],
+      currentStreak: json['currentStreak'] ?? 0,
+      rewardPoints: json['rewardPoints'] ?? 0,
     );
   }
 
@@ -33,6 +37,8 @@ class AuthModel extends UserEntity {
       'lastLat': lastLat,
       'lastLng': lastLng,
       'lastAddress': lastAddress,
+      'currentStreak': currentStreak,
+      'rewardPoints': rewardPoints,
     };
   }
 

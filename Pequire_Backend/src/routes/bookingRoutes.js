@@ -16,5 +16,8 @@ router.post('/:id/diagnosis', bookingController.submitDiagnosis);
 router.post('/:id/approve-diagnosis', bookingController.approveDiagnosis);
 router.post('/:id/verify-work', bookingController.verifyWork);
 router.post('/:id/feedback', bookingController.submitFeedback);
+router.post('/:id/user-feedback', bookingController.submitUserFeedback);
+router.post('/:id/cancel', bookingController.cancelBooking);
+router.post('/:id/settle-commission', bookingController.settleCommission);
 
 module.exports = router;

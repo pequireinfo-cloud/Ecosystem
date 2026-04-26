@@ -5,82 +5,78 @@ import 'package:pequire_provider_app/core/constants/app_spacing.dart';
 
 class AppTheme {
   static ThemeData get light {
+    final colorScheme = ColorScheme.light(
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
+      surface: Colors.white,
+      background: const Color(0xFFF8FAFC),
+      error: AppColors.red,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: const Color(0xFF0F172A),
+      onBackground: const Color(0xFF0F172A),
+    );
+
     return ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.light(
-        primary: AppColors.blue,
-        secondary: AppColors.deepBlue,
-        surface: AppColors.white,
-        error: AppColors.red,
-        onPrimary: AppColors.white,
-        onSecondary: AppColors.white,
-        onSurface: AppColors.dark,
-      ),
-      scaffoldBackgroundColor: AppColors.bg,
-      textTheme: TextTheme(
-        displayLarge: AppTypography.h1,
-        displayMedium: AppTypography.h2,
-        displaySmall: AppTypography.h3,
-        headlineMedium: AppTypography.h4,
-        bodyLarge: AppTypography.bodyLarge,
-        bodyMedium: AppTypography.body,
-        bodySmall: AppTypography.bodySmall,
-        labelLarge: AppTypography.label,
-      ),
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.background,
+      cardColor: Colors.white,
+      textTheme: _textTheme(colorScheme.onSurface),
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.white,
-        foregroundColor: AppColors.dark,
+        backgroundColor: Colors.white,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: AppTypography.h3,
-        shape: const Border(
-          bottom: BorderSide(color: Color(0x0D000000), width: 1),
-        ),
-        iconTheme: const IconThemeData(color: AppColors.dark, size: 20),
+        titleTextStyle: AppTypography.h3.copyWith(color: colorScheme.onSurface),
+        iconTheme: IconThemeData(color: colorScheme.onSurface, size: 20),
       ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.blue,
-          foregroundColor: AppColors.white,
-          textStyle: AppTypography.buttonText,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.button),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          elevation: 0,
-        ),
-      ),
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: AppColors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.input),
-          borderSide: const BorderSide(color: AppColors.lgray, width: 1.5),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.input),
-          borderSide: const BorderSide(color: AppColors.lgray, width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.input),
-          borderSide: const BorderSide(color: AppColors.blue, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(AppRadius.input),
-          borderSide: const BorderSide(color: AppColors.red, width: 1.5),
-        ),
-        hintStyle: AppTypography.body.copyWith(color: AppColors.gray),
-        labelStyle: AppTypography.label.copyWith(color: AppColors.gray),
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.white,
+      dividerTheme: const DividerThemeData(color: Color(0xFFF1F5F9)),
+    );
+  }
+
+  static ThemeData get dark {
+    final colorScheme = ColorScheme.dark(
+      primary: AppColors.primary,
+      secondary: AppColors.secondary,
+      surface: const Color(0xFF1E293B),
+      background: const Color(0xFF0F172A),
+      error: AppColors.red,
+      onPrimary: Colors.white,
+      onSecondary: Colors.white,
+      onSurface: Colors.white,
+      onBackground: Colors.white,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.background,
+      cardColor: colorScheme.surface,
+      textTheme: _textTheme(colorScheme.onSurface),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colorScheme.surface,
+        foregroundColor: colorScheme.onSurface,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.card),
-          side: const BorderSide(color: AppColors.lgray, width: 1),
-        ),
+        centerTitle: true,
+        titleTextStyle: AppTypography.h3.copyWith(color: colorScheme.onSurface),
+        iconTheme: IconThemeData(color: colorScheme.onSurface, size: 20),
       ),
+      dividerTheme: const DividerThemeData(color: Colors.white10),
+    );
+  }
+
+  static TextTheme _textTheme(Color textColor) {
+    return TextTheme(
+      displayLarge: AppTypography.h1.copyWith(color: textColor),
+      displayMedium: AppTypography.h2.copyWith(color: textColor),
+      displaySmall: AppTypography.h3.copyWith(color: textColor),
+      headlineMedium: AppTypography.h4.copyWith(color: textColor),
+      bodyLarge: AppTypography.bodyLarge.copyWith(color: textColor),
+      bodyMedium: AppTypography.body.copyWith(color: textColor.withOpacity(0.8)),
+      bodySmall: AppTypography.bodySmall.copyWith(color: textColor.withOpacity(0.6)),
+      labelLarge: AppTypography.label.copyWith(color: textColor),
     );
   }
 }

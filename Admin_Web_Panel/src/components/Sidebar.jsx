@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import logo from '../assets/logo.png';
-import wordmark from '../assets/wordmark.png';
+import logo from '../assets/logo.webp';
+import wordmark from '../assets/wordmark.webp';
 import { 
   LayoutDashboard, 
   Users, 
@@ -202,3 +202,5 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
 };
 
 export default Sidebar;
+
+

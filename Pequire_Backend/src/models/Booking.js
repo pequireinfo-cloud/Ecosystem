@@ -61,8 +61,12 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
-  rating: { type: Number, min: 1, max: 5 },
-  review: { type: String },
+  paymentMethod: { type: String, enum: ['online', 'offline'], default: 'online' },
+  commissionStatus: { type: String, enum: ['pending', 'paid'], default: 'pending' },
+  rating: { type: Number, min: 1, max: 5 }, // Customer rating SP
+  review: { type: String }, // Customer review for SP
+  userRating: { type: Number, min: 1, max: 5 }, // SP rating Customer
+  userReview: { type: String }, // SP review for Customer
   timeline: [{
     status: { type: String, required: true },
     timestamp: { type: Date, default: Date.now },
@@ -78,7 +82,7 @@ const bookingSchema = new mongoose.Schema({
 });
 
 // Middleware to push to timeline on status change
-bookingSchema.pre('save', function(next) {
+bookingSchema.pre('save', async function() {
   if (this.isModified('status')) {
     this.timeline.push({
       status: this.status,
@@ -86,7 +90,6 @@ bookingSchema.pre('save', function(next) {
       note: `Status changed to ${this.status}`
     });
   }
-  next();
 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

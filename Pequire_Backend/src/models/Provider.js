@@ -38,6 +38,10 @@ const providerSchema = new mongoose.Schema({
     default: 'Pending' 
   },
   rating: { type: Number, default: 5.0 },
+  reviewCount: { type: Number, default: 0 },
+  currentStreak: { type: Number, default: 0 },
+  highestStreak: { type: Number, default: 0 },
+  rewardPoints: { type: Number, default: 0 },
   totalJobsCompleted: { type: Number, default: 0 },
   earnings: {
     total: { type: Number, default: 0 },
@@ -54,6 +58,12 @@ const providerSchema = new mongoose.Schema({
     },
     address: String
   },
+  documents: {
+    aadharCard: { type: String },
+    panCard: { type: String },
+    drivingLicense: { type: String }
+  },
+  rejectionReason: { type: String },
   fcmToken: { type: String },
   lastActive: Date
 }, {
@@ -61,11 +71,10 @@ const providerSchema = new mongoose.Schema({
 });
 
 // Middleware to keep geo coordinates updated if lat/lng changes
-providerSchema.pre('save', function(next) {
-  if (this.location.latitude && this.location.longitude) {
+providerSchema.pre('save', async function() {
+  if (this.location && this.location.latitude !== undefined && this.location.longitude !== undefined) {
     this.location.geo.coordinates = [this.location.longitude, this.location.latitude];
   }
-  next();
 });
 
 module.exports = mongoose.model('Provider', providerSchema);

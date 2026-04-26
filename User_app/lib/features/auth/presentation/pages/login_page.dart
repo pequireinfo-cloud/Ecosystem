@@ -50,7 +50,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: EdgeInsets.only(left: 4),
                 child: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Colors.grey),
               ),
-              dropdownColor: Colors.white,
+               dropdownColor: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(16),
               elevation: 8,
               items: _countries.map((Map<String, String> country) {
@@ -65,10 +65,10 @@ class _LoginPageState extends State<LoginPage> {
                         const SizedBox(width: 8),
                         Text(
                           country['code']!,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -124,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
             // Background Image
             Positioned.fill(
               child: Image.asset(
-                'assets/login_bg.jpg',
+                'assets/login_bg.webp',
                 fit: BoxFit.cover,
               ),
             ),
@@ -164,7 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   Row(
                                     children: [
-                                      Image.asset('assets/logo.png', width: 32, height: 32),
+                                      Image.asset('assets/logo.webp', width: 32, height: 32),
                                       const SizedBox(width: 12),
                                       const Text(
                                         'PEQUIRE.',
@@ -261,13 +261,13 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.white,
             borderRadius: BorderRadius.circular(16),
           ),
           child: TextField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
             decoration: InputDecoration(
               border: InputBorder.none,
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -333,7 +333,7 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.white,
             borderRadius: BorderRadius.circular(16),
           ),
           child: TextField(
@@ -341,7 +341,7 @@ class _LoginPageState extends State<LoginPage> {
             keyboardType: TextInputType.number,
             maxLength: 6,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8, color: Colors.black),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
             decoration: const InputDecoration(
               border: InputBorder.none,
               counterText: '',
@@ -421,4 +421,6 @@ class SocialButton extends StatelessWidget {
     );
   }
 }
+
+
 

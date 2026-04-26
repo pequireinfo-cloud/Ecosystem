@@ -3,9 +3,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: kIsWeb 
-        ? 'http://10.46.122.48:3000/api' 
-        : 'http://10.46.122.48:3000/api', 
+    baseUrl: 'https://api.pequire.com/api', 
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));

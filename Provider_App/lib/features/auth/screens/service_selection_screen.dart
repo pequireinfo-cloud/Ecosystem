@@ -38,13 +38,13 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/logos/logo.png',
+                          'assets/images/logos/logo.webp',
                           height: 28,
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/logos/Wordmark.png',
+                          'assets/images/logos/wordmark.webp',
                           height: 18,
                           fit: BoxFit.contain,
                         ),
@@ -231,3 +231,5 @@ class _Service {
   final String name;
   const _Service(this.icon, this.name);
 }
+
+

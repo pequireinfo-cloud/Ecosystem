@@ -83,4 +83,21 @@ class BookingService {
       rethrow;
     }
   }
+
+  /// Submit feedback for the user (customer)
+  Future<void> submitUserFeedback({
+    required String bookingId,
+    required int rating,
+    required String feedback,
+  }) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/user-feedback', data: {
+        'rating': rating,
+        'feedback': feedback,
+      });
+    } catch (e) {
+      print('Error submitting user feedback: $e');
+      rethrow;
+    }
+  }
 }

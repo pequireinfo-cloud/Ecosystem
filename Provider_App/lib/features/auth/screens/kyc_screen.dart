@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:pequire_provider_app/core/services/api_service.dart';
+import 'dart:io';
 
 class KycScreen extends StatefulWidget {
   const KycScreen({super.key});
@@ -18,6 +21,14 @@ class _KycScreenState extends State<KycScreen> {
     'Driving License': null,
   };
 
+  final Map<String, String?> _localFilePaths = {
+    'Aadhar Card': null,
+    'PAN Card': null,
+    'Driving License': null,
+  };
+
+  bool _isUploading = false;
+
   bool get _allUploaded => _uploadedFiles.values.every((v) => v != null);
 
   Future<void> _pickFile(String docType) async {
@@ -27,21 +38,70 @@ class _KycScreenState extends State<KycScreen> {
         allowedExtensions: ['jpg', 'pdf', 'png', 'jpeg'],
       );
 
-      if (result != null && result.files.single.name.isNotEmpty) {
+      if (result != null && result.files.single.path != null) {
         setState(() {
           _uploadedFiles[docType] = result.files.single.name;
+          _localFilePaths[docType] = result.files.single.path;
         });
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text('Error picking file: $e'),
             backgroundColor: Colors.redAccent,
             behavior: SnackBarBehavior.floating,
           ),
         );
       }
+    }
+  }
+
+  Future<void> _submitKyc() async {
+    setState(() => _isUploading = true);
+    try {
+      final storage = FirebaseStorage.instance;
+      final Map<String, String> downloadUrls = {};
+
+      for (var entry in _localFilePaths.entries) {
+        if (entry.value != null) {
+          final file = File(entry.value!);
+          final fileName = 'providers/docs/${DateTime.now().millisecondsSinceEpoch}_${entry.key.replaceAll(' ', '_')}_${_uploadedFiles[entry.key]}';
+          final ref = storage.ref().child(fileName);
+          
+          await ref.putFile(file);
+          final url = await ref.getDownloadURL();
+          
+          if (entry.key == 'Aadhar Card') downloadUrls['aadharCard'] = url;
+          if (entry.key == 'PAN Card') downloadUrls['panCard'] = url;
+          if (entry.key == 'Driving License') downloadUrls['drivingLicense'] = url;
+        }
+      }
+
+      // TODO: Get current provider ID from Auth state. 
+      // For demonstration, using a placeholder.
+      const providerId = "67b07c87c88b39c0e4c6e91d"; 
+
+      await ApiService().put('/providers/$providerId/kyc', data: {
+        'kycStatus': 'In Review',
+        'documents': downloadUrls,
+      });
+
+      if (mounted) {
+        context.push('/verification-pending');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Upload failed: $e'),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploading = false);
     }
   }
 
@@ -63,13 +123,13 @@ class _KycScreenState extends State<KycScreen> {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/logos/logo.png',
+                          'assets/images/logos/logo.webp',
                           height: 28,
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/logos/Wordmark.png',
+                          'assets/images/logos/wordmark.webp',
                           height: 18,
                           fit: BoxFit.contain,
                         ),
@@ -169,7 +229,7 @@ class _KycScreenState extends State<KycScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: GestureDetector(
-                onTap: _allUploaded ? () => context.push('/verification-pending') : null,
+                onTap: (_allUploaded && !_isUploading) ? _submitKyc : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   height: 60,
@@ -184,9 +244,9 @@ class _KycScreenState extends State<KycScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'Submit for Review',
+                          _isUploading ? 'Uploading...' : 'Submit for Review',
                           style: AppTypography.h3.copyWith(
-                            color: _allUploaded ? Colors.white : const Color(0xFF94A3B8),
+                            color: (_allUploaded && !_isUploading) ? Colors.white : const Color(0xFF94A3B8),
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
                           ),
@@ -284,3 +344,5 @@ class _KycScreenState extends State<KycScreen> {
     );
   }
 }
+
+

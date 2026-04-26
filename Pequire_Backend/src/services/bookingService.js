@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Provider = require('../models/Provider');
+const User = require('../models/User');
 const matchingService = require('./MatchingService');
+const RewardService = require('./rewardService');
 
 /**
  * Service to handle booking operations using MongoDB and real-time bridges.
@@ -206,8 +208,165 @@ class BookingService {
     if (!booking) throw new Error('Booking not found');
 
     booking.rating = rating;
-    booking.feedback = feedback;
+    booking.review = feedback; // Ensure we use 'review' as per schema
     await booking.save();
+
+    // Recalculate Provider's Average Rating
+    if (booking.providerId) {
+      const provider = await Provider.findById(booking.providerId);
+      if (provider) {
+        const stats = await Booking.aggregate([
+          { $match: { providerId: provider._id, rating: { $exists: true } } },
+          { $group: { _id: null, avgRating: { $avg: "$rating" }, totalReviews: { $sum: 1 } } }
+        ]);
+
+        if (stats.length > 0) {
+          provider.rating = parseFloat(stats[0].avgRating.toFixed(1));
+          provider.reviewCount = stats[0].totalReviews;
+          await provider.save();
+        }
+      }
+    }
+
+    // UPDATE USER STREAK: User completed whole process till rating
+    if (booking.userId) {
+      const user = await User.findById(booking.userId);
+      if (user) {
+        user.currentStreak += 1;
+        if (user.currentStreak > (user.highestStreak || 0)) {
+          user.highestStreak = user.currentStreak;
+        }
+        await user.save();
+        
+        // CHECK REWARDS
+        await RewardService.checkAndAward(user, 'user');
+      }
+    }
+
+    return booking;
+  }
+
+  /**
+   * Submit User Feedback (SP rating User).
+   */
+  async submitUserFeedback(bookingId, rating, feedback) {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) throw new Error('Booking not found');
+
+    booking.userRating = rating;
+    booking.userReview = feedback;
+    await booking.save();
+
+    // Recalculate User's Average Rating
+    if (booking.userId) {
+      const user = await User.findById(booking.userId);
+      if (user) {
+        const stats = await Booking.aggregate([
+          { $match: { userId: user._id, userRating: { $exists: true } } },
+          { $group: { _id: null, avgRating: { $avg: "$userRating" }, totalReviews: { $sum: 1 } } }
+        ]);
+
+        if (stats.length > 0) {
+          user.rating = parseFloat(stats[0].avgRating.toFixed(1));
+          user.reviewCount = stats[0].totalReviews;
+          await user.save();
+        }
+      }
+    }
+
+    // UPDATE PROVIDER STREAK: SP completed whole process till rating
+    // If offline payment, only increment if commission is already paid
+    let canIncrementStreak = true;
+    if (booking.paymentMethod === 'offline' && booking.commissionStatus !== 'paid') {
+      canIncrementStreak = false;
+    }
+
+    if (canIncrementStreak && booking.providerId) {
+      const provider = await Provider.findById(booking.providerId);
+      if (provider) {
+        provider.currentStreak += 1;
+        if (provider.currentStreak > (provider.highestStreak || 0)) {
+          provider.highestStreak = provider.currentStreak;
+        }
+        await provider.save();
+
+        // CHECK REWARDS
+        await RewardService.checkAndAward(provider, 'provider');
+      }
+    }
+
+    return booking;
+  }
+
+  /**
+   * Settle Commission for Offline Payments (Required for SP Streak)
+   */
+  async settleCommission(bookingId) {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) throw new Error('Booking not found');
+
+    if (booking.paymentMethod !== 'offline') {
+      throw new Error('Only offline bookings need commission settlement');
+    }
+
+    if (booking.commissionStatus === 'paid') {
+      return booking; // Already paid
+    }
+
+    booking.commissionStatus = 'paid';
+    await booking.save();
+
+    // If SP already rated the user, increment the streak now
+    if (booking.userRating && booking.providerId) {
+      const provider = await Provider.findById(booking.providerId);
+      if (provider) {
+        provider.currentStreak += 1;
+        if (provider.currentStreak > (provider.highestStreak || 0)) {
+          provider.highestStreak = provider.currentStreak;
+        }
+        await provider.save();
+
+        // CHECK REWARDS
+        await RewardService.checkAndAward(provider, 'provider');
+      }
+    }
+
+    return booking;
+  }
+
+  /**
+   * Cancel Booking and Reset Streaks
+   */
+  async cancelBooking(bookingId, cancelledBy) {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) throw new Error('Booking not found');
+
+    if (booking.status === 'completed' || booking.status === 'cancelled') {
+      throw new Error('Booking cannot be cancelled now');
+    }
+
+    booking.status = 'cancelled';
+    booking.cancelledBy = cancelledBy;
+    await booking.save();
+
+    // Reset User's Streak if they cancelled
+    if (cancelledBy === 'user' && booking.userId) {
+      const user = await User.findById(booking.userId);
+      if (user) {
+        user.currentStreak = 0;
+        await user.save();
+      }
+    }
+
+    // Reset Provider's Streak if they cancelled
+    if (cancelledBy === 'provider' && booking.providerId) {
+      const provider = await Provider.findById(booking.providerId);
+      if (provider) {
+        provider.currentStreak = 0;
+        await provider.save();
+      }
+    }
+
     return booking;
   }
 

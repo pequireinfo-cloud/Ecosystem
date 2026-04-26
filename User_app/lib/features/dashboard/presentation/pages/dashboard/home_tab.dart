@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_state.dart';
 import 'dart:ui';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:animations/animations.dart';
@@ -98,7 +101,7 @@ class _HomeTabState extends State<HomeTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Stack(
           children: [
@@ -200,21 +203,21 @@ class _HomeTabState extends State<HomeTab> {
                 children: [
                   Text(
                     'Location',
-                    style: TextStyle(fontSize: 10, color: Colors.black.withOpacity(0.5), fontWeight: FontWeight.w500),
+                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontWeight: FontWeight.w500),
                   ),
                   Row(
                     children: [
                       Flexible(
                         child: Text(
                           _currentLocation,
-                          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (_currentLocation == 'Detecting...' || _currentLocation == 'Detecting location...')
                         const Padding(
                           padding: EdgeInsets.only(left: 8),
-                          child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5, color: Colors.black54)),
+                          child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                         )
                       else
                         Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: AppColors.secondary),
@@ -228,6 +231,31 @@ class _HomeTabState extends State<HomeTab> {
           _buildNotificationIcon(),
           const SizedBox(width: 12),
           _buildProfileIcon(context),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: () {
+              context.read<AuthBloc>().add(LogoutRequested());
+            },
+            child: GlassmorphicContainer(
+              width: 50,
+              height: 50,
+              borderRadius: 16,
+              blur: 15,
+              alignment: Alignment.center,
+              border: 1.5,
+              linearGradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.red.withOpacity(0.1), Colors.red.withOpacity(0.05)],
+              ),
+              borderGradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.red.withOpacity(0.2), Colors.red.withOpacity(0.05)],
+              ),
+              child: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 22),
+            ),
+          ),
         ],
       ),
     );
@@ -264,10 +292,10 @@ class _HomeTabState extends State<HomeTab> {
           child: Container(
             height: 54,
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.03),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: Colors.white.withOpacity(0.2),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.1) : Colors.black.withOpacity(0.05),
                 width: 1.5,
               ),
             ),

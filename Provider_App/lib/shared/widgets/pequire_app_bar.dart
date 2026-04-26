@@ -18,6 +18,9 @@ class PequireAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top + 8,
@@ -25,10 +28,10 @@ class PequireAppBar extends StatelessWidget {
         right: 20,
         bottom: 16,
       ),
-      decoration: const BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: theme.cardColor,
         border: Border(
-          bottom: BorderSide(color: Color(0xFFF1F5F9), width: 1),
+          bottom: BorderSide(color: isDark ? Colors.white10 : const Color(0xFFF1F5F9), width: 1),
         ),
       ),
       child: Row(
@@ -40,10 +43,10 @@ class PequireAppBar extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: isDark ? Colors.white10 : const Color(0xFFF8FAFC),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.arrow_back_rounded, size: 20, color: Color(0xFF1E293B)),
+                child: Icon(Icons.arrow_back_rounded, size: 20, color: theme.colorScheme.onSurface),
               ),
             )
           else
@@ -52,7 +55,10 @@ class PequireAppBar extends StatelessWidget {
             child: Text(
               title,
               textAlign: TextAlign.center,
-              style: AppTypography.h3.copyWith(fontSize: 17, color: const Color(0xFF0F172A)),
+              style: AppTypography.h3.copyWith(
+                fontSize: 17, 
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ),
           if (actions != null && actions!.isNotEmpty)

@@ -6,6 +6,7 @@ import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/core/services/booking_service.dart';
 import 'package:pequire_provider_app/features/home/screens/chat_page.dart';
+import 'package:pequire_provider_app/features/home/widgets/user_feedback_dialog.dart';
 
 class ActiveJobPanel extends StatefulWidget {
   final String bookingId;
@@ -127,6 +128,19 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     setState(() => _isSubmitting = true);
     try {
       await BookingService().verifyWorkOtp(widget.bookingId, otp);
+      
+      if (mounted) {
+        // Show Feedback Dialog
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => UserFeedbackDialog(
+            bookingId: widget.bookingId,
+            userName: _bookingData?['userId']?['name'] ?? 'the Customer',
+          ),
+        );
+      }
+      
       widget.onComplete();
     } catch (e) {
       _showError('Invalid OTP or verification failed.');
@@ -176,7 +190,7 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, -5))],
       ),
@@ -300,7 +314,10 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
             children: [
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(color: const Color(0xFFEEF2FF), borderRadius: BorderRadius.circular(8)),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).brightness == Brightness.dark ? AppColors.primary.withOpacity(0.2) : const Color(0xFFEEF2FF), 
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 child: Text('ACTIVE JOB', style: AppTypography.label.copyWith(color: AppColors.primary, fontSize: 10)),
               ),
               const SizedBox(width: 12),
@@ -322,7 +339,7 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
         decoration: InputDecoration(
           hintText: hint,
           filled: true,
-          fillColor: const Color(0xFFF8FAFC),
+          fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : const Color(0xFFF8FAFC),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -341,9 +358,9 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
               height: 100,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: const Color(0xFFF8FAFC),
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white.withOpacity(0.05) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0), style: BorderStyle.solid),
+                border: Border.all(color: Theme.of(context).dividerColor, style: BorderStyle.solid),
               ),
               child: image == null
                   ? const Center(child: Icon(Icons.add_a_photo_outlined, color: Color(0xFF94A3B8), size: 28))

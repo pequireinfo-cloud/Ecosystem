@@ -42,14 +42,14 @@ class PequireDrawer extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Image.asset(
-                          'assets/images/logos/logo.png',
+                          'assets/images/logos/logo.webp',
                           height: 24,
                           fit: BoxFit.contain,
                           color: Colors.white,
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/logos/Wordmark.png',
+                          'assets/images/logos/wordmark.webp',
                           height: 20,
                           fit: BoxFit.contain,
                           color: Colors.white, // Invert to white if it's a dark background Wordmark
@@ -319,3 +319,5 @@ class PequireDrawer extends StatelessWidget {
     );
   }
 }
+
+

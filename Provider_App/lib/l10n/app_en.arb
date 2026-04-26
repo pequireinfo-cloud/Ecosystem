@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "appName": "Pequire Partner",
+  "welcome": "Welcome",
+  "login": "Login",
+  "phoneNumber": "Phone Number",
+  "getOtp": "Get OTP",
+  "enterOtp": "Enter OTP",
+  "verify": "Verify",
+  "home": "Home",
+  "profile": "Profile",
+  "settings": "Settings",
+  "language": "Language",
+  "logout": "Logout",
+  "selectLanguage": "Select Language",
+  "hindi": "Hindi",
+  "english": "English",
+  "earnings": "Earnings",
+  "activeJobs": "Active Jobs"
+}

@@ -79,6 +79,10 @@ class OtpSentInternal extends AuthEvent {
   List<Object?> get props => [verificationId];
 }
 
+class CheckAuthStatus extends AuthEvent {}
+
+class LogoutRequested extends AuthEvent {}
+
 // States
 abstract class AuthState extends Equatable {
   const AuthState();
@@ -114,3 +118,5 @@ class AuthError extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+
+class AuthUnauthenticated extends AuthState {}

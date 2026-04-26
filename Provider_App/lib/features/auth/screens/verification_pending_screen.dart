@@ -3,15 +3,48 @@ import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 
-class VerificationPendingScreen extends StatelessWidget {
+import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/services/firebase_service.dart';
+
+class VerificationPendingScreen extends StatefulWidget {
   const VerificationPendingScreen({super.key});
+
+  @override
+  State<VerificationPendingScreen> createState() => _VerificationPendingScreenState();
+}
+
+class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
+  String _status = 'In Review';
+  String _rejectionReason = '';
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkStatus();
+  }
+
+  Future<void> _checkStatus() async {
+    setState(() => _isLoading = true);
+    // Placeholder ID
+    final profile = await ProviderService().getProfile("67b07c87c88b39c0e4c6e91d");
+    if (profile != null) {
+      setState(() {
+        _status = profile['kycStatus'] ?? 'In Review';
+        _rejectionReason = profile['rejectionReason'] ?? '';
+      });
+    }
+    setState(() => _isLoading = false);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Column(
+        child: _isLoading 
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -24,21 +57,30 @@ class VerificationPendingScreen extends StatelessWidget {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/logos/logo.png',
+                          'assets/images/logos/logo.webp',
                           height: 28,
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/logos/Wordmark.png',
+                          'assets/images/logos/wordmark.webp',
                           height: 18,
                           fit: BoxFit.contain,
+                        ),
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+                          onPressed: () async {
+                            // Import FirebaseAuth if needed
+                            await FirebaseService().auth.signOut();
+                            if (mounted) context.go('/login');
+                          },
                         ),
                       ],
                     ),
                     const SizedBox(height: 32),
 
-                    // Progress Track (Step 4 of 4)
+                    // Progress Track
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -46,7 +88,7 @@ class VerificationPendingScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'STEP 4 OF 4',
+                              'VERIFICATION STATUS',
                               style: AppTypography.label.copyWith(
                                 color: AppColors.primary,
                                 fontSize: 10,
@@ -65,7 +107,7 @@ class VerificationPendingScreen extends StatelessWidget {
                             const SizedBox(width: 4),
                             _progressSegment(true),
                             const SizedBox(width: 4),
-                            _progressSegment(true),
+                            _progressSegment(_status == 'Verified'),
                           ],
                         ),
                       ],
@@ -80,23 +122,27 @@ class VerificationPendingScreen extends StatelessWidget {
                             width: 100,
                             height: 100,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF0F7FF),
+                              color: _status == 'Verified' ? const Color(0xFFECFDF5) : (_status == 'Rejected' ? const Color(0xFFFEF2F2) : const Color(0xFFF0F7FF)),
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.08),
+                                  color: (_status == 'Verified' ? Colors.green : (_status == 'Rejected' ? Colors.red : AppColors.primary)).withOpacity(0.08),
                                   blurRadius: 30,
                                   spreadRadius: 5,
                                 ),
                               ],
                             ),
-                            child: const Center(
-                              child: Icon(Icons.hourglass_top_rounded, size: 48, color: AppColors.primary),
+                            child: Center(
+                              child: Icon(
+                                _status == 'Verified' ? Icons.check_circle_rounded : (_status == 'Rejected' ? Icons.error_rounded : Icons.hourglass_top_rounded), 
+                                size: 48, 
+                                color: _status == 'Verified' ? Colors.green : (_status == 'Rejected' ? Colors.red : AppColors.primary)
+                              ),
                             ),
                           ),
                           const SizedBox(height: 32),
                           Text(
-                            'Review in Progress',
+                            _status == 'Verified' ? 'Verification Complete!' : (_status == 'Rejected' ? 'Verification Failed' : 'Review in Progress'),
                             style: AppTypography.h1.copyWith(
                               fontSize: 28,
                               fontWeight: FontWeight.w900,
@@ -109,7 +155,11 @@ class VerificationPendingScreen extends StatelessWidget {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             child: Text(
-                              'We are reviewing your profile. This usually takes 24–48 hours for premium quality checks.',
+                              _status == 'Verified' 
+                                ? 'Congratulations! Your profile has been verified. You can now start accepting jobs.' 
+                                : (_status == 'Rejected' 
+                                    ? 'Reason: $_rejectionReason\nPlease re-upload clear documents.' 
+                                    : 'We are reviewing your profile. This usually takes 24–48 hours.'),
                               style: AppTypography.body.copyWith(
                                 color: const Color(0xFF64748B),
                                 fontSize: 14,
@@ -123,8 +173,8 @@ class VerificationPendingScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 32),
 
-                    // Feature Highlight (Complexity Element)
-                    Container(
+                    // Feature Highlight
+                    if (_status != 'Rejected') Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -155,22 +205,7 @@ class VerificationPendingScreen extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   GestureDetector(
-                    onTap: () async {
-                      // Simulating a refresh check with Firebase
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Checking verification status...'),
-                          backgroundColor: Color(0xFF0F172A),
-                          duration: Duration(seconds: 1),
-                        ),
-                      );
-                      await Future.delayed(const Duration(milliseconds: 1500));
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Verification still in progress.'), backgroundColor: Colors.orangeAccent),
-                        );
-                      }
-                    },
+                    onTap: _checkStatus,
                     child: Container(
                       height: 56,
                       decoration: BoxDecoration(
@@ -198,7 +233,15 @@ class VerificationPendingScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: () => context.go('/home'),
+                    onTap: () {
+                      if (_status == 'Verified') {
+                        context.go('/home');
+                      } else if (_status == 'Rejected') {
+                        context.push('/kyc');
+                      } else {
+                        context.go('/home'); // Allow browsing for now
+                      }
+                    },
                     child: Container(
                       height: 60,
                       decoration: BoxDecoration(
@@ -214,7 +257,7 @@ class VerificationPendingScreen extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Return to Dashboard',
+                          _status == 'Rejected' ? 'Re-upload Documents' : 'Return to Dashboard',
                           style: AppTypography.h3.copyWith(
                             color: Colors.white,
                             fontSize: 15,
@@ -272,3 +315,5 @@ class VerificationPendingScreen extends StatelessWidget {
     );
   }
 }
+
+

@@ -68,6 +68,35 @@ exports.submitFeedback = async (req, res) => {
   }
 };
 
+exports.submitUserFeedback = async (req, res) => {
+  try {
+    const { rating, feedback } = req.body;
+    const booking = await bookingService.submitUserFeedback(req.params.id, rating, feedback);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.cancelBooking = async (req, res) => {
+  try {
+    const { cancelledBy } = req.body; // 'user' or 'provider'
+    const booking = await bookingService.cancelBooking(req.params.id, cancelledBy);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.settleCommission = async (req, res) => {
+  try {
+    const booking = await bookingService.settleCommission(req.params.id);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 exports.getAllBookings = async (req, res) => {
   try {
     const bookings = await bookingService.getAllBookings();
@@ -94,3 +123,4 @@ exports.getUserBookings = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+gfjgjjhhjfcfhhgtth

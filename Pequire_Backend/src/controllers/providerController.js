@@ -15,8 +15,13 @@ exports.toggleProviderStatus = async (req, res) => {
 exports.updateProviderKyc = async (req, res) => {
   try {
     const { id } = req.params;
-    const { kycStatus } = req.body; // 'Verified' or 'Rejected'
-    const provider = await Provider.findByIdAndUpdate(id, { kycStatus }, { new: true });
+    const { kycStatus, documents, rejectionReason } = req.body;
+    
+    const updateData = { kycStatus };
+    if (documents) updateData.documents = documents;
+    if (rejectionReason) updateData.rejectionReason = rejectionReason;
+
+    const provider = await Provider.findByIdAndUpdate(id, updateData, { new: true });
     res.json(provider);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -31,3 +36,20 @@ exports.getProviders = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 }
+
+exports.getProviderReviews = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const Booking = require('../models/Booking');
+    const reviews = await Booking.find({ 
+      providerId: id, 
+      rating: { $exists: true } 
+    })
+    .populate('userId', 'name')
+    .sort({ createdAt: -1 });
+
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

@@ -9,6 +9,8 @@ class UserEntity extends Equatable {
   final double? lastLat;
   final double? lastLng;
   final String? lastAddress;
+  final int currentStreak;
+  final int rewardPoints;
 
   const UserEntity({
     required this.id,
@@ -18,6 +20,8 @@ class UserEntity extends Equatable {
     this.lastLat,
     this.lastLng,
     this.lastAddress,
+    this.currentStreak = 0,
+    this.rewardPoints = 0,
   });
 
   @override

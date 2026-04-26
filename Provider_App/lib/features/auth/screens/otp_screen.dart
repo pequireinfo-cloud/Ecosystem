@@ -7,6 +7,7 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:flutter/services.dart';
 
 import 'package:pequire_provider_app/core/services/firebase_service.dart';
+import 'package:pequire_provider_app/core/services/api_service.dart';
 import 'package:dio/dio.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -24,7 +25,6 @@ class _OtpScreenState extends State<OtpScreen> {
   Timer? _timer;
   bool _canResend = false;
   bool _isLoading = false;
-  final Dio _dio = Dio();
 
   @override
   void initState() {
@@ -73,32 +73,40 @@ class _OtpScreenState extends State<OtpScreen> {
     
     try {
       final smsCode = _controllers.map((c) => c.text).join();
+      String? idToken;
 
-      // 1. Verify with Firebase
-      final credential = PhoneAuthProvider.credential(
-        verificationId: widget.verificationId!,
-        smsCode: smsCode,
-      );
+      // Check for Test Mode
+      if (widget.verificationId == 'test_verification_id_provider') {
+        if (smsCode == '4321') {
+          idToken = "TEST_USER_TOKEN_9795769848";
+        } else {
+          throw Exception('Invalid OTP for test number');
+        }
+      } else {
+        // 1. Verify with Firebase
+        final credential = PhoneAuthProvider.credential(
+          verificationId: widget.verificationId!,
+          smsCode: smsCode,
+        );
 
-      final userCredential = await FirebaseService().auth.signInWithCredential(credential);
-      final idToken = await userCredential.user?.getIdToken();
+        final userCredential = await FirebaseService().auth.signInWithCredential(credential);
+        idToken = await userCredential.user?.getIdToken();
+      }
 
       if (idToken == null) {
         throw Exception('Failed to get identity token');
       }
 
-      // 2. Verify with our Backend (Using local IP for Android connectivity)
-      const String baseUrl = 'http://10.46.122.48:4000/api';
-      final response = await _dio.post(
-        '$baseUrl/auth/user/verify-otp',
+      // 2. Verify with our Backend
+      final response = await ApiService().post(
+        '/auth/user/verify-otp',
         data: {
           'idToken': idToken,
-          'role': 'provider', // Explicitly setting role as provider
+          'role': 'provider',
         },
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Handle success (save token, navigate)
         debugPrint("Backend Auth Success: ${response.data}");
         if (mounted) {
           context.go('/service-selection');
@@ -113,6 +121,8 @@ class _OtpScreenState extends State<OtpScreen> {
       
       if (e is DioException) {
         errorMessage = e.response?.data['message'] ?? 'Backend connection error';
+      } else if (e is Exception) {
+        errorMessage = e.toString().replaceAll('Exception: ', '');
       }
 
       setState(() => _isLoading = false);
@@ -138,13 +148,13 @@ class _OtpScreenState extends State<OtpScreen> {
               Row(
                 children: [
                   Image.asset(
-                    'assets/images/logos/logo.png',
+                    'assets/images/logos/logo.webp',
                     height: 28,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(width: 8),
                   Image.asset(
-                    'assets/images/logos/Wordmark.png',
+                    'assets/images/logos/wordmark.webp',
                     height: 18,
                     fit: BoxFit.contain,
                   ),
@@ -388,3 +398,5 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 }
+
+

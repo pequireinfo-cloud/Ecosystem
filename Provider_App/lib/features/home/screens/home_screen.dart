@@ -141,16 +141,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       endDrawer: const PequireDrawer(),
       body: Column(
         children: [
             // ─── Top Header ───
             Container(
               padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 12, 20, 16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                border: Border(bottom: BorderSide(color: Theme.of(context).dividerColor)),
               ),
               child: Row(
                 children: [
@@ -159,13 +159,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        'assets/images/logos/logo.png',
+                        'assets/images/logos/logo.webp',
                         height: 28,
                         fit: BoxFit.contain,
                       ),
                       const SizedBox(width: 8),
                       Image.asset(
-                        'assets/images/logos/Wordmark.png',
+                        'assets/images/logos/wordmark.webp',
                         height: 20,
                         fit: BoxFit.contain,
                       ),
@@ -179,13 +179,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       width: 40,
                       height: 40,
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF8FAFC),
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF8FAFC),
                         borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: const Color(0xFFF1F5F9)),
+                        border: Border.all(color: Theme.of(context).dividerColor),
                       ),
                       child: Stack(
                         children: [
-                          const Center(child: Icon(Icons.notifications_none_rounded, size: 20, color: Color(0xFF475569))),
+                          Center(child: Icon(Icons.notifications_none_rounded, size: 20, color: Theme.of(context).colorScheme.onSurface)),
                           Positioned(
                             right: 10,
                             top: 10,
@@ -200,6 +200,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 12),
+                  // Logout
+                  GestureDetector(
+                    onTap: () async {
+                      await FirebaseAuth.instance.signOut();
+                      if (mounted) {
+                        context.go('/login');
+                      }
+                    },
+                    child: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEF2F2),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFFEE2E2)),
+                      ),
+                      child: const Center(child: Icon(Icons.logout_rounded, size: 20, color: Color(0xFFEF4444))),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   // Avatar
                   GestureDetector(
                     onTap: () => _scaffoldKey.currentState?.openEndDrawer(),
@@ -208,8 +228,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
-                        color: const Color(0xFFF8FAFC),
+                        border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
+                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF8FAFC),
                       ),
                       clipBehavior: Clip.hardEdge,
                       child: Image.network(
@@ -1198,3 +1218,5 @@ class _LocationSearchFieldState extends State<_LocationSearchField> {
     );
   }
 }
+
+

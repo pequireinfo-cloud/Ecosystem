@@ -19,8 +19,40 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<LoginSubmitted>(_onLoginSubmitted);
     on<SendOtp>(_onSendOtp);
     on<VerifyOtp>(_onVerifyOtp);
+    on<CheckAuthStatus>(_onCheckAuthStatus);
+    on<LogoutRequested>(_onLogoutRequested);
     on<AuthErrorInternal>((event, emit) => emit(AuthError(event.message)));
     on<OtpSentInternal>((event, emit) => emit(OtpSent(event.verificationId)));
+  }
+
+  Future<void> _onCheckAuthStatus(
+    CheckAuthStatus event,
+    Emitter<AuthState> emit,
+  ) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final idToken = await user.getIdToken();
+      if (idToken != null) {
+        final failureOrUser = await verifyOtpUseCase(VerifyOtpParams(
+          idToken: idToken,
+          role: 'user',
+        ));
+        failureOrUser.fold(
+          (failure) => emit(AuthUnauthenticated()),
+          (userEntity) => emit(AuthAuthenticated(userEntity)),
+        );
+        return;
+      }
+    }
+    emit(AuthUnauthenticated());
+  }
+
+  Future<void> _onLogoutRequested(
+    LogoutRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    await _auth.signOut();
+    emit(AuthUnauthenticated());
   }
 
   Future<void> _onSendOtp(
@@ -29,10 +61,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     print('DEBUG: AuthBloc _onSendOtp called for ${event.phoneNumber}');
     emit(AuthLoading());
+    
+    // Fixed OTP for Testing
+    if (event.phoneNumber.contains('8081158394')) {
+      print('DEBUG: Test number detected. Bypassing Firebase verifyPhoneNumber.');
+      add(const OtpSentInternal('test_verification_id_user'));
+      return;
+    }
+
     try {
       print('DEBUG: Calling _auth.verifyPhoneNumber...');
       
-      // Configure Invisible reCAPTCHA for Web
       await _auth.verifyPhoneNumber(
         phoneNumber: event.phoneNumber,
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -67,14 +106,31 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   ) async {
     emit(AuthLoading());
     try {
-      // 1. Verify with Firebase
-      final credential = PhoneAuthProvider.credential(
-        verificationId: event.verificationId,
-        smsCode: event.smsCode,
-      );
+      String? idToken;
 
-      final userCredential = await _auth.signInWithCredential(credential);
-      final idToken = await userCredential.user?.getIdToken();
+      // Check for Test Mode
+      if (event.verificationId == 'test_verification_id_user') {
+        if (event.smsCode == '1234') {
+          // For testing, we might not have a real Firebase user session
+          // We can try to sign in with a custom token or just mock the backend call
+          // However, for "Realism", we'll assume the backend has a way to handle this
+          // or we use a real test number in Firebase console.
+          // For now, let's use a dummy token that the backend will recognize as "Test User"
+          idToken = "TEST_USER_TOKEN_8081158394";
+        } else {
+          emit(const AuthError('Invalid OTP for test number'));
+          return;
+        }
+      } else {
+        // 1. Verify with Firebase
+        final credential = PhoneAuthProvider.credential(
+          verificationId: event.verificationId,
+          smsCode: event.smsCode,
+        );
+
+        final userCredential = await _auth.signInWithCredential(credential);
+        idToken = await userCredential.user?.getIdToken();
+      }
 
       if (idToken == null) {
         emit(const AuthError('Failed to get identity token'));

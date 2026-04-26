@@ -16,19 +16,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   final List<_Slide> _slides = const [
     _Slide(
-      image: 'assets/images/onboarding_1.png',
+      image: 'assets/images/onboarding_1.webp',
       title: 'Get Jobs Instantly',
       subtitle: 'Receive real-time service requests from customers near you',
       gradient: [Color(0xFF025EF3), Color(0xFF0142A8)],
     ),
     _Slide(
-      image: 'assets/images/onboarding_2.png',
+      image: 'assets/images/onboarding_2.webp',
       title: 'Earn on Your Terms',
       subtitle: 'Set your own hours and work when it suits you best',
       gradient: [Color(0xFF059669), Color(0xFF047857)],
     ),
     _Slide(
-      image: 'assets/images/onboarding_3.png',
+      image: 'assets/images/onboarding_3.webp',
       title: 'Get Paid Fast',
       subtitle: 'Instant payments directly to your bank after every job',
       gradient: [Color(0xFF7C3AED), Color(0xFF6D28D9)],
@@ -80,14 +80,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Row(
                         children: [
                           Image.asset(
-                            'assets/images/logos/logo.png',
+                            'assets/images/logos/logo.webp',
                             height: 28,
                             fit: BoxFit.contain,
                             color: Colors.white,
                           ),
                           const SizedBox(width: 8),
                           Image.asset(
-                            'assets/images/logos/Wordmark.png',
+                            'assets/images/logos/wordmark.webp',
                             height: 20,
                             fit: BoxFit.contain,
                             color: Colors.white,
@@ -253,3 +253,8 @@ class _Slide {
   final List<Color> gradient;
   const _Slide({required this.image, required this.title, required this.subtitle, required this.gradient});
 }
+
+
+
+
+

@@ -6,6 +6,8 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:flutter/services.dart';
 
 import 'package:pequire_provider_app/core/services/firebase_service.dart';
+import 'package:pequire_provider_app/core/services/api_service.dart';
+import 'package:dio/dio.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,6 +42,14 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final phone = '+91${_phoneController.text.trim()}';
       
+      // Fixed OTP for Testing
+      if (phone.contains('9795769848')) {
+        debugPrint("Test number detected. Bypassing Firebase verifyPhoneNumber.");
+        setState(() => _isLoading = false);
+        context.push('/login/otp', extra: 'test_verification_id_provider');
+        return;
+      }
+
       await FirebaseService().auth.verifyPhoneNumber(
         phoneNumber: phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
@@ -48,9 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
           final idToken = await userCredential.user?.getIdToken();
           
           if (idToken != null && mounted) {
-            // Verify with backend (Using local IP for Android connectivity)
-            const String baseUrl = 'http://10.46.122.48:4000/api';
-            await Dio().post('$baseUrl/auth/user/verify-otp', data: {
+            // Use ApiService instead of hardcoded Dio for consistency
+            final response = await ApiService().post('/auth/user/verify-otp', data: {
               'idToken': idToken,
               'role': 'provider',
             });
@@ -85,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
           children: [
@@ -100,13 +109,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Image.asset(
-                          'assets/images/logos/logo.png',
+                          'assets/images/logos/logo.webp',
                           height: 28,
                           fit: BoxFit.contain,
                         ),
                         const SizedBox(width: 8),
                         Image.asset(
-                          'assets/images/logos/Wordmark.png',
+                          'assets/images/logos/wordmark.webp',
                           height: 18,
                           fit: BoxFit.contain,
                         ),
@@ -133,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           style: AppTypography.h1.copyWith(
                             fontSize: 26,
                             fontWeight: FontWeight.w900,
-                            color: const Color(0xFF0F172A),
+                            color: Theme.of(context).colorScheme.onSurface,
                             height: 1.1,
                             letterSpacing: -0.5,
                           ),
@@ -142,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           'Our premium portal ensures safe and efficient job management.',
                           style: AppTypography.body.copyWith(
-                            color: const Color(0xFF64748B),
+                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                             fontSize: 14,
                             height: 1.4,
                           ),
@@ -165,11 +174,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       height: 56,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
-                        boxShadow: AppColors.softShadow,
+                        boxShadow: Theme.of(context).brightness == Brightness.dark ? null : AppColors.softShadow,
                         border: Border.all(
-                          color: _phoneController.text.isNotEmpty ? AppColors.primary.withOpacity(0.3) : const Color(0xFFF1F5F9),
+                          color: _phoneController.text.isNotEmpty ? AppColors.primary.withOpacity(0.3) : Theme.of(context).dividerColor,
                           width: 1.5,
                         ),
                       ),
@@ -186,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Text(
                                   '+91',
                                   style: AppTypography.label.copyWith(
-                                    color: const Color(0xFF1E293B),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
                                   ),
@@ -208,7 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               style: AppTypography.h3.copyWith(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
-                                color: const Color(0xFF0F172A),
+                                color: Theme.of(context).colorScheme.onSurface,
                                 letterSpacing: 1,
                               ),
                               decoration: InputDecoration(
@@ -236,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         height: 60,
                         decoration: BoxDecoration(
                           gradient: _isValid ? AppColors.primaryGradient : null,
-                          color: _isValid ? null : const Color(0xFFF1F5F9),
+                          color: _isValid ? null : (Theme.of(context).brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF1F5F9)),
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: _isValid ? AppColors.primaryGlow : null,
                         ),
@@ -372,3 +381,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
+

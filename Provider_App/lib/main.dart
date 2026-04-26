@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:pequire_provider_app/core/theme/app_theme.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
@@ -20,8 +21,14 @@ import 'features/settings/screens/settings_screen.dart';
 import 'features/notifications/screens/notifications_screen.dart';
 import 'features/help/screens/help_screen.dart';
 
+import 'features/settings/screens/language_selection_screen.dart';
 import 'package:pequire_provider_app/core/services/firebase_service.dart';
 import 'package:pequire_provider_app/core/services/socket_service.dart';
+
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pequire_provider_app/core/providers/locale_provider.dart';
+import 'package:pequire_provider_app/core/providers/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,9 +49,29 @@ void main() async {
   );
 }
 
+
 final _router = GoRouter(
-  initialLocation: '/onboarding',
+  initialLocation: '/',
+  redirect: (context, state) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isLoggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/onboarding' || state.matchedLocation == '/login/otp';
+    
+    if (user == null) {
+      // Not logged in
+      if (isLoggingIn) return null; // Let them proceed to login/onboarding
+      return '/onboarding'; // Otherwise force onboarding
+    }
+    
+    // Logged in
+    if (isLoggingIn) return '/home'; // If logged in, don't show login screens
+    
+    return null; // Let them proceed to their destination
+  },
   routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const Scaffold(body: Center(child: CircularProgressIndicator())),
+    ),
     GoRoute(
       path: '/onboarding',
       builder: (context, state) => const OnboardingScreen(),
@@ -111,22 +138,42 @@ final _router = GoRouter(
       builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
+      path: '/language-selection',
+      builder: (context, state) => const LanguageSelectionScreen(),
+    ),
+    GoRoute(
       path: '/help',
       builder: (context, state) => const HelpScreen(),
     ),
   ],
 );
 
-class PequireApp extends StatelessWidget {
+class PequireApp extends ConsumerWidget {
   const PequireApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locale = ref.watch(localeProvider);
+    final themeMode = ref.watch(themeModeProvider);
+    
     return MaterialApp.router(
-      title: 'PeQuire Provider',
+      title: 'Pequire Partner',
       debugShowCheckedModeBanner: false,
       routerConfig: _router,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode: themeMode,
+      locale: locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('hi'),
+      ],
     );
   }
 }

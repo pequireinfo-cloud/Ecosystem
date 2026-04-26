@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, ShieldCheck, Clock, Search, Filter, MoreHorizontal, Mail, Phone, Calendar } from 'lucide-react';
+import { Users, UserCheck, ShieldCheck, Clock, Search, Filter, MoreHorizontal, Mail, Phone, Calendar, Star } from 'lucide-react';
 import api from '../utils/api';
 
 const UserManagement = () => {
@@ -174,6 +174,7 @@ const UserManagement = () => {
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>USER</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>CONTACT</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>STATUS</th>
+                <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>RATING</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>KYC VERIFICATION</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>JOINED DATE</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}></th>
@@ -227,6 +228,13 @@ const UserManagement = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: getStatusColor(user.status) }}></div>
                         <span style={{ fontSize: '13px', fontWeight: '500', textTransform: 'capitalize' }}>{user.status}</span>
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Star size={14} fill="#F59E0B" color="#F59E0B" />
+                        <span style={{ fontWeight: '700', fontSize: '13px' }}>{user.rating?.toFixed(1) || '5.0'}</span>
+                        <span style={{ fontSize: '11px', color: '#94A3B8' }}>({user.reviewCount || 0})</span>
                       </div>
                     </td>
                     <td style={{ padding: '16px 12px' }}>

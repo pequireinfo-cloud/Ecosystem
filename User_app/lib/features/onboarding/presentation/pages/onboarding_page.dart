@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/auth/presentation/pages/login_page.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -13,23 +14,24 @@ class _OnboardingPageState extends State<OnboardingPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<OnboardingContent> _contents = [
-    OnboardingContent(
-      title: 'Transparent Pricing',
-      image: 'assets/onboarding_pricing.jpg',
-    ),
-    OnboardingContent(
-      title: 'Verified Professionals',
-      image: 'assets/onboarding_professionals.jpg',
-    ),
-    OnboardingContent(
-      title: 'Snap Problem, Get Solution',
-      image: 'assets/onboarding_snap_solve.jpg',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    
+    final List<OnboardingContent> _contents = [
+      OnboardingContent(
+        title: l10n.onboarding1,
+        image: 'assets/onboarding_pricing.webp',
+      ),
+      OnboardingContent(
+        title: l10n.onboarding2,
+        image: 'assets/onboarding_professionals.webp',
+      ),
+      OnboardingContent(
+        title: l10n.onboarding3,
+        image: 'assets/onboarding_snap_solve.webp',
+      ),
+    ];
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -40,13 +42,13 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Row(
                 children: [
                   Image.asset(
-                    'assets/logo.png',
+                    'assets/logo.webp',
                     width: 36,
                     height: 36,
                   ),
                   const SizedBox(width: 8),
                   Image.asset(
-                    'assets/wordmark.png',
+                    'assets/wordmark.webp',
                     height: 18,
                     color: const Color(0xFF1A1B2F),
                   ),
@@ -107,9 +109,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             builder: (context) => const LoginPage()),
                       );
                     },
-                    child: const Text(
-                      'Skip',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.skip,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey,
@@ -204,4 +206,9 @@ class OnboardingContent {
     required this.image,
   });
 }
+
+
+
+
+
 

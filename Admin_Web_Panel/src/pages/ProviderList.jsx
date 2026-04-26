@@ -74,15 +74,16 @@ const ProviderList = () => {
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>PROVIDER</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>SERVICE</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>STATUS</th>
+              <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>RATING</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>KYC</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>ACTIONS</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center' }}>Loading...</td></tr>
+              <tr><td colSpan="6" style={{ padding: '40px', textAlign: 'center' }}>Loading...</td></tr>
             ) : filteredProviders.length === 0 ? (
-              <tr><td colSpan="5" style={{ padding: '40px', textAlign: 'center' }}>No providers found.</td></tr>
+              <tr><td colSpan="6" style={{ padding: '40px', textAlign: 'center' }}>No providers found.</td></tr>
             ) : filteredProviders.map((p) => (
                 <tr key={p._id} style={{ borderTop: '1px solid var(--border)' }}>
                   <td style={{ padding: '16px 24px' }}>
@@ -101,6 +102,13 @@ const ProviderList = () => {
                       backgroundColor: p.status === 'Blocked' ? '#FDE8E8' : (p.status === 'Online' ? '#DEF7EC' : '#F3F4F6'),
                       color: p.status === 'Blocked' ? '#9B1C1C' : (p.status === 'Online' ? '#03543F' : '#374151')
                     }}>{p.status?.toUpperCase() || 'OFFLINE'}</span>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Star size={14} fill="#F59E0B" color="#F59E0B" />
+                      <span style={{ fontWeight: '700', fontSize: '14px' }}>{p.rating?.toFixed(1) || '5.0'}</span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>({p.reviewCount || 0})</span>
+                    </div>
                   </td>
                   <td style={{ padding: '16px 24px', fontSize: '14px' }}>
                     <span style={{ fontWeight: '600', color: p.kycStatus === 'Verified' ? '#059669' : '#D97706' }}>{p.kycStatus}</span>

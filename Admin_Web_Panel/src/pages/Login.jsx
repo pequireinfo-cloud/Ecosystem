@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../utils/api';
-import logo from '../assets/logo.png';
-import wordmark from '../assets/wordmark.png';
+import logo from '../assets/logo.webp';
+import wordmark from '../assets/wordmark.webp';
 import { Mail, Lock, LogIn, AlertCircle, Loader2 } from 'lucide-react';
 
 const Login = ({ onLoginSuccess }) => {
@@ -236,3 +236,5 @@ const blob2Style = {
 };
 
 export default Login;
+
+
