@@ -5,23 +5,25 @@ const admin = require('firebase-admin');
 // Place it in the backend folder or use environment variables.
 
 try {
-  // If running locally, you must store the service account key alongside your code.
-  // const serviceAccount = require('../../serviceAccountKey.json');
-  // admin.initializeApp({
-  //   credential: admin.credential.cert(serviceAccount)
-  // });
+  const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
   
-  // Alternative: Using GOOGLE_APPLICATION_CREDENTIALS in .env
-  if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-    admin.initializeApp({
-        credential: admin.credential.applicationDefault()
-    });
-    console.log('Firebase Admin Initialized successfully.');
+  if (serviceAccountPath) {
+    const path = require('path');
+    const resolvedPath = path.resolve(serviceAccountPath);
+    
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(resolvedPath)
+      });
+      console.log('✅ Firebase Admin Initialized successfully.');
+    } else {
+      console.log('ℹ️ Firebase Admin already initialized.');
+    }
   } else {
-    console.warn('WARN: GOOGLE_APPLICATION_CREDENTIALS not set in .env');
+    console.warn('⚠️ WARN: Firebase Service Account not found. Push notifications may not work.');
   }
 } catch (error) {
-  console.error('Firebase Admin Initialization Error:', error);
+  console.error('❌ Firebase Admin Initialization Error:', error.message);
 }
 
 const db = admin.apps.length ? admin.firestore() : null;

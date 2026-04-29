@@ -16,12 +16,8 @@ class BookingSession {
   dynamic pickupLocation;
   String? pickupAddress;
 
-  // Simulation support
-  bool isSimulation = false;
-
   BookingSession({
     required this.category, 
-    this.isSimulation = false,
     this.price,
     this.userId,
     this.pickupLocation,

@@ -16,6 +16,7 @@ import 'emergency_sos_page.dart';
 import 'subscription_page.dart';
 import 'package:pequire_user_app/features/notifications/presentation/pages/notifications/notification_page.dart';
 import 'location_picker_page.dart';
+import 'map_location_picker_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
 import 'package:pequire_user_app/core/services/location_service.dart';
 import 'package:pequire_user_app/features/auth/domain/repositories/auth_repository.dart';
@@ -215,8 +216,8 @@ class _HomeTabState extends State<HomeTab> {
                         ),
                       ),
                       if (_currentLocation == 'Detecting...' || _currentLocation == 'Detecting location...')
-                        const Padding(
-                          padding: EdgeInsets.only(left: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
                           child: SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 1.5, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5))),
                         )
                       else
@@ -270,7 +271,17 @@ class _HomeTabState extends State<HomeTab> {
     if (result == 'CURRENT_LOCATION') {
       await _initLocation();
     } else if (result == 'SELECT_ON_MAP') {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Map selection coming soon!')));
+      final mapResult = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const MapLocationPickerPage()),
+      );
+      if (mapResult is LocationResult && mounted) {
+        setState(() {
+          _currentLocation = mapResult.address;
+          _currentPosition = mapResult.position;
+        });
+        _updateBackendLocation(mapResult.position.latitude, mapResult.position.longitude, mapResult.address);
+      }
     } else if (result is LocationResult) {
       if (mounted) {
         setState(() {

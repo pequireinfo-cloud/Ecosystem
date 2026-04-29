@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pequire_user_app/l10n/app_localizations.dart';
+
 import 'package:pequire_user_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:pequire_user_app/features/auth/presentation/bloc/auth_state.dart';
 import 'package:pequire_user_app/core/theme/theme_cubit.dart';
@@ -325,7 +327,7 @@ class _ProfileTabState extends State<ProfileTab> {
       backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(36),
           ),

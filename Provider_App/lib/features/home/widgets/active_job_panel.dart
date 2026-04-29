@@ -13,7 +13,6 @@ class ActiveJobPanel extends StatefulWidget {
   final String serviceType;
   final String address;
   final VoidCallback onComplete;
-  final bool isSimulation;
 
   const ActiveJobPanel({
     super.key,
@@ -21,7 +20,6 @@ class ActiveJobPanel extends StatefulWidget {
     required this.serviceType,
     required this.address,
     required this.onComplete,
-    this.isSimulation = false,
   });
 
   @override
@@ -48,7 +46,6 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
   }
 
   void _startPolling() async {
-    if (widget.isSimulation) return;
     while (mounted) {
       try {
         final response = await ApiService().get('/bookings/${widget.bookingId}');
@@ -69,11 +66,6 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     final otp = await _showOtpDialog('Arrival OTP');
     if (otp == null) return;
 
-    if (widget.isSimulation) {
-      setState(() => _currentStatus = 'diagnosing');
-      return;
-    }
-
     setState(() => _isSubmitting = true);
     try {
       await BookingService().verifyArrivalOtp(widget.bookingId, otp);
@@ -87,11 +79,6 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
   Future<void> _submitDiagnosis() async {
     if (_priceController.text.isEmpty) {
       _showError('Please enter a final price.');
-      return;
-    }
-
-    if (widget.isSimulation) {
-      setState(() => _currentStatus = 'working');
       return;
     }
 
@@ -119,11 +106,6 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
 
     final otp = await _showOtpDialog('Completion OTP');
     if (otp == null) return;
-
-    if (widget.isSimulation) {
-       widget.onComplete();
-       return;
-    }
 
     setState(() => _isSubmitting = true);
     try {

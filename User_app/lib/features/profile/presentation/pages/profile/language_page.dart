@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/core/locale/locale_cubit.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pequire_user_app/l10n/app_localizations.dart';
 
 class LanguagePage extends StatelessWidget {
   const LanguagePage({super.key});

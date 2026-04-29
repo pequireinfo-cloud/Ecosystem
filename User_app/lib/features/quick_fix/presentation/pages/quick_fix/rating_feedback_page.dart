@@ -3,7 +3,6 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
 import 'package:pequire_user_app/core/services/booking_service.dart';
-import 'package:pequire_user_app/features/quick_fix/presentation/widgets/booking_simulator.dart';
 
 class RatingFeedbackPage extends StatefulWidget {
   final BookingSession session;
@@ -29,15 +28,11 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
     setState(() => _isSubmitting = true);
     
     try {
-      if (widget.session.isSimulation) {
-        await Future.delayed(const Duration(seconds: 1)); // Mock delay
-      } else {
-        await BookingService().submitFeedback(
-          bookingId: widget.session.bookingId!,
-          rating: _rating,
-          feedback: _commentController.text,
-        );
-      }
+      await BookingService().submitFeedback(
+        bookingId: widget.session.bookingId!,
+        rating: _rating,
+        feedback: _commentController.text,
+      );
       
       if (!mounted) return;
 
@@ -79,9 +74,7 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BookingSimulator(
-      session: widget.session,
-      child: QuickFixBaseLayout(
+    return QuickFixBaseLayout(
         title: 'Rate Experience',
         initialSheetSize: 0.8,
         child: Padding(
@@ -165,7 +158,6 @@ class _RatingFeedbackPageState extends State<RatingFeedbackPage> {
             ],
           ),
         ),
-      ),
     );
   }
 }

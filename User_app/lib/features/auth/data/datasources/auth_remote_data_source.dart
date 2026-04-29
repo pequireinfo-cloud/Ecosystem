@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../models/auth_model.dart';
 import '../../domain/entities/login_role.dart';
 import 'package:flutter/foundation.dart';
+import '../../../../core/config/api_config.dart';
 
 abstract class AuthRemoteDataSource {
   Future<AuthModel> login({
@@ -23,8 +24,18 @@ abstract class AuthRemoteDataSource {
     required String address,
   });
 
-  Future<AuthModel> verifyOtp({
-    required String idToken,
+  Future<void> sendWhatsAppOtp({
+    required String phoneNumber,
+  });
+
+  Future<AuthModel> verifyWhatsAppOtp({
+    required String phoneNumber,
+    required String otp,
+    required String role,
+  });
+
+  Future<AuthModel> verifyDescope({
+    required String token,
     required String role,
   });
 }
@@ -34,18 +45,34 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   AuthRemoteDataSourceImpl({required this.dio});
 
-  // Base URL for API (Using local IP for Android connectivity)
-  static const String baseUrl = 'http://10.46.122.48:4000/api';
+  // Using centralized ApiConfig
+  static const String baseUrl = ApiConfig.baseUrl;
 
   @override
-  Future<AuthModel> verifyOtp({
-    required String idToken,
+  Future<void> sendWhatsAppOtp({
+    required String phoneNumber,
+  }) async {
+    await dio.post(
+      '$baseUrl/auth/user/send-whatsapp-otp',
+      options: Options(headers: ApiConfig.headers),
+      data: {
+        'phoneNumber': phoneNumber,
+      },
+    );
+  }
+
+  @override
+  Future<AuthModel> verifyWhatsAppOtp({
+    required String phoneNumber,
+    required String otp,
     required String role,
   }) async {
     final response = await dio.post(
-      '$baseUrl/auth/user/verify-otp',
+      '$baseUrl/auth/user/verify-whatsapp-otp',
+      options: Options(headers: ApiConfig.headers),
       data: {
-        'idToken': idToken,
+        'phoneNumber': phoneNumber,
+        'otp': otp,
         'role': role,
       },
     );
@@ -62,15 +89,51 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
+  Future<AuthModel> verifyDescope({
+    required String token,
+    required String role,
+  }) async {
+    try {
+      debugPrint('AUTH_REMOTE: Verifying Descope token with backend...');
+      debugPrint('AUTH_REMOTE: URL: $baseUrl/auth/user/verify-descope');
+      
+      final response = await dio.post(
+        '$baseUrl/auth/user/verify-descope',
+        options: Options(headers: ApiConfig.headers),
+        data: {
+          'sessionToken': token,
+          'role': role,
+        },
+      ).timeout(const Duration(seconds: 10));
+
+      debugPrint('AUTH_REMOTE: Backend Response: ${response.statusCode}');
+      
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return AuthModel.fromJson(response.data['user']);
+      } else {
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          type: DioExceptionType.badResponse,
+        );
+      }
+    } catch (e) {
+      debugPrint('AUTH_REMOTE: Verification Failed: $e');
+      if (e is DioException) {
+        debugPrint('AUTH_REMOTE: Dio Error Type: ${e.type}');
+        debugPrint('AUTH_REMOTE: Dio Error Msg: ${e.message}');
+      }
+      rethrow;
+    }
+  }
+
+  @override
   Future<AuthModel> login({
     required String email,
     required String password,
     required LoginRole role,
   }) async {
-    // Mocking an API call
     await Future.delayed(const Duration(seconds: 1));
-
-    // For mocking, we just succeed if email doesn't contain "error"
     if (!email.contains('error')) {
       return AuthModel(
         id: '1',
@@ -96,10 +159,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String password,
     required LoginRole role,
   }) async {
-    // Mocking an API call for registration
     await Future.delayed(const Duration(seconds: 1));
-
-    // For mocking, we just succeed if email doesn't contain "error"
     if (!email.contains('error')) {
       return AuthModel(
         id: '2',
@@ -126,7 +186,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required double lng,
     required String address,
   }) async {
-    // Mocking an API call to update user location
     await Future.delayed(const Duration(milliseconds: 500));
     debugPrint("Location updated for $userId to $address ($lat, $lng)");
   }

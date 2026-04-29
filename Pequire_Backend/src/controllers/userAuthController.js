@@ -1,77 +1,106 @@
-const admin = require('firebase-admin');
 const User = require('../models/User');
+const Provider = require('../models/Provider');
 const jwt = require('jsonwebtoken');
+const descopeSdk = require('@descope/node-sdk');
+const DescopeClient = descopeSdk.default || descopeSdk.DescopeClient || descopeSdk;
 
-// Initialize Firebase Admin if not already initialized
-if (!admin.apps.length) {
-  try {
-    admin.initializeApp({
-      credential: admin.credential.cert(process.env.FIREBASE_SERVICE_ACCOUNT_PATH)
-    });
-  } catch (error) {
-    console.error('Firebase Admin Init Error:', error);
-  }
+// Initialize Descope Client
+let descopeClient;
+try {
+  descopeClient = DescopeClient({
+    projectId: process.env.DESCOPE_PROJECT_ID || 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5'
+  });
+} catch (e) {
+  console.error('FAILED TO INITIALIZE DESCOPE CLIENT:', e);
 }
 
-exports.verifyOtpAndLogin = async (req, res) => {
+// @desc    Verify Descope Token and Login/Register
+// @route   POST /api/auth/user/verify-descope
+// @access  Public
+exports.verifyDescopeToken = async (req, res) => {
   try {
-    const { idToken, role } = req.body;
+    const { sessionToken, role = 'user' } = req.body;
 
-    if (!idToken) {
-      return res.status(400).json({ message: 'ID Token is required' });
-    }
-
-    // 1. Verify the Firebase ID Token
-    let phoneNumber;
-    if (idToken.startsWith('TEST_USER_TOKEN_')) {
-      phoneNumber = idToken.split('_').pop(); // e.g. 8081158394
-      if (!phoneNumber.startsWith('+')) phoneNumber = '+91' + phoneNumber; // Default to India for test
-    } else {
-      const decodedToken = await admin.auth().verifyIdToken(idToken);
-      phoneNumber = decodedToken.phone_number;
-    }
-
-    if (!phoneNumber) {
-      return res.status(400).json({ message: 'Phone number not found in token' });
-    }
-
-    // 2. Find or Create the User in MongoDB
-    let user = await User.findOne({ phoneNumber: phoneNumber });
-
-    if (!user) {
-      // Create new user if not exists
-      user = new User({
-        phoneNumber: phoneNumber,
-        name: 'New User', // Default name, can be updated later
-        email: `${phoneNumber}@pequire.com`, // Placeholder email
-        password: 'otp_authenticated', // Placeholder password since it's OTP login
-        role: role || 'user',
-        status: 'active'
+    if (!sessionToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'Descope session token is required'
       });
-      await user.save();
     }
 
-    // 3. Generate Custom JWT for our Backend session
-    const jwtToken = jwt.sign(
-      { id: user._id, phoneNumber: user.phoneNumber, role: user.role },
-      process.env.JWT_SECRET || 'pequire_super_secret_key',
-      { expiresIn: '30d' } // Long lived session
+    // 1. Verify the session token with Descope
+    let authDetails;
+    try {
+      authDetails = await descopeClient.validateSession(sessionToken);
+    } catch (error) {
+      console.error('Descope Validation Error:', error);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Descope session'
+      });
+    }
+
+    // 2. Extract user info from Descope authDetails
+    const loginId = authDetails.token.sub;
+    const phoneNumber = authDetails.token.phone || loginId;
+
+    let account;
+    let isNew = false;
+
+    if (role === 'provider') {
+      account = await Provider.findOne({ phoneNumber });
+      if (!account) {
+        console.log(`Creating new provider with phone: ${phoneNumber}`);
+        account = await Provider.create({
+          phoneNumber,
+          fullName: 'New Partner',
+          serviceType: 'Carpentry',
+          status: 'Offline'
+        });
+        isNew = true;
+      }
+    } else {
+      account = await User.findOne({ phoneNumber });
+      if (!account) {
+        console.log(`Creating new user with phone: ${phoneNumber}`);
+        account = await User.create({
+          phoneNumber,
+          name: 'New User',
+          role: 'user'
+        });
+        isNew = true;
+      }
+    }
+
+    // 4. Generate our own JWT for the Ecosystem
+    const token = jwt.sign(
+      { id: account._id, role: role },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
     );
 
     res.status(200).json({
-      message: 'Login successful',
-      token: jwtToken,
+      success: true,
+      token,
       user: {
-        id: user._id,
-        name: user.name,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
-        avatar: user.avatar
+        id: account._id,
+        phoneNumber: account.phoneNumber,
+        role: role,
+        name: account.name || account.fullName,
+        isNewUser: isNew,
+        kycStatus: account.kycStatus
       }
     });
 
   } catch (error) {
-    console.error('OTP Verification Backend Error:', error);
-    res.status(401).json({ message: 'Invalid or expired token', error: error.message });
+    console.error('Verify Descope Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during verification'
+    });
   }
 };
+
+// Note: Manual OTP endpoints (send-whatsapp-otp, verify-whatsapp-otp) 
+// are now handled DIRECTLY by the Descope SDK on the mobile side.
+// The backend only needs to verify the final session token.

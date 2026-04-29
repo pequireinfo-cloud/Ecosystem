@@ -6,7 +6,7 @@ import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_f
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/rating_feedback_page.dart';
 import 'searching_provider_page.dart';
-import 'package:pequire_user_app/features/quick_fix/presentation/widgets/booking_simulator.dart';
+import 'searching_provider_page.dart';
 
 class PaymentPage extends StatefulWidget {
   final BookingSession session;
@@ -43,9 +43,7 @@ class _PaymentPageState extends State<PaymentPage> {
           }
         }
 
-        return BookingSimulator(
-          session: widget.session,
-          child: QuickFixBaseLayout(
+        return QuickFixBaseLayout(
             title: isFinalPayment ? 'Final Payment' : 'Select Payment Method',
             initialSheetSize: 0.8,
             child: Padding(
@@ -124,16 +122,6 @@ class _PaymentPageState extends State<PaymentPage> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () async {
-                        // In simulation mode, just go to next step
-                        if (widget.session.isSimulation) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RatingFeedbackPage(session: widget.session),
-                            ),
-                          );
-                          return;
-                        }
 
                         // Show loading
                         showDialog(

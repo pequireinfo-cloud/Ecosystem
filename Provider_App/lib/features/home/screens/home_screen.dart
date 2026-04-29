@@ -43,7 +43,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   String? _activeBookingId;
   String? _activeServiceType;
   String? _activeAddress;
-  bool _isSimulation = false;
   final List<LatLng> _hotspots = [
     const LatLng(28.6129, 77.2295), // Connaught Place area
     const LatLng(28.5272, 77.2602), // Okhla area
@@ -325,7 +324,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         bookingId: _activeBookingId!,
                         serviceType: _activeServiceType ?? 'Service',
                         address: _activeAddress ?? 'Nearby',
-                        isSimulation: _isSimulation,
                         onComplete: () {
                           setState(() {
                             _activeBookingId = null;
@@ -346,115 +344,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
         ],
       ),
-      floatingActionButton: _activeBookingId != null ? null : Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (_activeJobDestination != null)
-            FloatingActionButton.extended(
-              heroTag: 'complete_job',
-              onPressed: () {
-                setState(() {
-                  _activeJobDestination = null;
-                  _routePoints.clear();
-                });
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Job Completed Successfully!')));
-              },
-              backgroundColor: const Color(0xFF10B981),
-              icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-              label: Text('Complete Job', style: AppTypography.label.copyWith(color: Colors.white)),
-            )
-          else
-            FloatingActionButton.extended(
-              heroTag: 'simulate_job',
-              onPressed: _showSimulateJobModal,
-              backgroundColor: AppColors.primary,
-              icon: const Icon(Icons.add_location_alt_rounded, color: Colors.white),
-              label: Text('Simulate Job', style: AppTypography.label.copyWith(color: Colors.white)),
-            ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            heroTag: 'debug_menu',
-            onPressed: _showDebugMenu,
-            backgroundColor: const Color(0xFF0F172A),
-            child: const Icon(Icons.bug_report_rounded, color: Colors.white),
-          ),
-        ],
-      ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  void _showDebugMenu() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.bug_report_rounded, color: Color(0xFFDC2626)),
-                    const SizedBox(width: 8),
-                    Text('Debug Simulator', style: AppTypography.h2.copyWith(color: const Color(0xFF0F172A), fontSize: 18)),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                Text('SIMULATE KYC STATE', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 11)),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: KycState.values.map((state) {
-                    final isCurrent = ref.read(kycProvider) == state;
-                    return ActionChip(
-                      label: Text(state.name.toUpperCase()),
-                      labelStyle: TextStyle(
-                        color: isCurrent ? Colors.white : const Color(0xFF475569),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      backgroundColor: isCurrent ? AppColors.primary : const Color(0xFFF1F5F9),
-                      side: BorderSide.none,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      onPressed: () {
-                        ref.read(kycProvider.notifier).updateState(state);
-                        Navigator.pop(ctx);
-                      },
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 24),
-                Text('SIMULATE JOB SITUATION', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontWeight: FontWeight.w700, letterSpacing: 1, fontSize: 11)),
-                const SizedBox(height: 12),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    _showSimulateJobModal();
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFEEF2FF),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text('Trigger New Job Request', style: AppTypography.label.copyWith(color: const Color(0xFF4F46E5), fontSize: 14)),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 
@@ -517,7 +407,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       _activeServiceType = serviceType;
                       _activeAddress = address;
                       _activeJobDestination = LatLng(lat, lon);
-                      _isSimulation = false;
                     });
                   // Start Firestore tracking
                   TrackingService().startTracking(bookingId);
@@ -544,120 +433,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  void _simulateIncomingJob(double lat, double lon, String addressName) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: const BoxDecoration(color: Color(0xFFFEF3C7), shape: BoxShape.circle),
-              child: const Icon(Icons.bolt_rounded, color: Color(0xFFD97706), size: 20),
-            ),
-            const SizedBox(width: 12),
-            const Text('New Job Request'),
-          ],
-        ),
-        titleTextStyle: AppTypography.h3.copyWith(color: const Color(0xFF0F172A), fontSize: 18),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Electrician • Fan Repair', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF64748B), fontSize: 14)),
-            const SizedBox(height: 12),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.location_on_outlined, color: Color(0xFF94A3B8), size: 16),
-                const SizedBox(width: 4),
-                Expanded(child: Text(addressName, style: AppTypography.label.copyWith(color: const Color(0xFF0F172A), fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis)),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                const Icon(Icons.payments_outlined, color: Color(0xFF94A3B8), size: 16),
-                const SizedBox(width: 4),
-                Text('Estimated ₹450 - ₹600', style: AppTypography.label.copyWith(color: const Color(0xFF059669), fontSize: 13)),
-              ],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(foregroundColor: const Color(0xFF64748B)),
-            child: const Text('Decline'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              setState(() {
-                _activeBookingId = 'sim_\${DateTime.now().millisecondsSinceEpoch}';
-                _activeServiceType = 'Electrician • Fan Repair';
-                _activeAddress = addressName;
-                _activeJobDestination = LatLng(lat, lon);
-                _isSimulation = true;
-              });
-              final providerLocation = ref.read(locationProvider).value;
-              if (providerLocation != null) {
-                _fetchRoute(LatLng(providerLocation.latitude, providerLocation.longitude), LatLng(lat, lon));
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
-            ),
-            child: const Text('Accept Job'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showSimulateJobModal() {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 24, right: 24, top: 24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Simulate Job Request', style: AppTypography.h2.copyWith(color: const Color(0xFF0F172A))),
-              const SizedBox(height: 8),
-              Text('Search the live map database for a destination.', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF64748B))),
-              const SizedBox(height: 20),
-              // Dynamic Search Field
-              SizedBox(
-                height: 300, // Fixed height to allow scrolling of suggestions above the keyboard
-                child: _LocationSearchField(
-                  onSelected: (lat, lon, name) {
-                    Navigator.pop(ctx);
-                    if (mounted) {
-                      _simulateIncomingJob(lat, lon, name);
-                    }
-                  },
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
 
 
   Future<void> _fetchRoute(LatLng start, LatLng end) async {

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/auth/presentation/pages/login_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pequire_user_app/l10n/app_localizations.dart';
+import 'package:pequire_user_app/core/widgets/pequire_logo.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -41,17 +42,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               padding: const EdgeInsets.only(top: 16.0, left: 24.0, right: 24.0),
               child: Row(
                 children: [
-                  Image.asset(
-                    'assets/logo.webp',
-                    width: 36,
-                    height: 36,
-                  ),
-                  const SizedBox(width: 8),
-                  Image.asset(
-                    'assets/wordmark.webp',
-                    height: 18,
-                    color: const Color(0xFF1A1B2F),
-                  ),
+                  const PequireLogo(height: 36, isLight: true),
                 ],
               ),
             ),

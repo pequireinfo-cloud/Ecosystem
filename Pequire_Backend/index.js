@@ -20,6 +20,12 @@ module.exports = { app, server, io };
 app.use(cors());
 app.use(express.json());
 
+// Attach socket.io to request for use in controllers
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 const bookingRoutes = require('./src/routes/bookingRoutes');
 const jobRoutes = require('./src/routes/spRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
@@ -51,6 +57,22 @@ app.use('/api/admin/stats', adminStatsRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'Pequire Backend API is running' });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date(),
+    version: '1.0.0'
+  });
+});
+
+app.get('/api/config', (req, res) => {
+  res.json({
+    descopeProjectId: process.env.DESCOPE_PROJECT_ID || 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5',
+    firebaseEnabled: !!process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
+    supportEmail: 'support@pequire.com'
+  });
 });
 
 // Socket.io basic setup

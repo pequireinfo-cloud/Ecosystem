@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 
 class QuickFixBaseLayout extends StatelessWidget {
   final Widget child;
@@ -29,31 +31,7 @@ class QuickFixBaseLayout extends StatelessWidget {
         children: [
           // Background Layer (Real Map or Dummy Map)
           Positioned.fill(
-            child: background ?? Container(
-              color: Colors.grey.shade200,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.map_outlined, size: 80, color: Colors.grey.shade400),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Live Map View',
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '(Map context for service booking)',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: background ?? const _DefaultMapBackground(),
           ),
 
           // Custom App Bar Overlay
@@ -147,6 +125,57 @@ class QuickFixBaseLayout extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DefaultMapBackground extends StatefulWidget {
+  const _DefaultMapBackground();
+
+  @override
+  State<_DefaultMapBackground> createState() => _DefaultMapBackgroundState();
+}
+
+class _DefaultMapBackgroundState extends State<_DefaultMapBackground> {
+  LatLng _currentPos = const LatLng(28.6139, 77.2090);
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLocation();
+  }
+
+  Future<void> _loadLocation() async {
+    try {
+      final pos = await Geolocator.getCurrentPosition();
+      if (mounted) {
+        setState(() {
+          _currentPos = LatLng(pos.latitude, pos.longitude);
+          _loading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        GoogleMap(
+          initialCameraPosition: CameraPosition(target: _currentPos, zoom: 14),
+          myLocationEnabled: true,
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          mapToolbarEnabled: false,
+        ),
+        if (_loading)
+          const Center(child: CircularProgressIndicator()),
+      ],
     );
   }
 }

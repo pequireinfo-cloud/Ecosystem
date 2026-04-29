@@ -42,29 +42,41 @@ class RegisterSubmitted extends AuthEvent {
   List<Object?> get props => [name, email, password, role];
 }
 
-class SendOtp extends AuthEvent {
+class SendWhatsAppOtp extends AuthEvent {
   final String phoneNumber;
-  const SendOtp(this.phoneNumber);
+  const SendWhatsAppOtp(this.phoneNumber);
 
   @override
   List<Object?> get props => [phoneNumber];
 }
 
-class VerifyOtp extends AuthEvent {
-  final String verificationId;
-  final String smsCode;
+class VerifyWhatsAppOtp extends AuthEvent {
+  final String phoneNumber;
+  final String otp;
   final String role;
-  const VerifyOtp({
-    required this.verificationId,
-    required this.smsCode,
+  const VerifyWhatsAppOtp({
+    required this.phoneNumber,
+    required this.otp,
     required this.role,
   });
 
   @override
-  List<Object?> get props => [verificationId, smsCode, role];
+  List<Object?> get props => [phoneNumber, otp, role];
 }
 
-// Internal events for Firebase callbacks
+class LoginWithDescope extends AuthEvent {
+  final String token;
+  final String role;
+  const LoginWithDescope({
+    required this.token,
+    required this.role,
+  });
+
+  @override
+  List<Object?> get props => [token, role];
+}
+
+// Internal events
 class AuthErrorInternal extends AuthEvent {
   final String message;
   const AuthErrorInternal(this.message);
@@ -73,10 +85,10 @@ class AuthErrorInternal extends AuthEvent {
 }
 
 class OtpSentInternal extends AuthEvent {
-  final String verificationId;
-  const OtpSentInternal(this.verificationId);
+  final String phoneNumber;
+  const OtpSentInternal(this.phoneNumber);
   @override
-  List<Object?> get props => [verificationId];
+  List<Object?> get props => [phoneNumber];
 }
 
 class CheckAuthStatus extends AuthEvent {}
@@ -96,11 +108,11 @@ class AuthInitial extends AuthState {}
 class AuthLoading extends AuthState {}
 
 class OtpSent extends AuthState {
-  final String verificationId;
-  const OtpSent(this.verificationId);
+  final String phoneNumber;
+  const OtpSent(this.phoneNumber);
 
   @override
-  List<Object?> get props => [verificationId];
+  List<Object?> get props => [phoneNumber];
 }
 
 class AuthAuthenticated extends AuthState {

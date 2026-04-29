@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@descope/node-sdk": "^2.4.0"
+  }
+}

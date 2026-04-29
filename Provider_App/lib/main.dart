@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pequire_provider_app/core/theme/app_theme.dart';
 import 'features/onboarding/screens/onboarding_screen.dart';
 import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/otp_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/history/screens/booking_history_screen.dart';
 import 'features/profile/screens/profile_screen.dart';
@@ -26,12 +25,23 @@ import 'package:pequire_provider_app/core/services/firebase_service.dart';
 import 'package:pequire_provider_app/core/services/socket_service.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pequire_provider_app/l10n/app_localizations.dart';
 import 'package:pequire_provider_app/core/providers/locale_provider.dart';
 import 'package:pequire_provider_app/core/providers/theme_provider.dart';
 
+import 'package:descope/descope.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Descope
+  Descope.projectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';
+
+  // Load persistent session
+  final prefs = await SharedPreferences.getInstance();
+  ApiConfig.currentProviderId = prefs.getString('current_provider_id');
   
   // Initialize Firebase
   debugPrint("Starting Firebase initialization...");
@@ -53,10 +63,14 @@ void main() async {
 final _router = GoRouter(
   initialLocation: '/',
   redirect: (context, state) {
-    final user = FirebaseAuth.instance.currentUser;
-    final isLoggingIn = state.matchedLocation == '/login' || state.matchedLocation == '/onboarding' || state.matchedLocation == '/login/otp';
+    final session = Descope.sessionManager.session;
+    final isLoggedIn = session != null && !session.sessionToken.isExpired;
     
-    if (user == null) {
+    final isLoggingIn = state.matchedLocation == '/login' || 
+                        state.matchedLocation == '/onboarding' || 
+                        state.matchedLocation == '/login/otp';
+    
+    if (!isLoggedIn) {
       // Not logged in
       if (isLoggingIn) return null; // Let them proceed to login/onboarding
       return '/onboarding'; // Otherwise force onboarding
@@ -79,15 +93,6 @@ final _router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
-      routes: [
-        GoRoute(
-          path: 'otp',
-          builder: (context, state) {
-            final verificationId = state.extra as String?;
-            return OtpScreen(verificationId: verificationId);
-          },
-        ),
-      ],
     ),
     GoRoute(
       path: '/home',

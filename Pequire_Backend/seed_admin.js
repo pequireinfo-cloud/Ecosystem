@@ -20,7 +20,7 @@ async function seedAdmin() {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const admin = new User({
-      fullName: 'Anurag Admin',
+      name: 'Anurag Admin',
       email: email,
       password: hashedPassword,
       phoneNumber: '+91 0000000000',

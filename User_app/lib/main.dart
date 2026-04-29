@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:descope/descope.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'features/home/presentation/pages/home_page.dart';
 import 'features/onboarding/presentation/pages/onboarding_page.dart';
 import 'core/theme/app_theme.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:pequire_user_app/l10n/app_localizations.dart';
 import 'core/locale/locale_cubit.dart';
 import 'core/theme/theme_cubit.dart';
 import 'injection_container.dart' as di;
@@ -21,6 +22,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   await di.init();
+  
+  // Global Descope Initialization
+  Descope.projectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';
 
   runApp(const MyApp());
 }

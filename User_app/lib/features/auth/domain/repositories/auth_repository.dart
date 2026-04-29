@@ -16,6 +16,21 @@ abstract class AuthRepository {
     required LoginRole role,
   });
 
+  Future<Either<Failure, void>> sendWhatsAppOtp({
+    required String phoneNumber,
+  });
+
+  Future<Either<Failure, UserEntity>> verifyWhatsAppOtp({
+    required String phoneNumber,
+    required String otp,
+    required String role,
+  });
+
+  Future<Either<Failure, UserEntity>> verifyDescope({
+    required String token,
+    required String role,
+  });
+
   Future<Either<Failure, void>> updateUserLocation({
     required String userId,
     required double lat,
@@ -23,8 +38,5 @@ abstract class AuthRepository {
     required String address,
   });
 
-  Future<Either<Failure, UserEntity>> verifyOtpWithBackend({
-    required String idToken,
-    required String role,
-  });
+  Future<Either<Failure, UserEntity?>> getCachedUser();
 }

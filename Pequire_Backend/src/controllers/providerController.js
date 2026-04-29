@@ -22,6 +22,17 @@ exports.updateProviderKyc = async (req, res) => {
     if (rejectionReason) updateData.rejectionReason = rejectionReason;
 
     const provider = await Provider.findByIdAndUpdate(id, updateData, { new: true });
+    
+    // Notify admin panel in real-time
+    if (req.io) {
+      req.io.emit('kyc_submitted', {
+        id: provider._id,
+        fullName: provider.fullName,
+        kycStatus: provider.kycStatus,
+        timestamp: new Date()
+      });
+    }
+
     res.json(provider);
   } catch (error) {
     res.status(500).json({ error: error.message });

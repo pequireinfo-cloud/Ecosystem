@@ -3,9 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
-import 'package:pequire_user_app/features/auth/domain/entities/login_role.dart';
 import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
-import 'package:pequire_user_app/presentation/pages/onboarding/otp_verification_page.dart';
+import 'package:pequire_user_app/core/widgets/pequire_logo.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,86 +14,16 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final _phoneController = TextEditingController();
+  final _phoneController = TextEditingController(text: '98765 43210');
   final _otpController = TextEditingController();
   bool _isOtpSent = false;
-  String _verificationId = '';
-  String _selectedCountryCode = '+91';
-  String _selectedFlag = '🇮🇳';
-
-  final List<Map<String, String>> _countries = [
-    {'code': '+91', 'flag': '🇮🇳', 'name': 'India'},
-    {'code': '+1', 'flag': '🇺🇸', 'name': 'USA'},
-    {'code': '+44', 'flag': '🇬🇧', 'name': 'UK'},
-    {'code': '+61', 'flag': '🇦🇺', 'name': 'Australia'},
-    {'code': '+971', 'flag': '🇦🇪', 'name': 'UAE'},
-  ];
+  bool _isLoading = false;
 
   @override
   void dispose() {
     _phoneController.dispose();
     _otpController.dispose();
     super.dispose();
-  }
-
-  Widget _buildCountryPicker() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          DropdownButtonHideUnderline(
-            child: DropdownButton<Map<String, String>>(
-              value: _countries.firstWhere((c) => c['code'] == _selectedCountryCode),
-              icon: const Padding(
-                padding: EdgeInsets.only(left: 4),
-                child: Icon(Icons.keyboard_arrow_down_rounded, size: 18, color: Colors.grey),
-              ),
-               dropdownColor: Theme.of(context).cardColor,
-              borderRadius: BorderRadius.circular(16),
-              elevation: 8,
-              items: _countries.map((Map<String, String> country) {
-                return DropdownMenuItem<Map<String, String>>(
-                  value: country,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(country['flag']!, style: const TextStyle(fontSize: 20)),
-                        const SizedBox(width: 8),
-                        Text(
-                          country['code']!,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (Map<String, String>? value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedCountryCode = value['code']!;
-                    _selectedFlag = value['flag']!;
-                  });
-                }
-              },
-            ),
-          ),
-          Container(
-            height: 24,
-            width: 1.5,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-            color: Colors.grey.withOpacity(0.3),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
@@ -109,128 +38,156 @@ class _LoginPageState extends State<LoginPage> {
         } else if (state is OtpSent) {
           setState(() {
             _isOtpSent = true;
-            _verificationId = state.verificationId;
+            _isLoading = false;
           });
         } else if (state is AuthError) {
+          setState(() => _isLoading = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: AppColors.error),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       },
       child: Scaffold(
-        backgroundColor: const Color(0xFF000814),
+        backgroundColor: const Color(0xFF0D1117), // Dark base color
         body: Stack(
           children: [
-            // Background Image
+            // 1. Grid Background
             Positioned.fill(
               child: Image.asset(
                 'assets/login_bg.webp',
                 fit: BoxFit.cover,
+                opacity: const AlwaysStoppedAnimation(0.6),
               ),
             ),
-            
-            // Subtle Dark Overlay for contrast
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.black.withOpacity(0.3),
-                      const Color(0xFF1A1B2F).withOpacity(0.8),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            
+
+            // 2. Main Content
             SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                      child: IntrinsicHeight(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 20),
-                              // Top Logo & Back Button Row
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Image.asset('assets/logo.webp', width: 32, height: 32),
-                                      const SizedBox(width: 12),
-                                      const Text(
-                                        'PEQUIRE.',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w900,
-                                          letterSpacing: 1.5,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  if (_isOtpSent)
-                                    IconButton(
-                                      onPressed: () => setState(() => _isOtpSent = false),
-                                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                                    ),
-                                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const PequireLogo(height: 32, isLight: false),
+                        if (_isOtpSent)
+                          IconButton(
+                            onPressed: () => setState(() => _isOtpSent = false),
+                            icon: const Icon(Icons.arrow_back, color: Colors.white),
+                          ),
+                      ],
+                    ),
+
+                    const Spacer(flex: 2),
+
+                    // Heading
+                    Text(
+                      _isOtpSent ? 'Verify your\nnumber' : 'Enter your mobile\nnumber',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w600,
+                        height: 1.1,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _isOtpSent ? 'Code is sent to +91' : 'Join the Pequire ecosystem',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 16,
+                      ),
+                    ),
+
+                    const SizedBox(height: 48),
+
+                    // Label
+                    Text(
+                      _isOtpSent ? 'Enter 6-digit OTP' : 'Phone Number',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Input Box
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: _isOtpSent ? _buildOtpInput() : _buildPhoneInput(),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Action Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: _isLoading ? null : (_isOtpSent ? _verifyOtp : _sendOtp),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: _isLoading 
+                          ? const CircularProgressIndicator(color: Colors.white)
+                          : Text(
+                              _isOtpSent ? 'Verify & Login' : 'Get OTP',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                               ),
-                              
-                              const Spacer(),
-                              
-                              // Animated Content Area (Bottom Bottom)
-                              AnimatedSwitcher(
-                                duration: const Duration(milliseconds: 350),
-                                transitionBuilder: (Widget child, Animation<double> animation) {
-                                  return FadeTransition(
-                                    opacity: animation,
-                                    child: SlideTransition(
-                                      position: Tween<Offset>(
-                                        begin: const Offset(0.1, 0),
-                                        end: Offset.zero,
-                                      ).animate(animation),
-                                      child: child,
-                                    ),
-                                  );
-                                },
-                                child: _isOtpSent ? _buildOtpView() : _buildPhoneView(),
-                              ),
-                              
-                              const SizedBox(height: 24),
-                              
-                              // Terms and Privacy
-                              Center(
-                                child: Column(
-                                  children: const [
-                                    Text(
-                                      'By signing up, you agree to the Terms of Service',
-                                      style: TextStyle(color: Colors.white30, fontSize: 11),
-                                    ),
-                                    SizedBox(height: 4),
-                                    Text(
-                                      'and Data Processing Agreement',
-                                      style: TextStyle(color: Colors.white30, fontSize: 11),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 40),
-                            ],
+                            ),
+                      ),
+                    ),
+
+                    if (_isOtpSent) ...[
+                      const SizedBox(height: 24),
+                      Center(
+                        child: TextButton(
+                          onPressed: _sendOtp,
+                          child: const Text(
+                            'Resend Code',
+                            style: TextStyle(
+                              color: Color(0xFF3B82F6),
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
+                    ],
+
+                    const Spacer(flex: 3),
+
+                    // Footer
+                    Center(
+                      child: Text(
+                        'By signing up, you agree to the Terms of Service\nand Data Processing Agreement',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.3),
+                          fontSize: 12,
+                          height: 1.5,
+                        ),
+                      ),
                     ),
-                  );
-                },
+                    const SizedBox(height: 20),
+                  ],
+                ),
               ),
             ),
           ],
@@ -239,188 +196,90 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildPhoneView() {
-    return Column(
-      key: const ValueKey('phone_view'),
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildPhoneInput() {
+    return Row(
       children: [
+        // Fake Flag & +91
+        const Text('🇮🇳', style: TextStyle(fontSize: 24)),
+        const SizedBox(width: 8),
         const Text(
-          'Enter your mobile\nnumber',
+          '+91',
           style: TextStyle(
-            color: Colors.white,
-            fontSize: 34,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            height: 1.2,
+            color: Colors.black,
           ),
         ),
-        const SizedBox(height: 40),
-        const Text(
-          'Phone Number',
-          style: TextStyle(color: Colors.white60, fontSize: 14),
-        ),
-        const SizedBox(height: 12),
+        const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
+        const SizedBox(width: 8),
         Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
+          height: 24,
+          width: 1,
+          color: Colors.grey.withOpacity(0.3),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
           child: TextField(
             controller: _phoneController,
             keyboardType: TextInputType.phone,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-              hintText: '98765 43210',
-              prefixIcon: _buildCountryPicker(),
-              suffixIcon: const Padding(
-                padding: EdgeInsets.only(right: 12.0),
-                child: Icon(Icons.contact_phone_rounded, color: AppColors.primary, size: 24),
-              ),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+              letterSpacing: 1.2,
             ),
-          ),
-        ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 60,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_phoneController.text.length >= 10) {
-                final fullPhone = '$_selectedCountryCode${_phoneController.text.trim()}';
-                context.read<AuthBloc>().add(SendOtp(fullPhone));
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter a valid phone number')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
-            child: const Text('Get OTP', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildOtpView() {
-    return Column(
-      key: const ValueKey('otp_view'),
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Verify your\nnumber',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 34,
-            fontWeight: FontWeight.bold,
-            height: 1.2,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'Code is sent to $_selectedCountryCode ${_phoneController.text}',
-          style: const TextStyle(color: Colors.white60, fontSize: 14),
-        ),
-        const SizedBox(height: 40),
-        const Text(
-          'Enter 6-digit OTP',
-          style: TextStyle(color: Colors.white60, fontSize: 14),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: TextField(
-            controller: _otpController,
-            keyboardType: TextInputType.number,
-            maxLength: 6,
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, letterSpacing: 8, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black),
             decoration: const InputDecoration(
               border: InputBorder.none,
-              counterText: '',
-              contentPadding: EdgeInsets.symmetric(vertical: 18),
-              hintText: '******',
-              hintStyle: TextStyle(color: Colors.grey, letterSpacing: 8),
+              hintText: '98765 43210',
+              hintStyle: TextStyle(color: Colors.grey),
             ),
           ),
         ),
-        const SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 60,
-          child: ElevatedButton(
-            onPressed: () {
-              if (_otpController.text.length == 6) {
-                context.read<AuthBloc>().add(
-                      VerifyOtp(
-                        verificationId: _verificationId,
-                        smsCode: _otpController.text,
-                        role: 'user',
-                      ),
-                    );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please enter the 6-digit verification code')),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            ),
-            child: const Text('Verify & Login', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Center(
-          child: TextButton(
-            onPressed: () {},
-            child: const Text('Resend Code', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-          ),
-        ),
+        const Icon(Icons.contact_page_outlined, color: Color(0xFF3B82F6)),
       ],
     );
   }
-}
 
-class SocialButton extends StatelessWidget {
-  final String? imageAsset;
-  final IconData iconData;
-  const SocialButton({super.key, this.imageAsset, required this.iconData});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: (MediaQuery.of(context).size.width - 80) / 3,
-      height: 64,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+  Widget _buildOtpInput() {
+    return TextField(
+      controller: _otpController,
+      keyboardType: TextInputType.number,
+      maxLength: 6,
+      textAlign: TextAlign.center,
+      style: const TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+        letterSpacing: 16,
       ),
-      child: Center(
-        child: Icon(
-          iconData,
-          color: iconData == Icons.g_mobiledata ? Colors.red : (iconData == Icons.facebook ? Colors.blue : Colors.black),
-          size: 32,
-        ),
+      decoration: const InputDecoration(
+        border: InputBorder.none,
+        counterText: '',
+        hintText: '******',
+        hintStyle: TextStyle(color: Colors.grey, letterSpacing: 16),
       ),
     );
   }
+
+  void _sendOtp() {
+    String raw = _phoneController.text.replaceAll(' ', '');
+    String fullPhone = raw.startsWith('+') ? raw : '+91$raw';
+    
+    setState(() => _isLoading = true);
+    context.read<AuthBloc>().add(SendWhatsAppOtp(fullPhone));
+  }
+
+  void _verifyOtp() {
+    if (_otpController.text.length == 6) {
+      String raw = _phoneController.text.replaceAll(' ', '');
+      String fullPhone = raw.startsWith('+') ? raw : '+91$raw';
+      
+      setState(() => _isLoading = true);
+      context.read<AuthBloc>().add(VerifyWhatsAppOtp(
+        phoneNumber: fullPhone,
+        otp: _otpController.text,
+        role: 'user',
+      ));
+    }
+  }
 }
-
-
-

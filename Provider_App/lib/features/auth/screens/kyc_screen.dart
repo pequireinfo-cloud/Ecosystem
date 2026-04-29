@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pequire_provider_app/core/services/api_service.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 import 'dart:io';
 
 class KycScreen extends StatefulWidget {
@@ -78,11 +80,10 @@ class _KycScreenState extends State<KycScreen> {
         }
       }
 
-      // TODO: Get current provider ID from Auth state. 
-      // For demonstration, using a placeholder.
-      const providerId = "67b07c87c88b39c0e4c6e91d"; 
+      final providerId = ApiConfig.currentProviderId;
+      if (providerId == null) throw "Provider ID not found. Please log in again.";
 
-      await ApiService().put('/providers/$providerId/kyc', data: {
+      await ApiService().put('providers/$providerId/kyc', data: {
         'kycStatus': 'In Review',
         'documents': downloadUrls,
       });
@@ -120,21 +121,7 @@ class _KycScreenState extends State<KycScreen> {
                   children: [
                     const SizedBox(height: 24),
                     // Brand Identity
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/logos/logo.webp',
-                          height: 28,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 8),
-                        Image.asset(
-                          'assets/images/logos/wordmark.webp',
-                          height: 18,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
+                    const PequireLogo(height: 28, isLight: true),
                     const SizedBox(height: 32),
 
                     // Progress Track

@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const userAuthController = require('../controllers/userAuthController');
 
-// Route for OTP verification and login/signup
-router.post('/verify-otp', userAuthController.verifyOtpAndLogin);
+// Unified Authentication via Descope
+// This handles both One-Tap and Manual OTP (as both result in a Descope session token)
+router.post('/verify-descope', userAuthController.verifyDescopeToken);
 
 module.exports = router;

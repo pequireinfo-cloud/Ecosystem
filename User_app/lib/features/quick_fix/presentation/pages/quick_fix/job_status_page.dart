@@ -9,8 +9,6 @@ import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/tracking_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/payment_page.dart';
 
-import 'package:pequire_user_app/features/quick_fix/presentation/widgets/booking_simulator.dart';
-
 class JobStatusPage extends StatefulWidget {
   final BookingSession session;
   const JobStatusPage({super.key, required this.session});
@@ -22,20 +20,12 @@ class JobStatusPage extends StatefulWidget {
 class _JobStatusPageState extends State<JobStatusPage> {
   @override
   Widget build(BuildContext context) {
-    return BookingSimulator(
-      session: widget.session,
-      child: QuickFixBaseLayout(
+    return QuickFixBaseLayout(
         title: 'Job Status',
         initialSheetSize: 0.8,
         background: TrackerMapContainer(session: widget.session),
         child: StreamBuilder<Map<String, dynamic>>(
-          stream: widget.session.isSimulation 
-            ? Stream.value({
-                'status': 'accepted',
-                'arrivalOtp': '4920',
-                'providerId': {'fullName': 'Rahul Sharma (Simulated)'}
-              })
-            : BookingService().watchBooking(widget.session.bookingId ?? ''),
+          stream: BookingService().watchBooking(widget.session.bookingId ?? ''),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData) {
               return const Center(child: Padding(
