@@ -87,6 +87,15 @@ exports.verifyDescopeToken = async (req, res) => {
         phoneNumber: account.phoneNumber,
         role: role,
         name: account.name || account.fullName,
+        nickname: account.nickname,
+        email: account.email,
+        dob: account.dob,
+        gender: account.gender,
+        country: account.country,
+        address: account.address,
+        preferences: account.preferences,
+        currentStreak: account.currentStreak,
+        rewardPoints: account.rewardPoints,
         isNewUser: isNew,
         kycStatus: account.kycStatus
       }
@@ -94,6 +103,91 @@ exports.verifyDescopeToken = async (req, res) => {
 
   } catch (error) {
     console.error('Verify Descope Error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error during verification'
+    });
+  }
+};
+
+// @desc    Verify OTP Code directly on Backend
+// @route   POST /api/auth/user/verify-otp
+// @access  Public
+exports.verifyOtpCode = async (req, res) => {
+  try {
+    const { phoneNumber, otp, role = 'user' } = req.body;
+
+    if (!phoneNumber || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Phone number and OTP are required'
+      });
+    }
+
+    console.log(`Backend verifying OTP for ${phoneNumber}...`);
+
+    // 1. Verify the OTP code with Descope
+    let authResponse;
+    try {
+      authResponse = await descopeClient.otp.verify.sms(phoneNumber, otp);
+      console.log('Descope OTP Verification successful');
+    } catch (error) {
+      console.error('Descope OTP Verification Error:', error);
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid OTP or expired'
+      });
+    }
+
+    // 2. Extract user info from authResponse
+    // Use optional chaining to handle different SDK response structures
+    const phone = authResponse?.user?.phone || authResponse?.data?.user?.phone || phoneNumber;
+
+    let account;
+    let isNew = false;
+
+    if (role === 'provider') {
+      account = await Provider.findOne({ phoneNumber: phone });
+      if (!account) {
+        account = await Provider.create({
+          phoneNumber: phone,
+          fullName: 'New Partner',
+          status: 'Offline'
+        });
+        isNew = true;
+      }
+    } else {
+      account = await User.findOne({ phoneNumber: phone });
+      if (!account) {
+        account = await User.create({
+          phoneNumber: phone,
+          name: 'New User',
+          role: 'user'
+        });
+        isNew = true;
+      }
+    }
+
+    const token = jwt.sign(
+      { id: account._id, role: role },
+      process.env.JWT_SECRET,
+      { expiresIn: '30d' }
+    );
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: account._id,
+        phoneNumber: account.phoneNumber,
+        role: role,
+        name: account.name || account.fullName,
+        isNewUser: isNew
+      }
+    });
+
+  } catch (error) {
+    console.error('Backend OTP Verification Error:', error);
     res.status(500).json({
       success: false,
       message: 'Internal server error during verification'

@@ -28,13 +28,31 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  nickname: String,
+  dob: String,
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other', 'Not Specified'],
+    default: 'Not Specified'
+  },
+  country: {
+    type: String,
+    default: 'India'
+  },
   address: {
     street: String,
     city: String,
     state: String,
+    country: String,
     zipCode: String,
     latitude: Number,
     longitude: Number
+  },
+  preferences: {
+    pushNotifications: { type: Boolean, default: true },
+    biometricAuth: { type: Boolean, default: false },
+    theme: { type: String, default: 'light' },
+    language: { type: String, default: 'en' }
   },
   status: { 
     type: String, 
@@ -51,6 +69,15 @@ const userSchema = new mongoose.Schema({
   currentStreak: { type: Number, default: 0 },
   highestStreak: { type: Number, default: 0 },
   rewardPoints: { type: Number, default: 0 },
+  lastActiveDate: Date,
+  coupons: [{
+    code: String,
+    title: String,
+    description: String,
+    discount: String,
+    expiryDate: Date,
+    isUsed: { type: Boolean, default: false }
+  }],
   lastLogin: Date
 }, {
   timestamps: true // Automatically manages createdAt and updatedAt

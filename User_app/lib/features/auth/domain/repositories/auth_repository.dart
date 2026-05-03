@@ -39,4 +39,6 @@ abstract class AuthRepository {
   });
 
   Future<Either<Failure, UserEntity?>> getCachedUser();
+  Future<String?> getToken();
+  Future<void> logout();
 }

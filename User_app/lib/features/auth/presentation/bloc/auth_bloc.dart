@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:descope/descope.dart';
 import 'package:flutter/foundation.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../core/config/api_config.dart';
+import '../../domain/entities/user_entity.dart';
 import 'auth_state.dart';
 export 'auth_state.dart';
 
@@ -28,27 +30,49 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     try {
+      debugPrint('AUTH_BLOC: Checking persistent auth status...');
+      
+      // 1. Check our own local cache first (more reliable for "Persistent Login")
+      final failureOrUser = await repository.getCachedUser();
+      final token = await repository.getToken();
+
+      if (token != null) {
+        ApiConfig.setToken(token);
+        debugPrint('AUTH_BLOC: Token restored to ApiConfig');
+      }
+
+      bool isAuthenticated = false;
+      UserEntity? authenticatedUser;
+
+      failureOrUser.fold(
+        (failure) => isAuthenticated = false,
+        (user) {
+          if (user != null) {
+            isAuthenticated = true;
+            authenticatedUser = user;
+          }
+        },
+      );
+
+      if (isAuthenticated && authenticatedUser != null) {
+        debugPrint('AUTH_BLOC: User authenticated from local cache');
+        emit(AuthAuthenticated(authenticatedUser!));
+        return;
+      }
+
+      // 2. Fallback to Descope Session Manager if local cache is empty
       final session = Descope.sessionManager.session;
       if (session != null && !session.sessionToken.isExpired) {
-        debugPrint('AUTH_BLOC: Valid Descope session found');
-        
-        final failureOrUser = await repository.getCachedUser();
-        
-        failureOrUser.fold(
-          (failure) => emit(AuthUnauthenticated()),
-          (user) {
-            if (user != null) {
-              emit(AuthAuthenticated(user));
-            } else {
-              emit(AuthUnauthenticated());
-            }
-          },
-        );
+        debugPrint('AUTH_BLOC: Valid Descope session found, but no local user?');
+        // This case is unlikely if cacheUser is called on login, but handle it
+        emit(AuthUnauthenticated()); // Or try to fetch user from backend
         return;
       }
     } catch (e) {
       debugPrint('AUTH_BLOC: Session check error: $e');
     }
+    
+    debugPrint('AUTH_BLOC: No valid session found, landing on Onboarding');
     emit(AuthUnauthenticated());
   }
 
@@ -57,6 +81,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     await _auth.signOut();
+    Descope.sessionManager.clearSession();
+    await repository.logout();
     emit(AuthUnauthenticated());
   }
 

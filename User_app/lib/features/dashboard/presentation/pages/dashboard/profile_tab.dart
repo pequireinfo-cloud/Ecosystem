@@ -17,6 +17,10 @@ import 'package:pequire_user_app/features/profile/presentation/pages/profile/hel
 import 'package:pequire_user_app/features/profile/presentation/pages/profile/privacy_policy_page.dart';
 import 'package:pequire_user_app/features/profile/presentation/pages/profile/my_coupons_page.dart';
 import 'provider_tracking_broadcast.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_event.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_state.dart';
+import 'package:pequire_user_app/injection_container.dart';
 
 class ProfileTab extends StatefulWidget {
   final UserEntity user;
@@ -27,140 +31,164 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
-  bool _isDarkMode = false;
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text(
-          l10n.profile,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        children: [
-          _buildUserCard(),
-          const SizedBox(height: 24),
-          _buildSection('My Order & Rewards', [
-            _buildMenuItem(
-              Icons.shopping_bag_outlined,
-              'My Orders',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersPage()));
-              },
+    return BlocProvider(
+      create: (context) => sl<ProfileBloc>()..add(GetProfile()),
+      child: BlocBuilder<ProfileBloc, ProfileState>(
+        builder: (context, state) {
+          UserEntity currentUser = widget.user;
+          if (state is ProfileLoaded) {
+            currentUser = state.user;
+          }
+          
+          final l10n = AppLocalizations.of(context)!;
+          return Scaffold(
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            appBar: AppBar(
+              title: Text(
+                l10n.profile,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              centerTitle: true,
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              automaticallyImplyLeading: false,
             ),
-            _buildMenuItem(
-              Icons.stars_rounded,
-              'My Rewards',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const MyCouponsPage()));
-              },
-            ),
-          ]),
-          _buildSection('Account', [
-            _buildMenuItem(
-              Icons.account_circle_outlined,
-              'Manage Profile',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const ManageProfilePage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.lock_outline_rounded,
-              'Password & Security',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityPage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.notifications_none_rounded,
-              'Notifications',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsSettingsPage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.account_balance_wallet_outlined,
-              'Payment',
-              onTap: () {
-                // Placeholder for Payment
-              },
-            ),
-            _buildMenuItem(
-              Icons.language_rounded,
-              l10n.language,
-              trailing: Localizations.localeOf(context).languageCode == 'en' ? l10n.english : l10n.hindi,
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const LanguagePage()));
-              },
-            ),
-          ]),
-          _buildSection('Preferences', [
-            _buildMenuItem(
-              Icons.list_alt_rounded,
-              'About Us',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUsPage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.palette_outlined,
-              'Theme',
-              trailing: context.watch<ThemeCubit>().state == ThemeMode.light ? 'Light' : 'Dark',
-              onTap: () {
-                context.read<ThemeCubit>().toggleTheme();
-              },
-            ),
-            _buildMenuItem(
-              Icons.calendar_today_outlined,
-              'Appointments',
-              onTap: () {
-                // Placeholder or link to OrdersPage as per plan
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersPage()));
-              },
-            ),
-          ]),
-          _buildSection('Support', [
-            _buildMenuItem(
-              Icons.help_outline_rounded,
-              'Help Center',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpCenterPage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.privacy_tip_outlined,
-              'Privacy & Policy',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()));
-              },
-            ),
-            _buildMenuItem(
-              Icons.logout_rounded,
-              l10n.logout,
-              isDestructive: true,
-              onTap: () => _showLogoutDialog(context, l10n),
-            ),
-          ]),
-          const SizedBox(height: 40),
-        ],
+            body: state is ProfileLoading && state is! ProfileLoaded
+                ? const Center(child: CircularProgressIndicator())
+                : ListView(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    children: [
+                      _buildUserCard(currentUser),
+                      const SizedBox(height: 24),
+                      _buildSection('My Order & Rewards', [
+                        _buildMenuItem(
+                          Icons.shopping_bag_outlined,
+                          'My Orders',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.stars_rounded,
+                          'My Rewards',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => MyCouponsPage(user: currentUser)));
+                          },
+                        ),
+                      ]),
+                      _buildSection('Account', [
+                        _buildMenuItem(
+                          Icons.account_circle_outlined,
+                          'Manage Profile',
+                          onTap: () {
+                            Navigator.push(
+                              context, 
+                              MaterialPageRoute(
+                                builder: (context) => BlocProvider.value(
+                                  value: BlocProvider.of<ProfileBloc>(context),
+                                  child: ManageProfilePage(user: currentUser),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.lock_outline_rounded,
+                          'Password & Security',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const SecurityPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.notifications_none_rounded,
+                          'Notifications',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const NotificationsSettingsPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.account_balance_wallet_outlined,
+                          'Payment',
+                          onTap: () {
+                            // Placeholder for Payment
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.language_rounded,
+                          l10n.language,
+                          trailing: Localizations.localeOf(context).languageCode == 'en' ? l10n.english : l10n.hindi,
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const LanguagePage()));
+                          },
+                        ),
+                      ]),
+                      _buildSection('Preferences', [
+                        _buildMenuItem(
+                          Icons.list_alt_rounded,
+                          'About Us',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const AboutUsPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.palette_outlined,
+                          'Theme',
+                          trailing: context.watch<ThemeCubit>().state == ThemeMode.light ? 'Light' : 'Dark',
+                          onTap: () {
+                            context.read<ThemeCubit>().toggleTheme();
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.calendar_today_outlined,
+                          'Appointments',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const OrdersPage()));
+                          },
+                        ),
+                      ]),
+                      _buildSection('Support', [
+                        _buildMenuItem(
+                          Icons.help_outline_rounded,
+                          'Help Center',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpCenterPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.privacy_tip_outlined,
+                          'Privacy & Policy',
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const PrivacyPolicyPage()));
+                          },
+                        ),
+                        _buildMenuItem(
+                          Icons.logout_rounded,
+                          l10n.logout,
+                          isDestructive: true,
+                          onTap: () => _showLogoutDialog(context, l10n),
+                        ),
+                      ]),
+                      const SizedBox(height: 40),
+                    ],
+                  ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildUserCard() {
+  Widget _buildUserCard(UserEntity user) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -186,15 +214,15 @@ class _ProfileTabState extends State<ProfileTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.user.email.split('@')[0],
+                  user.nickname ?? user.email.split('@')[0],
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
-                    _buildStreakBadge(widget.user.currentStreak),
+                    _buildStreakBadge(user.currentStreak),
                     const SizedBox(width: 8),
-                    _buildPointsBadge(widget.user.rewardPoints),
+                    _buildPointsBadge(user.rewardPoints),
                   ],
                 ),
               ],

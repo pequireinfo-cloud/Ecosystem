@@ -13,6 +13,14 @@ import 'core/theme/theme_cubit.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'features/auth/data/datasources/auth_local_data_source.dart';
+import 'features/profile/data/datasources/profile_remote_data_source.dart';
+import 'features/profile/data/repositories/profile_repository_impl.dart';
+import 'features/profile/domain/repositories/profile_repository.dart';
+import 'features/profile/presentation/bloc/profile_bloc.dart';
+import 'features/quick_fix/data/datasources/booking_remote_data_source.dart';
+import 'features/quick_fix/data/repositories/booking_repository_impl.dart';
+import 'features/quick_fix/domain/repositories/booking_repository.dart';
+import 'features/quick_fix/presentation/bloc/order_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -24,6 +32,8 @@ Future<void> init() async {
       ));
   sl.registerFactory(() => LocaleCubit());
   sl.registerFactory(() => ThemeCubit());
+  sl.registerFactory(() => ProfileBloc(repository: sl()));
+  sl.registerFactory(() => OrderBloc(repository: sl()));
 
   // Use cases (keeping for legacy if needed, but Bloc now uses repository directly)
   sl.registerLazySingleton(() => LoginUseCase(sl()));
@@ -36,6 +46,12 @@ Future<void> init() async {
       localDataSource: sl(),
     ),
   );
+  sl.registerLazySingleton<ProfileRepository>(
+    () => ProfileRepositoryImpl(remoteDataSource: sl()),
+  );
+  sl.registerLazySingleton<BookingRepository>(
+    () => BookingRepositoryImpl(remoteDataSource: sl()),
+  );
 
   // Data sources
   sl.registerLazySingleton<AuthRemoteDataSource>(
@@ -43,6 +59,12 @@ Future<void> init() async {
   );
   sl.registerLazySingleton<AuthLocalDataSource>(
     () => AuthLocalDataSourceImpl(sharedPreferences: sl()),
+  );
+  sl.registerLazySingleton<ProfileRemoteDataSource>(
+    () => ProfileRemoteDataSourceImpl(dio: sl()),
+  );
+  sl.registerLazySingleton<BookingRemoteDataSource>(
+    () => BookingRemoteDataSourceImpl(dio: sl()),
   );
 
   // External

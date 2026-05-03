@@ -23,6 +23,7 @@ import 'package:pequire_user_app/features/auth/domain/repositories/auth_reposito
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:pequire_user_app/l10n/app_localizations.dart';
 
 class HomeTab extends StatefulWidget {
   final UserEntity user;
@@ -203,7 +204,7 @@ class _HomeTabState extends State<HomeTab> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Location',
+                    AppLocalizations.of(context)?.location ?? 'Location',
                     style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5), fontWeight: FontWeight.w500),
                   ),
                   Row(
@@ -232,31 +233,6 @@ class _HomeTabState extends State<HomeTab> {
           _buildNotificationIcon(),
           const SizedBox(width: 12),
           _buildProfileIcon(context),
-          const SizedBox(width: 12),
-          GestureDetector(
-            onTap: () {
-              context.read<AuthBloc>().add(LogoutRequested());
-            },
-            child: GlassmorphicContainer(
-              width: 50,
-              height: 50,
-              borderRadius: 16,
-              blur: 15,
-              alignment: Alignment.center,
-              border: 1.5,
-              linearGradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.red.withOpacity(0.1), Colors.red.withOpacity(0.05)],
-              ),
-              borderGradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [Colors.red.withOpacity(0.2), Colors.red.withOpacity(0.05)],
-              ),
-              child: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 22),
-            ),
-          ),
         ],
       ),
     );
@@ -598,9 +574,9 @@ class _HomeTabState extends State<HomeTab> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Categories',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              Text(
+                AppLocalizations.of(context)?.categories ?? 'Categories',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               GestureDetector(
                 onTap: () {
@@ -699,9 +675,9 @@ class _HomeTabState extends State<HomeTab> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Best Professionals',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(context)?.bestProfessionals ?? 'Best Professionals',
+                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     'Top rated in your community',

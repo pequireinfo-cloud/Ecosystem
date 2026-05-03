@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_bloc.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_event.dart';
+import 'package:pequire_user_app/features/profile/presentation/bloc/profile_state.dart';
+
 class ManageProfilePage extends StatefulWidget {
-  const ManageProfilePage({super.key});
+  final UserEntity user;
+  const ManageProfilePage({super.key, required this.user});
 
   @override
   State<ManageProfilePage> createState() => _ManageProfilePageState();
@@ -23,12 +30,15 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(text: 'Andrew Ainsley');
-    _nicknameController = TextEditingController(text: 'Andrew');
-    _dobController = TextEditingController(text: '12/27/1995');
-    _emailController = TextEditingController(text: 'andrew_ainsley@yourdomain.com');
-    _phoneController = TextEditingController(text: '+1 111 467 378 399');
-    _addressController = TextEditingController(text: '267 New Avenue Park, New York');
+    _fullNameController = TextEditingController(text: widget.user.email.split('@')[0]); // Fallback if name is empty
+    _nicknameController = TextEditingController(text: widget.user.nickname ?? '');
+    _dobController = TextEditingController(text: widget.user.dob ?? '');
+    _emailController = TextEditingController(text: widget.user.email);
+    _phoneController = TextEditingController(text: widget.user.phoneNumber ?? '');
+    _addressController = TextEditingController(text: widget.user.lastAddress ?? '');
+    
+    _selectedCountry = widget.user.country ?? 'India';
+    _selectedGender = widget.user.gender ?? 'Not Specified';
   }
 
   @override
@@ -59,54 +69,68 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
         ),
         centerTitle: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              const SizedBox(height: 24),
-              _buildModernTextField(controller: _fullNameController, hint: 'Full Name'),
-              const SizedBox(height: 20),
-              _buildModernTextField(controller: _nicknameController, hint: 'Nickname'),
-              const SizedBox(height: 20),
-              _buildModernTextField(
-                controller: _dobController, 
-                hint: 'Date of Birth',
-                suffixIcon: Icons.calendar_month_rounded,
-                onTap: _selectDate,
-                readOnly: true,
-              ),
-              const SizedBox(height: 20),
-              _buildModernTextField(
-                controller: _emailController, 
-                hint: 'Email',
-                suffixIcon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
-              const SizedBox(height: 20),
-              _buildDropdownField(
-                value: _selectedCountry,
-                items: ['United States', 'Canada', 'United Kingdom', 'Australia'],
-                onChanged: (val) => setState(() => _selectedCountry = val!),
-              ),
-              const SizedBox(height: 20),
-              _buildPhoneField(),
-              const SizedBox(height: 20),
-              _buildDropdownField(
-                value: _selectedGender,
-                items: ['Male', 'Female', 'Other'],
-                onChanged: (val) => setState(() => _selectedGender = val!),
-              ),
-              const SizedBox(height: 20),
-              _buildModernTextField(
-                controller: _addressController, 
-                hint: 'Address',
-              ),
-              const SizedBox(height: 48),
-              _buildUpdateButton(),
-              const SizedBox(height: 40),
-            ],
+      body: BlocListener<ProfileBloc, ProfileState>(
+        listener: (context, state) {
+          if (state is ProfileLoaded) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Profile updated successfully!')),
+            );
+            Navigator.pop(context);
+          } else if (state is ProfileError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.message)),
+            );
+          }
+        },
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                const SizedBox(height: 24),
+                _buildModernTextField(controller: _fullNameController, hint: 'Full Name'),
+                const SizedBox(height: 20),
+                _buildModernTextField(controller: _nicknameController, hint: 'Nickname'),
+                const SizedBox(height: 20),
+                _buildModernTextField(
+                  controller: _dobController, 
+                  hint: 'Date of Birth',
+                  suffixIcon: Icons.calendar_month_rounded,
+                  onTap: _selectDate,
+                  readOnly: true,
+                ),
+                const SizedBox(height: 20),
+                _buildModernTextField(
+                  controller: _emailController, 
+                  hint: 'Email',
+                  suffixIcon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+                _buildDropdownField(
+                  value: _selectedCountry,
+                  items: ['India', 'United States', 'Canada', 'United Kingdom', 'Australia'],
+                  onChanged: (val) => setState(() => _selectedCountry = val!),
+                ),
+                const SizedBox(height: 20),
+                _buildPhoneField(),
+                const SizedBox(height: 20),
+                _buildDropdownField(
+                  value: _selectedGender,
+                  items: ['Male', 'Female', 'Other', 'Not Specified'],
+                  onChanged: (val) => setState(() => _selectedGender = val!),
+                ),
+                const SizedBox(height: 20),
+                _buildModernTextField(
+                  controller: _addressController, 
+                  hint: 'Address',
+                ),
+                const SizedBox(height: 48),
+                _buildUpdateButton(),
+                const SizedBox(height: 40),
+              ],
+            ),
           ),
         ),
       ),
@@ -264,7 +288,15 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
       child: ElevatedButton(
         onPressed: () {
           if (_formKey.currentState!.validate()) {
-            Navigator.pop(context);
+            context.read<ProfileBloc>().add(UpdateProfile({
+              'name': _fullNameController.text,
+              'nickname': _nicknameController.text,
+              'dob': _dobController.text,
+              'email': _emailController.text,
+              'gender': _selectedGender,
+              'country': _selectedCountry,
+              'address': {'street': _addressController.text}
+            }));
           }
         },
         style: ElevatedButton.styleFrom(

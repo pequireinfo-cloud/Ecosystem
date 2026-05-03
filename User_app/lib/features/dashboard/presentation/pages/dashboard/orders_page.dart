@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_state.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/bloc/order_bloc.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/bloc/order_event.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/bloc/order_state.dart';
+import 'package:pequire_user_app/injection_container.dart';
 import 'chat_page.dart';
 import 'tracking_page.dart';
 
@@ -7,36 +14,74 @@ class OrdersPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
-      appBar: AppBar(
-        title: const Text(
-          'My Orders',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+    final authState = context.read<AuthBloc>().state;
+    String userId = '';
+    if (authState is AuthAuthenticated) {
+      userId = authState.user.id;
+    }
+
+    return BlocProvider(
+      create: (context) => sl<OrderBloc>()..add(GetUserOrders(userId)),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF5F5F7),
+        appBar: AppBar(
+          title: const Text(
+            'My Orders',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
+        body: BlocBuilder<OrderBloc, OrderState>(
+          builder: (context, state) {
+            if (state is OrderLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is OrderLoaded) {
+              if (state.orders.isEmpty) {
+                return const Center(child: Text('No orders found'));
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: state.orders.length,
+                itemBuilder: (context, index) {
+                  return _buildOrderCard(context, state.orders[index]);
+                },
+              );
+            } else if (state is OrderError) {
+              return Center(child: Text(state.message));
+            }
+            return const SizedBox();
+          },
         ),
-      ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return _buildOrderCard(context, index);
-        },
       ),
     );
   }
 
-  Widget _buildOrderCard(BuildContext context, int index) {
-    final titles = ['Home Cleaning', 'Pipe Repair', 'AC Maintenance'];
-    final dates = ['Oct 25, 2023', 'Oct 28, 2023', 'Nov 02, 2023'];
-    final statuses = ['Completed', 'In Process', 'Upcoming'];
-    final colors = [const Color(0xFF4CAF50), const Color(0xFF2196F3), const Color(0xFFFF9800)];
+  Widget _buildOrderCard(BuildContext context, Map<String, dynamic> order) {
+    final title = order['serviceType'] ?? 'General Service';
+    final date = order['scheduledDate'] ?? 'Date TBD';
+    final status = order['status'] ?? 'Unknown';
+    
+    Color statusColor;
+    switch (status.toLowerCase()) {
+      case 'completed':
+        statusColor = const Color(0xFF4CAF50);
+        break;
+      case 'in-progress':
+      case 'accepted':
+        statusColor = const Color(0xFF2196F3);
+        break;
+      case 'pending':
+        statusColor = const Color(0xFFFF9800);
+        break;
+      default:
+        statusColor = Colors.grey;
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -59,12 +104,12 @@ class OrdersPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: colors[index].withOpacity(0.1),
+                  color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Icon(
-                  index == 0 ? Icons.cleaning_services_rounded : index == 1 ? Icons.build_circle_rounded : Icons.ac_unit_rounded,
-                  color: colors[index],
+                  Icons.build_circle_rounded,
+                  color: statusColor,
                   size: 26,
                 ),
               ),
@@ -74,7 +119,7 @@ class OrdersPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      titles[index],
+                      title,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 17,
@@ -87,7 +132,7 @@ class OrdersPage extends StatelessWidget {
                         Icon(Icons.calendar_today_rounded, size: 12, color: Colors.grey.shade400),
                         const SizedBox(width: 4),
                         Text(
-                          dates[index],
+                          date,
                           style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                         ),
                       ],
@@ -98,13 +143,13 @@ class OrdersPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: colors[index].withOpacity(0.1),
+                  color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  statuses[index],
+                  status.toUpperCase(),
                   style: TextStyle(
-                    color: colors[index],
+                    color: statusColor,
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
@@ -112,20 +157,19 @@ class OrdersPage extends StatelessWidget {
               ),
             ],
           ),
-          if (index != 0) ...[
+          if (status.toLowerCase() != 'completed') ...[
             const SizedBox(height: 20),
             Row(
               children: [
                 Expanded(
                   child: TextButton.icon(
                     onPressed: () {
-                      // Placeholder for ChatPage
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ChatPage(
-                            userName: 'John Wilson',
-                            serviceType: titles[index],
+                            userName: order['providerName'] ?? 'Provider',
+                            serviceType: title,
                           ),
                         ),
                       );
@@ -144,13 +188,12 @@ class OrdersPage extends StatelessWidget {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // Placeholder for TrackingPage
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => TrackingPage(
-                            serviceTitle: titles[index],
-                            orderId: 'ORDER_123',
+                            serviceTitle: title,
+                            orderId: order['_id'] ?? order['id'] ?? 'ORDER',
                           ),
                         ),
                       );

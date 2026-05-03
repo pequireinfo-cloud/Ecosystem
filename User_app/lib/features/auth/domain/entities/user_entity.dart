@@ -6,24 +6,36 @@ class UserEntity extends Equatable {
   final String email;
   final LoginRole role;
   final String? phoneNumber;
+  final String? nickname;
+  final String? dob;
+  final String? gender;
+  final String? country;
   final double? lastLat;
   final double? lastLng;
   final String? lastAddress;
   final int currentStreak;
   final int rewardPoints;
+  final Map<String, dynamic>? preferences;
+  final List<Map<String, dynamic>>? coupons;
 
   const UserEntity({
     required this.id,
     required this.email,
     required this.role,
     this.phoneNumber,
+    this.nickname,
+    this.dob,
+    this.gender,
+    this.country,
     this.lastLat,
     this.lastLng,
     this.lastAddress,
     this.currentStreak = 0,
     this.rewardPoints = 0,
+    this.preferences,
+    this.coupons,
   });
 
   @override
-  List<Object?> get props => [id, email, role, phoneNumber, lastLat, lastLng, lastAddress];
+  List<Object?> get props => [id, email, role, phoneNumber, nickname, dob, gender, country, lastLat, lastLng, lastAddress, currentStreak, rewardPoints, preferences, coupons];
 }

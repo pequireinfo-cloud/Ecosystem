@@ -5,6 +5,8 @@ import '../models/auth_model.dart';
 abstract class AuthLocalDataSource {
   Future<void> cacheUser(AuthModel userToCache);
   Future<AuthModel?> getLastUser();
+  Future<void> cacheToken(String token);
+  Future<String?> getToken();
   Future<void> clearCache();
 }
 
@@ -33,7 +35,18 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   }
 
   @override
-  Future<void> clearCache() {
-    return sharedPreferences.remove(CACHED_USER);
+  Future<void> cacheToken(String token) {
+    return sharedPreferences.setString('JWT_TOKEN', token);
+  }
+
+  @override
+  Future<String?> getToken() {
+    return Future.value(sharedPreferences.getString('JWT_TOKEN'));
+  }
+
+  @override
+  Future<void> clearCache() async {
+    await sharedPreferences.remove(CACHED_USER);
+    await sharedPreferences.remove('JWT_TOKEN');
   }
 }

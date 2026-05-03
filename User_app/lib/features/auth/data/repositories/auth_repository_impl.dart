@@ -68,21 +68,20 @@ class AuthRepositoryImpl implements AuthRepository {
     required String phoneNumber,
   }) async {
     try {
-      debugPrint('AUTH_REPO: Attempting to send SMS OTP to: $phoneNumber');
+      debugPrint('AUTH_REPO: Attempting to send Text OTP to: $phoneNumber');
       debugPrint('AUTH_REPO: Using Project ID: ${Descope.projectId}');
       
-      // Use Descope SDK directly to send OTP via SMS
+      // Use Descope SDK directly to send OTP via SMS (Text)
       await Descope.otp.signUpOrIn(
         method: DeliveryMethod.sms,
         loginId: phoneNumber,
       );
       
-      debugPrint('AUTH_REPO: OTP send request successful');
+      debugPrint('AUTH_REPO: Text OTP send request successful');
       return const Right(null);
     } catch (e) {
-      debugPrint('AUTH_REPO: ERROR occurred: $e');
-      String message = e.toString();
-      return Left(ServerFailure('WhatsApp OTP Error: $message'));
+      debugPrint('AUTH_REPO: Text OTP Send ERROR: $e');
+      return Left(ServerFailure('Text OTP Send Error: ${e.toString()}'));
     }
   }
 
@@ -93,30 +92,26 @@ class AuthRepositoryImpl implements AuthRepository {
     required String role,
   }) async {
     try {
-      // 1. Verify OTP using Descope SDK
-      final authResponse = await Descope.otp.verify(
-        method: DeliveryMethod.sms,
-        loginId: phoneNumber,
-        code: otp,
-      );
+      debugPrint('AUTH_REPO: Verifying Text OTP via Backend for: $phoneNumber');
       
-      // 2. Extract session token
-      final session = DescopeSession.fromAuthenticationResponse(authResponse);
-      Descope.sessionManager.manageSession(session);
-      
-      // 3. Verify the Descope session with our backend
-      final authModel = await remoteDataSource.verifyDescope(
-        token: session.sessionToken.jwt,
+      // We now call our backend directly to verify the OTP.
+      // This satisfies the requirement that the backend MUST be the one verifying the code.
+      final authModel = await remoteDataSource.verifyWhatsAppOtp(
+        phoneNumber: phoneNumber,
+        otp: otp,
         role: role,
       );
+      
+      debugPrint('AUTH_REPO: Backend verification successful');
 
-      // 4. Cache user for persistence
+      // Cache user for persistence
       await localDataSource.cacheUser(authModel);
+      // Note: Backend verification returns our own JWT, which is handled in remoteDataSource.verifyWhatsAppOtp
 
       return Right(authModel);
     } catch (e) {
-      String message = e.toString();
-      return Left(ServerFailure('OTP Verification Error: $message'));
+      debugPrint('AUTH_REPO: Backend OTP Verification ERROR: $e');
+      return Left(ServerFailure('OTP Verification Error: ${e.toString()}'));
     }
   }
 
@@ -160,6 +155,8 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return const Left(ServerFailure('An unexpected error occurred'));
     }
+  }
+
   @override
   Future<Either<Failure, UserEntity?>> getCachedUser() async {
     try {
@@ -168,5 +165,15 @@ class AuthRepositoryImpl implements AuthRepository {
     } catch (e) {
       return const Left(CacheFailure('Failed to load cached user'));
     }
+  }
+
+  @override
+  Future<String?> getToken() {
+    return localDataSource.getToken();
+  }
+
+  @override
+  Future<void> logout() async {
+    await localDataSource.clearCache();
   }
 }

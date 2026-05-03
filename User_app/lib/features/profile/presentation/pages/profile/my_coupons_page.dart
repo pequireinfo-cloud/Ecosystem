@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 
+import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
+
 class MyCouponsPage extends StatelessWidget {
-  const MyCouponsPage({super.key});
+  final UserEntity user;
+  const MyCouponsPage({super.key, required this.user});
 
   @override
   Widget build(BuildContext context) {
@@ -53,14 +56,10 @@ class MyCouponsPage extends StatelessWidget {
   }
 
   Widget _buildCouponsList(bool available) {
+    final List<Map<String, dynamic>> allCoupons = user.coupons ?? [];
     final coupons = available
-        ? [
-            {'code': 'WELCOME20', 'discount': '20% OFF', 'desc': 'On your first cleaning service', 'expiry': 'Valid until 31 Dec 2024'},
-            {'code': 'SUMMER50', 'discount': '\$50 OFF', 'desc': 'On AC maintenance services', 'expiry': 'Valid until 30 Aug 2024'},
-          ]
-        : [
-            {'code': 'EXPIRED10', 'discount': '10% OFF', 'desc': 'Site-wide discount', 'expiry': 'Expired on 15 Jan 2024'},
-          ];
+        ? allCoupons.where((c) => c['isUsed'] == false).toList()
+        : allCoupons.where((c) => c['isUsed'] == true).toList();
 
     if (coupons.isEmpty) {
       return const Center(child: Text('No coupons found', style: TextStyle(color: Colors.grey)));
@@ -76,7 +75,7 @@ class MyCouponsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCouponCard(Map<String, String> coupon, bool available) {
+  Widget _buildCouponCard(Map<String, dynamic> coupon, bool available) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -123,13 +122,13 @@ class MyCouponsPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        coupon['desc']!,
+                        coupon['description'] ?? '',
                         style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                       ),
                       const Spacer(),
                       const SizedBox(height: 8),
                       Text(
-                        coupon['expiry']!,
+                        coupon['expiryDate']?.toString() ?? 'No expiry',
                         style: TextStyle(fontSize: 11, color: available ? Colors.orange : Colors.grey),
                       ),
                     ],

@@ -109,6 +109,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       debugPrint('AUTH_REMOTE: Backend Response: ${response.statusCode}');
       
       if (response.statusCode == 200 || response.statusCode == 201) {
+        final token = response.data['token'];
+        if (token != null) {
+          ApiConfig.setToken(token);
+        }
         return AuthModel.fromJson(response.data['user']);
       } else {
         throw DioException(
