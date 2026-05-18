@@ -10,6 +10,7 @@ class BookingService {
     required double estimatedPrice,
     List<String> imageUrls = const [],
     bool isWaitAndSave = false,
+    String paymentTiming = 'postpaid',
   }) async {
     try {
       final response = await ApiService().post('/bookings', data: {
@@ -21,6 +22,7 @@ class BookingService {
           'address': address
         },
         'estimatedPrice': estimatedPrice,
+        'paymentTiming': paymentTiming,
       });
 
       if (response.statusCode == 201) {
@@ -48,6 +50,16 @@ class BookingService {
       await ApiService().post('/bookings/$bookingId/approve-diagnosis');
     } catch (e) {
       print('Error approving diagnosis: $e');
+    }
+  }
+
+  Future<void> confirmPayment(String bookingId, {String method = 'upi'}) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/confirm-payment', data: {
+        'method': method,
+      });
+    } catch (e) {
+      print('Error confirming payment: $e');
     }
   }
 

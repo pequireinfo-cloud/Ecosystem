@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PequireLogo extends StatelessWidget {
   final double height;
@@ -18,16 +19,23 @@ class PequireLogo extends StatelessWidget {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset(
-          'assets/images/logos/logo.webp',
+        SvgPicture.asset(
+          'assets/images/logos/Logo.svg',
           height: height,
+          fit: BoxFit.contain,
+          colorFilter: !isLight ? const ColorFilter.mode(Colors.white, BlendMode.srcIn) : null,
         ),
-        SizedBox(width: height * 0.375),
-        Image.asset(
-          'assets/images/logos/Wordmark.webp',
-          height: height * 0.56,
-          color: wordmarkColor,
+        SizedBox(width: height * 0.3),
+        Flexible(
+          child: SvgPicture.asset(
+            'assets/images/logos/Wordmark.svg',
+            height: height * 0.55,
+            width: height * 0.55 * 5.26,
+            fit: BoxFit.contain,
+            colorFilter: ColorFilter.mode(wordmarkColor, BlendMode.srcIn),
+          ),
         ),
       ],
     );

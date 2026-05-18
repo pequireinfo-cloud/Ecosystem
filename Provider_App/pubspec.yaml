@@ -94,6 +94,8 @@ flutter:
     - assets/images/
     - assets/images/onboarding/
     - assets/images/logos/
+    - assets/images/logos/Logo.svg
+    - assets/images/logos/Wordmark.svg
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PequireLogo extends StatelessWidget {
   final double height;
@@ -12,22 +13,31 @@ class PequireLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If isLight is true, we use dark colors for the wordmark (to be seen on light bg)
-    // If isLight is false (default), we use white for the wordmark (to be seen on dark bg)
-    final Color wordmarkColor = isLight ? const Color(0xFF1A1B2F) : Colors.white;
+    // If isLight is true (light background), we use dark colors for the dark parts of the logo/wordmark
+    // If isLight is false (dark background), we use white for the dark parts
+    final Color visibilityColor = isLight ? const Color(0xFF01173B) : Colors.white;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Image.asset(
-          'assets/logo.webp',
+        SvgPicture.asset(
+          'assets/Logo.svg',
           height: height,
+          fit: BoxFit.contain,
+          placeholderBuilder: (context) => SizedBox(height: height, width: height, child: const CircularProgressIndicator(strokeWidth: 2)),
+          colorFilter: !isLight ? const ColorFilter.mode(Colors.white, BlendMode.srcIn) : null,
         ),
-        SizedBox(width: height * 0.375), // Proportional spacing
-        Image.asset(
-          'assets/wordmark.webp',
-          height: height * 0.56, // Proportional height for text
-          color: wordmarkColor,
+        SizedBox(width: height * 0.3),
+        Flexible(
+          child: SvgPicture.asset(
+            'assets/Wordmark.svg',
+            height: height * 0.55,
+            width: height * 0.55 * 5.26, 
+            fit: BoxFit.contain,
+            placeholderBuilder: (context) => const Text('PEQUIRE', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            colorFilter: ColorFilter.mode(visibilityColor, BlendMode.srcIn),
+          ),
         ),
       ],
     );

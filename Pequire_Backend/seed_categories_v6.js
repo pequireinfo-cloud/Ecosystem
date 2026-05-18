@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
 
+require('dotenv').config();
 const Category = require('./src/models/Category');
 
 async function seedCategories() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/pequire');
-    console.log('Connected to MongoDB for seeding');
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/pequire';
+    await mongoose.connect(mongoURI);
+    console.log('Connected to MongoDB for seeding:', mongoURI.includes('mongodb+srv') ? 'Atlas Cluster' : 'Localhost');
 
     // Clear existing categories
     await Category.deleteMany({});

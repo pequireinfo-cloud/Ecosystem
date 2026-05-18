@@ -2,9 +2,27 @@ const bookingService = require('../services/bookingService');
 
 exports.createBooking = async (req, res) => {
   try {
-    const { userId, serviceType, problemDescription, location, estimatedPrice } = req.body;
-    const newBooking = await bookingService.createBooking({ userId, serviceType, problemDescription, location, estimatedPrice });
+    const { userId, serviceType, problemDescription, location, estimatedPrice, paymentTiming } = req.body;
+    const newBooking = await bookingService.createBooking({ userId, serviceType, problemDescription, location, estimatedPrice, paymentTiming });
     res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.confirmPayment = async (req, res) => {
+  try {
+    const booking = await bookingService.confirmPayment(req.params.id, req.body);
+    res.status(200).json(booking);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.confirmOfflinePayment = async (req, res) => {
+  try {
+    const booking = await bookingService.confirmOfflinePayment(req.params.id);
+    res.status(200).json(booking);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

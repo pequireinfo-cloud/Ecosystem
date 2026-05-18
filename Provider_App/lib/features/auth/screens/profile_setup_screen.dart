@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -42,21 +43,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                   children: [
                     const SizedBox(height: 24),
                     // Brand Identity
-                    Row(
-                      children: [
-                        Image.asset(
-                          'assets/images/logos/logo.webp',
-                          height: 28,
-                          fit: BoxFit.contain,
-                        ),
-                        const SizedBox(width: 8),
-                        Image.asset(
-                          'assets/images/logos/wordmark.webp',
-                          height: 18,
-                          fit: BoxFit.contain,
-                        ),
-                      ],
-                    ),
+                    const PequireLogo(height: 28, isLight: true),
                     const SizedBox(height: 32),
 
                     // Progress Track

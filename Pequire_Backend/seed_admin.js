@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
+require('dotenv').config();
 const User = require('./src/models/User');
 const bcrypt = require('bcryptjs');
 
 async function seedAdmin() {
   try {
-    await mongoose.connect('mongodb://localhost:27017/pequire');
-    console.log('Connected to MongoDB');
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/pequire';
+    await mongoose.connect(mongoURI);
+    console.log('Connected to MongoDB:', mongoURI.includes('mongodb+srv') ? 'Atlas Cluster' : 'Localhost');
 
     const email = 'admin@pequire.com';
     const password = 'admin123';

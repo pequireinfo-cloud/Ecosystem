@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../utils/api';
-import logo from '../assets/logo.webp';
-import wordmark from '../assets/wordmark.webp';
+import logo from '../assets/Logo.svg';
+import wordmark from '../assets/Wordmark.svg';
 import { Mail, Lock, LogIn, AlertCircle, Loader2 } from 'lucide-react';
 
 const Login = ({ onLoginSuccess }) => {

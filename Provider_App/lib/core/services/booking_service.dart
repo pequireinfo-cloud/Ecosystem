@@ -84,6 +84,16 @@ class BookingService {
     }
   }
 
+  /// Confirm Cash Payment Received
+  Future<void> confirmOfflinePayment(String bookingId) async {
+    try {
+      await ApiService().post('/bookings/$bookingId/confirm-offline-payment');
+    } catch (e) {
+      print('Error confirming offline payment: $e');
+      rethrow;
+    }
+  }
+
   /// Submit feedback for the user (customer)
   Future<void> submitUserFeedback({
     required String bookingId,

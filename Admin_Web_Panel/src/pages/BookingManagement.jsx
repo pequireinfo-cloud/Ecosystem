@@ -95,7 +95,7 @@ const BookingManagement = () => {
             <tr style={{ backgroundColor: '#F8FAFC' }}>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>ID</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>SERVICE</th>
-              <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>ADDRESS</th>
+              <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>PAYMENT</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>DATE</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>STATUS</th>
               <th style={{ padding: '16px 24px', fontSize: '12px', fontWeight: '700', color: 'var(--text-muted)' }}>ACTIONS</th>
@@ -110,9 +110,13 @@ const BookingManagement = () => {
                   </td>
                   <td style={{ padding: '16px 24px', fontSize: '14px' }}>{b.serviceType || 'N/A'}</td>
                   <td style={{ padding: '16px 24px', fontSize: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <MapPin size={14} color="var(--text-muted)" />
-                      {b.location?.address || 'No Address'}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      <span style={{ fontWeight: '600', color: b.paymentStatus === 'paid' ? '#10B981' : '#F59E0B' }}>
+                        {b.paymentStatus ? b.paymentStatus.toUpperCase() : 'PENDING'}
+                      </span>
+                      <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        {b.paymentTiming ? b.paymentTiming.toUpperCase() : 'POSTPAID'}
+                      </span>
                     </div>
                   </td>
                   <td style={{ padding: '16px 24px', fontSize: '14px' }}>

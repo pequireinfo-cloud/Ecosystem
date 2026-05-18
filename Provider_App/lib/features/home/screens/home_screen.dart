@@ -16,6 +16,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pequire_provider_app/features/home/widgets/active_job_panel.dart';
 import 'package:pequire_provider_app/core/services/tracking_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -154,22 +155,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 children: [
                   // Brand Group (Logo + Wordmark)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Image.asset(
-                        'assets/images/logos/logo.webp',
-                        height: 28,
-                        fit: BoxFit.contain,
-                      ),
-                      const SizedBox(width: 8),
-                      Image.asset(
-                        'assets/images/logos/wordmark.webp',
-                        height: 20,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
+                  const PequireLogo(height: 28, isLight: true),
                   const Spacer(),
                   // Notification bell
                   GestureDetector(

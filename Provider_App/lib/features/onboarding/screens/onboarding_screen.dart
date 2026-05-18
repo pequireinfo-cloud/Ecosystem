@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -77,23 +78,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       // New Brand Group
-                      Row(
-                        children: [
-                          Image.asset(
-                            'assets/images/logos/logo.webp',
-                            height: 28,
-                            fit: BoxFit.contain,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
-                          Image.asset(
-                            'assets/images/logos/wordmark.webp',
-                            height: 20,
-                            fit: BoxFit.contain,
-                            color: Colors.white,
-                          ),
-                        ],
-                      ),
+                      const PequireLogo(height: 28, isLight: false),
                       // Skip
                       GestureDetector(
                         onTap: () => context.go('/login'),

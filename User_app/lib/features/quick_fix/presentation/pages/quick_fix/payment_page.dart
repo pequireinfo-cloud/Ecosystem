@@ -6,7 +6,7 @@ import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_f
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/rating_feedback_page.dart';
 import 'searching_provider_page.dart';
-import 'searching_provider_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentPage extends StatefulWidget {
   final BookingSession session;
@@ -23,7 +23,7 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
-  String _selectedMethod = 'Google Pay UPI';
+  String _selectedMethod = 'Pay via UPI (Prepaid)';
 
   @override
   Widget build(BuildContext context) {
@@ -102,18 +102,16 @@ class _PaymentPageState extends State<PaymentPage> {
                   
                   const SizedBox(height: 24),
                   
-                  const Text('Recommended', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
+                  Text(isFinalPayment ? 'Pay Online (0% Fee)' : 'Pay Now (Prepaid)', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
                   const SizedBox(height: 16),
                   
-                  _buildPaymentOption('Google Pay UPI', 'Fastest way to pay', Icons.account_balance_wallet_rounded, Colors.green),
-                  const SizedBox(height: 12),
-                  _buildPaymentOption('PhonePe UPI', 'Secure payment', Icons.payments_rounded, Colors.purple),
+                  _buildPaymentOption(isFinalPayment ? 'Pay via UPI' : 'Pay via UPI (Prepaid)', 'GPay, PhonePe, Paytm', Icons.qr_code_scanner_rounded, Colors.green),
                   
                   const SizedBox(height: 24),
                   
                   const Text('Other Options', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF001233))),
                   const SizedBox(height: 16),
-                  _buildPaymentOption('Cash after service', 'Pay cash or QR code', Icons.money_rounded, Colors.orange),
+                  _buildPaymentOption(isFinalPayment ? 'Cash' : 'Pay after service', 'Pay cash or direct QR to provider', Icons.money_rounded, Colors.orange),
                   
                   const SizedBox(height: 32),
                   
@@ -132,8 +130,14 @@ class _PaymentPageState extends State<PaymentPage> {
   
                         try {
                           if (isFinalPayment) {
-                             // Final Payment logic
-                             await Future.delayed(const Duration(seconds: 2)); // Mock payment processing
+                             if (_selectedMethod.contains('UPI')) {
+                               await _launchUPIIntent(displayPrice, widget.session.bookingId ?? 'BK-1234');
+                               await BookingService().confirmPayment(widget.session.bookingId!, method: 'upi');
+                             } else {
+                               // Cash selected
+                               await Future.delayed(const Duration(seconds: 1));
+                             }
+                             
                              if (mounted) {
                                Navigator.pop(context); // Close loading
                                Navigator.pushReplacement(
@@ -144,7 +148,7 @@ class _PaymentPageState extends State<PaymentPage> {
                                );
                              }
                           } else {
-                            // Initial Booking logic
+                            String timing = _selectedMethod.contains('UPI') ? 'prepaid' : 'postpaid';
                             final bookingId = await BookingService().createBooking(
                               userId: widget.session.userId ?? 'temp_user_789',
                               serviceType: widget.session.category ?? 'General Service',
@@ -153,9 +157,15 @@ class _PaymentPageState extends State<PaymentPage> {
                               address: widget.session.pickupAddress ?? 'Current Location',
                               estimatedPrice: widget.session.price ?? 1200,
                               isWaitAndSave: widget.isWaitAndSave,
+                              paymentTiming: timing,
                             );
   
                             widget.session.bookingId = bookingId;
+
+                            if (timing == 'prepaid' && bookingId != null) {
+                               await _launchUPIIntent(displayPrice, bookingId);
+                               await BookingService().confirmPayment(bookingId, method: 'upi');
+                            }
   
                             if (mounted) {
                               Navigator.pop(context); // Close loading
@@ -232,6 +242,29 @@ class _PaymentPageState extends State<PaymentPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchUPIIntent(String amount, String transactionNote) async {
+    // Actual business UPI ID
+    final String upiId = 'ddayal7143@okaxis';
+    final String payeeName = 'Pequire Services';
+    
+    final Uri upiUri = Uri.parse(
+      'upi://pay?pa=$upiId&pn=$payeeName&am=$amount&cu=INR&tn=Payment for $transactionNote'
+    );
+
+    try {
+      if (await canLaunchUrl(upiUri)) {
+        await launchUrl(upiUri, mode: LaunchMode.externalApplication);
+        // We wait a few seconds so when they return, we assume payment was done (Phase 1 zero-cost assumption)
+        await Future.delayed(const Duration(seconds: 3));
+      } else {
+        // Fallback if no UPI app is installed
+        throw Exception("No UPI app found on this device");
+      }
+    } catch (e) {
+      throw Exception("Could not launch UPI app: $e");
+    }
   }
 }
 

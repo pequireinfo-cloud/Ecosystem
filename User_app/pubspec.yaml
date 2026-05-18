@@ -44,6 +44,7 @@ dependencies:
   intl: ^0.20.2
   descope: ^0.7.2
   shared_preferences: ^2.2.2
+  url_launcher: ^6.2.1
 
 
 dev_dependencies:
@@ -62,5 +63,12 @@ flutter:
   generate: true
   uses-material-design: true
   assets:
-    - assets/
-
+    - assets/login_bg.webp
+    - assets/onboarding_pricing.webp
+    - assets/onboarding_professionals.webp
+    - assets/onboarding_snap_solve.webp
+    - assets/profile_avatar.webp
+    - assets/Logo.svg
+    - assets/Wordmark.svg
+    - assets/login_header.svg
+    - assets/login_header_utf8.svg

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import logo from '../assets/logo.webp';
-import wordmark from '../assets/wordmark.webp';
+import logo from '../assets/Logo.svg';
+import wordmark from '../assets/Wordmark.svg';
 import { 
   LayoutDashboard, 
   Users, 

@@ -1,5 +1,5 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "dart.flutterSdkPath": "C:\\Users\\Admin\\Downloads\\flutter_windows_3.32.0-stable\\flutter",
-    "dart.sdkPath": "C:\\Users\\Admin\\Downloads\\flutter_windows_3.32.0-stable\\flutter\\bin\\cache\\dart-sdk"
+    "dart.flutterSdkPath": "C:\\Users\\Admin\\.puro\\envs\\stable\\flutter",
+    "dart.sdkPath": "C:\\Users\\Admin\\.puro\\envs\\stable\\flutter\\bin\\cache\\dart-sdk"
 }

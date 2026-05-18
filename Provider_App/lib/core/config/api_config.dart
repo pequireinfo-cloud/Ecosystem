@@ -1,6 +1,6 @@
 class ApiConfig {
   // Using local IP (Connected via Mobile Hotspot)
-  static const String baseUrl = 'http://10.46.122.48:4000/api';
+  static const String baseUrl = 'http://10.209.29.48:4000/api';
   
   // Descope Project ID
   static const String descopeProjectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';

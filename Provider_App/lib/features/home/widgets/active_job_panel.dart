@@ -131,6 +131,24 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
     }
   }
 
+  Future<void> _confirmCash() async {
+    setState(() => _isSubmitting = true);
+    try {
+      await BookingService().confirmOfflinePayment(widget.bookingId);
+      // Wait for next poll to update UI, or just fetch immediately
+      final response = await ApiService().get('/bookings/${widget.bookingId}');
+      if (mounted) {
+        setState(() {
+          _bookingData = response.data;
+        });
+      }
+    } catch (e) {
+      _showError('Failed to confirm cash receipt.');
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
+  }
+
   Future<String?> _showOtpDialog(String title) {
     String otpValue = '';
     return showDialog<String>(
@@ -200,11 +218,23 @@ class _ActiveJobPanelState extends State<ActiveJobPanel> {
             if (_currentStatus == 'waiting_approval') _buildWaitingStage(),
             if (_currentStatus == 'working') _buildWorkingStage(),
             if (_currentStatus == 'completed') ...[
-              const Center(child: Icon(Icons.check_circle, color: Colors.green, size: 48)),
-              const SizedBox(height: 16),
-              const Center(child: Text('JOB COMPLETED', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green))),
-              const SizedBox(height: 24),
-              SizedBox(width: double.infinity, child: ElevatedButton(onPressed: widget.onComplete, child: const Text('Close'))),
+              if (_bookingData?['paymentTiming'] == 'postpaid' && _bookingData?['paymentStatus'] != 'paid') ...[
+                const Center(child: CircularProgressIndicator()),
+                const SizedBox(height: 16),
+                const Center(child: Text('Waiting for Online Payment...', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange))),
+                const SizedBox(height: 24),
+                SizedBox(width: double.infinity, child: ElevatedButton(
+                  onPressed: _isSubmitting ? null : _confirmCash, 
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
+                  child: _isSubmitting ? const CircularProgressIndicator(color: Colors.white) : const Text('Confirm Cash Received')
+                )),
+              ] else ...[
+                const Center(child: Icon(Icons.check_circle, color: Colors.green, size: 48)),
+                const SizedBox(height: 16),
+                const Center(child: Text('JOB COMPLETED & PAID', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green))),
+                const SizedBox(height: 24),
+                SizedBox(width: double.infinity, child: ElevatedButton(onPressed: widget.onComplete, child: const Text('Close'))),
+              ]
             ],
           ],
         ),

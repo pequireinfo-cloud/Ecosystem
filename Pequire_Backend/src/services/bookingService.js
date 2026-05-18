@@ -33,7 +33,7 @@ class BookingService {
    * Create a new booking.
    */
   async createBooking(bookingData) {
-    const { userId, serviceType, problemDescription, location, estimatedPrice } = bookingData;
+    const { userId, serviceType, problemDescription, location, estimatedPrice, paymentTiming } = bookingData;
     
     const newBooking = new Booking({
       bookingId: Math.random().toString(36).substring(2, 10).toUpperCase(),
@@ -43,13 +43,18 @@ class BookingService {
       status: 'pending',
       location,
       estimatedPrice,
+      paymentTiming: paymentTiming || 'postpaid',
       timeline: [{ status: 'pending', timestamp: new Date() }]
     });
 
     await newBooking.save();
     
-    // Trigger real-time notifications
-    this.notifyNearbyProviders(newBooking).catch(err => console.error('Notification Error:', err));
+    if (newBooking.paymentTiming !== 'prepaid') {
+      // Postpaid: Trigger real-time notifications immediately
+      this.notifyNearbyProviders(newBooking).catch(err => console.error('Notification Error:', err));
+    } else {
+      console.log(`Prepaid Booking ${newBooking.bookingId}: Waiting for payment confirmation before matching.`);
+    }
     
     // Broadcast to Admin and User
     if (this.io) {
@@ -103,6 +108,59 @@ class BookingService {
 
     // Real-time: Sync to Firestore for the Provider App view
     this._syncToFirestore(booking);
+  }
+
+  /**
+   * Confirm Payment (Online/Prepaid/Postpaid)
+   */
+  async confirmPayment(bookingId, paymentData) {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) throw new Error('Booking not found');
+
+    booking.paymentStatus = 'paid';
+    booking.paymentMethod = 'online';
+    booking.timeline.push({ status: booking.status, timestamp: new Date(), note: 'Payment confirmed online' });
+    
+    await booking.save();
+    this._syncToFirestore(booking);
+
+    if (booking.paymentTiming === 'prepaid' && booking.status === 'pending') {
+      // Now that they've paid, start matching
+      this.notifyNearbyProviders(booking).catch(err => console.error('Notification Error:', err));
+    } else if (booking.paymentTiming === 'postpaid') {
+      // Notify SP that payment was received
+      if (this.io && booking.providerId) {
+        this.io.emit('payment_received', {
+          bookingId: booking._id,
+          publicId: booking.bookingId,
+          amount: booking.finalPrice || booking.estimatedPrice
+        });
+      }
+    }
+
+    return booking;
+  }
+
+  /**
+   * Confirm Offline Payment (Provider App Cash collection)
+   */
+  async confirmOfflinePayment(bookingId) {
+    const booking = await Booking.findById(bookingId);
+    if (!booking) throw new Error('Booking not found');
+
+    booking.paymentStatus = 'paid';
+    booking.paymentMethod = 'offline';
+    booking.timeline.push({ status: booking.status, timestamp: new Date(), note: 'Payment received offline (cash)' });
+    
+    await booking.save();
+    this._syncToFirestore(booking);
+
+    // Notify User
+    if (this.io) {
+      this.io.to(booking.bookingId).emit('offline_payment_confirmed', booking);
+    }
+
+    return booking;
   }
 
   /**

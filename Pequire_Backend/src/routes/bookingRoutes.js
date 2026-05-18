@@ -10,6 +10,8 @@ router.get('/:id', bookingController.getBookingById);
 router.get('/user/:userId', bookingController.getUserBookings);
 
 // Lifecycle routes
+router.post('/:id/confirm-payment', bookingController.confirmPayment);
+router.post('/:id/confirm-offline-payment', bookingController.confirmOfflinePayment);
 router.put('/:id/accept', bookingController.acceptBooking);
 router.post('/:id/verify-arrival', bookingController.verifyArrival);
 router.post('/:id/diagnosis', bookingController.submitDiagnosis);

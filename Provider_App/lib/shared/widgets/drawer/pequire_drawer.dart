@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
@@ -41,18 +42,18 @@ class PequireDrawer extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset(
-                          'assets/images/logos/logo.webp',
+                        SvgPicture.asset(
+                          'assets/images/logos/Logo.svg',
                           height: 24,
                           fit: BoxFit.contain,
-                          color: Colors.white,
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         ),
                         const SizedBox(width: 8),
-                        Image.asset(
-                          'assets/images/logos/wordmark.webp',
+                        SvgPicture.asset(
+                          'assets/images/logos/Wordmark.svg',
                           height: 20,
                           fit: BoxFit.contain,
-                          color: Colors.white, // Invert to white if it's a dark background Wordmark
+                          colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                         ),
                       ],
                     ),

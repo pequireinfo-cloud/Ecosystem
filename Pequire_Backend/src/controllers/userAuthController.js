@@ -126,17 +126,25 @@ exports.verifyOtpCode = async (req, res) => {
 
     console.log(`Backend verifying OTP for ${phoneNumber}...`);
 
-    // 1. Verify the OTP code with Descope
+    // 1. Verify the OTP code with Descope (Try SMS first, then WhatsApp)
     let authResponse;
     try {
+      // Try verifying via SMS
       authResponse = await descopeClient.otp.verify.sms(phoneNumber, otp);
-      console.log('Descope OTP Verification successful');
-    } catch (error) {
-      console.error('Descope OTP Verification Error:', error);
-      return res.status(401).json({
-        success: false,
-        message: 'Invalid OTP or expired'
-      });
+      console.log('Descope OTP Verification successful (SMS)');
+    } catch (smsError) {
+      console.log('SMS Verification failed, trying WhatsApp...');
+      try {
+        // Try verifying via WhatsApp
+        authResponse = await descopeClient.otp.verify.whatsapp(phoneNumber, otp);
+        console.log('Descope OTP Verification successful (WhatsApp)');
+      } catch (whatsappError) {
+        console.error('Descope OTP Verification Error (All Channels):', whatsappError);
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid OTP or expired'
+        });
+      }
     }
 
     // 2. Extract user info from authResponse

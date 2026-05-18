@@ -71,7 +71,7 @@ class AuthRepositoryImpl implements AuthRepository {
       debugPrint('AUTH_REPO: Attempting to send Text OTP to: $phoneNumber');
       debugPrint('AUTH_REPO: Using Project ID: ${Descope.projectId}');
       
-      // Use Descope SDK directly to send OTP via SMS (Text)
+      // Use Descope SDK to send OTP via SMS (Text Message)
       await Descope.otp.signUpOrIn(
         method: DeliveryMethod.sms,
         loginId: phoneNumber,

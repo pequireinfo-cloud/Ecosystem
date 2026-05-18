@@ -61,6 +61,7 @@ const bookingSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'failed', 'refunded'],
     default: 'pending'
   },
+  paymentTiming: { type: String, enum: ['prepaid', 'postpaid'], default: 'postpaid' },
   paymentMethod: { type: String, enum: ['online', 'offline'], default: 'online' },
   commissionStatus: { type: String, enum: ['pending', 'paid'], default: 'pending' },
   rating: { type: Number, min: 1, max: 5 }, // Customer rating SP
