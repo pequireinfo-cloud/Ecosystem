@@ -1,6 +1,6 @@
 class ApiConfig {
-  // Using local IP (Connected via Mobile Hotspot)
-  static const String baseUrl = 'http://10.209.29.48:4000/api';
+  // Production Backend URL
+  static const String baseUrl = 'https://api.pequire.com/api';
   
   // Descope Project ID
   static const String descopeProjectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';

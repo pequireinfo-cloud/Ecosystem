@@ -26,7 +26,7 @@ const ProviderList = () => {
   const toggleStatus = async (id, currentStatus) => {
     const nextStatus = currentStatus === 'Blocked' ? 'Offline' : 'Blocked';
     try {
-      await axios.put(`http://localhost:4000/api/admin/providers/${id}/status`, { status: nextStatus });
+      await api.put(`/admin/providers/${id}/status`, { status: nextStatus });
       fetchProviders();
     } catch (err) {
       alert('Error updating status');

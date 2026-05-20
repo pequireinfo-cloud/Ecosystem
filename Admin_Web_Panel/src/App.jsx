@@ -12,7 +12,7 @@ import Login from './pages/Login';
 import { io } from 'socket.io-client';
 import { Bell, X, ShieldCheck } from 'lucide-react';
 
-const SOCKET_URL = 'http://localhost:4000'; // Backend URL
+const SOCKET_URL = 'https://api.pequire.com'; // Backend URL
 
 function App() {
   const [activeTab, setActiveTab] = useState('dashboard');

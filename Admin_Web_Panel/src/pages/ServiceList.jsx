@@ -39,7 +39,7 @@ const ServiceList = () => {
   const handleDeleteService = async (id) => {
     if (window.confirm('Are you sure you want to delete this listing?')) {
       try {
-        await axios.delete(`http://localhost:4000/api/services/${id}`);
+        await api.delete(`/services/${id}`);
         fetchData();
       } catch (err) {
         alert('Error deleting service');
@@ -54,7 +54,7 @@ const ServiceList = () => {
     const updatedList = [...(category[type] || []), newItemName.trim()];
     
     try {
-      await axios.put(`http://localhost:4000/api/categories/${catId}`, {
+      await api.put(`/categories/${catId}`, {
         [type]: updatedList
       });
       setNewItemName('');
@@ -70,7 +70,7 @@ const ServiceList = () => {
     const updatedList = category[type].filter((_, i) => i !== itemIndex);
     
     try {
-      await axios.put(`http://localhost:4000/api/categories/${catId}`, {
+      await api.put(`/categories/${catId}`, {
         [type]: updatedList
       });
       fetchData();
