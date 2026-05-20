@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import api from '../utils/api';
 import logo from '../assets/Logo.svg';
 import wordmark from '../assets/Wordmark.svg';
-import { Mail, Lock, LogIn, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, LogIn, AlertCircle, Loader2, Eye, EyeOff } from 'lucide-react';
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -81,13 +82,30 @@ const Login = ({ onLoginSuccess }) => {
             <div style={inputWrapperStyle}>
               <Lock size={18} style={iconStyle} />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 style={inputStyle}
               />
+              <button 
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{
+                  position: 'absolute',
+                  right: '16px',
+                  background: 'none',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '4px'
+                }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
           </div>
 

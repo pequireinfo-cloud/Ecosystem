@@ -34,10 +34,10 @@ exports.loginAdmin = async (req, res) => {
       token,
       user: {
         id: user._id,
-        fullName: user.fullName,
+        fullName: user.name, // Schema uses 'name'
         email: user.email,
         role: user.role,
-        profilePicture: user.profilePicture
+        profilePicture: user.avatar // Schema uses 'avatar'
       }
     });
   } catch (error) {

@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     index: true // High performance lookups for login
   },
+  password: { 
+    type: String 
+    // Used only for Admin logins. Normal users authenticate via Descope OTP.
+  },
   role: { 
     type: String, 
     enum: ['user', 'admin'], 
