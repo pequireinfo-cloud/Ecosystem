@@ -5,7 +5,7 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 
 import 'package:pequire_provider_app/core/services/provider_service.dart';
-import 'package:pequire_provider_app/core/services/firebase_service.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 
 class VerificationPendingScreen extends StatefulWidget {
   const VerificationPendingScreen({super.key});
@@ -27,8 +27,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
 
   Future<void> _checkStatus() async {
     setState(() => _isLoading = true);
-    // Placeholder ID
-    final profile = await ProviderService().getProfile("67b07c87c88b39c0e4c6e91d");
+    final profile = await ProviderService().getProfile(ApiConfig.currentProviderId ?? "");
     if (profile != null) {
       setState(() {
         _status = profile['kycStatus'] ?? 'In Review';
@@ -62,9 +61,7 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
                         IconButton(
                           icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
                           onPressed: () async {
-                            // Import FirebaseAuth if needed
-                            await FirebaseService().auth.signOut();
-                            if (mounted) context.go('/login');
+                            await ApiConfig.logout(context);
                           },
                         ),
                       ],

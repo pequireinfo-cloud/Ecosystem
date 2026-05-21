@@ -62,17 +62,11 @@ class _KycScreenState extends State<KycScreen> {
   Future<void> _submitKyc() async {
     setState(() => _isUploading = true);
     try {
-      final storage = FirebaseStorage.instance;
       final Map<String, String> downloadUrls = {};
 
       for (var entry in _localFilePaths.entries) {
         if (entry.value != null) {
-          final file = File(entry.value!);
-          final fileName = 'providers/docs/${DateTime.now().millisecondsSinceEpoch}_${entry.key.replaceAll(' ', '_')}_${_uploadedFiles[entry.key]}';
-          final ref = storage.ref().child(fileName);
-          
-          await ref.putFile(file);
-          final url = await ref.getDownloadURL();
+          final url = await ApiService().uploadFile(entry.value!);
           
           if (entry.key == 'Aadhar Card') downloadUrls['aadharCard'] = url;
           if (entry.key == 'PAN Card') downloadUrls['panCard'] = url;

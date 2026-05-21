@@ -184,6 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                     context.read<AuthBloc>().add(
                                           RegisterSubmitted(
+                                            name: email.split('@').first,
                                             email: email,
                                             password: password,
                                             role: _selectedRole,

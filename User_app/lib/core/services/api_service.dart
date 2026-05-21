@@ -38,4 +38,36 @@ class ApiService {
       rethrow;
     }
   }
+
+  Future<String> uploadFile(String filePath) async {
+    try {
+      final fileName = filePath.split(RegExp(r'[/\\]')).last;
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          filePath,
+          filename: fileName,
+        ),
+      });
+
+      // Ensure the baseUrl ends with a slash for relative path resolution
+      final uploadUrl = _dio.options.baseUrl.endsWith('/') ? 'upload' : '/upload';
+      final response = await _dio.post(
+        uploadUrl,
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+        ),
+      );
+
+      if (response.data != null && response.data['success'] == true) {
+        return response.data['url'] as String;
+      } else {
+        throw Exception(response.data?['error'] ?? 'File upload failed');
+      }
+    } on DioException catch (e) {
+      debugPrint('API File Upload Error: ${e.message}');
+      final err = e.response?.data?['error'] ?? e.message ?? 'File upload failed';
+      throw Exception(err);
+    }
+  }
 }

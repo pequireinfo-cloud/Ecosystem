@@ -5,6 +5,7 @@ import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -25,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _fetchProfile() async {
     setState(() => _isLoading = true);
-    final providerId = FirebaseAuth.instance.currentUser?.uid;
+    final providerId = ApiConfig.currentProviderId;
     if (providerId != null) {
       final profile = await ProviderService().getProfile(providerId);
       if (mounted) {
@@ -169,10 +170,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _logoutButton(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        await FirebaseAuth.instance.signOut();
-        if (context.mounted) {
-          context.go('/login');
-        }
+        await ApiConfig.logout(context);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),

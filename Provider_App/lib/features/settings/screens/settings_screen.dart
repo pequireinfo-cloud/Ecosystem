@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:pequire_provider_app/l10n/app_localizations.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
@@ -153,10 +153,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () async {
-        await FirebaseAuth.instance.signOut();
-        if (context.mounted) {
-          context.go('/login');
-        }
+        await ApiConfig.logout(context);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

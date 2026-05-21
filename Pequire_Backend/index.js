@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 require('dotenv').config();
 
@@ -19,6 +20,7 @@ module.exports = { app, server, io };
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Attach socket.io to request for use in controllers
 app.use((req, res, next) => {
@@ -57,6 +59,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/support', require('./src/routes/supportRoutes'));
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/stats', adminStatsRoutes);
+app.use('/api/upload', require('./src/routes/uploadRoutes'));
 
 app.get('/', (req, res) => {
   res.json({ message: 'Pequire Backend API is running' });

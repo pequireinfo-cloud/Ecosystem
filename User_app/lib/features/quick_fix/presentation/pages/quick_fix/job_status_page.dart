@@ -89,8 +89,7 @@ class _JobStatusPageState extends State<JobStatusPage> {
             );
           },
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildArrivalStatus(Map<String, dynamic> data) {

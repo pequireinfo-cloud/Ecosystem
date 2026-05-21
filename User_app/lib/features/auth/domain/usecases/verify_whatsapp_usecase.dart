@@ -10,7 +10,7 @@ class VerifyWhatsAppUseCase {
   VerifyWhatsAppUseCase(this.repository);
 
   Future<Either<Failure, UserEntity>> call(VerifyWhatsAppParams params) async {
-    return await repository.verifyWhatsAppWithBackend(
+    return await repository.verifyDescope(
       token: params.token,
       role: params.role,
     );

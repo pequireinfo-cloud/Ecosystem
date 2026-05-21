@@ -4,6 +4,7 @@ import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:intl/intl.dart';
 
 class ReviewsScreen extends StatefulWidget {
@@ -26,7 +27,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
 
   Future<void> _fetchData() async {
     setState(() => _isLoading = true);
-    final providerId = FirebaseAuth.instance.currentUser?.uid;
+    final providerId = ApiConfig.currentProviderId;
     if (providerId != null) {
       final profile = await ProviderService().getProfile(providerId);
       final reviews = await ProviderService().getReviews(providerId);

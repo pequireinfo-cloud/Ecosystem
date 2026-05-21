@@ -10,8 +10,8 @@ class VerifyOtpUseCase {
   VerifyOtpUseCase(this.repository);
 
   Future<Either<Failure, UserEntity>> call(VerifyOtpParams params) async {
-    return await repository.verifyOtpWithBackend(
-      idToken: params.idToken,
+    return await repository.verifyDescope(
+      token: params.idToken,
       role: params.role,
     );
   }

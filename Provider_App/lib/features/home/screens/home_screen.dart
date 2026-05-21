@@ -17,6 +17,7 @@ import 'package:pequire_provider_app/features/home/widgets/active_job_panel.dart
 import 'package:pequire_provider_app/core/services/tracking_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -188,10 +189,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Logout
                   GestureDetector(
                     onTap: () async {
-                      await FirebaseAuth.instance.signOut();
-                      if (mounted) {
-                        context.go('/login');
-                      }
+                      await ApiConfig.logout(context);
                     },
                     child: Container(
                       width: 40,
@@ -385,7 +383,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                final providerId = FirebaseAuth.instance.currentUser?.uid ?? 'unknown_provider';
+                final providerId = ApiConfig.currentProviderId ?? 'unknown_provider';
                 await BookingService().acceptBooking(bookingId, providerId);
                 if (mounted) {
                     setState(() {
