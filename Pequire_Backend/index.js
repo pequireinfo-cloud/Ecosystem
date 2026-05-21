@@ -53,6 +53,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/admin/providers', providerRoutes);
+app.use('/api/providers', providerRoutes);
 app.use('/api/admin/auth', adminAuthRoutes);
 app.use('/api/auth/user', userAuthRoutes);
 app.use('/api/users', userRoutes);
