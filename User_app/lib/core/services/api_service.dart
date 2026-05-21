@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import '../config/api_config.dart';
 
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.pequire.com/api', 
+    baseUrl: ApiConfig.baseUrl.endsWith('/') ? ApiConfig.baseUrl : '${ApiConfig.baseUrl}/', 
     connectTimeout: const Duration(seconds: 10),
     receiveTimeout: const Duration(seconds: 10),
   ));
@@ -49,10 +50,8 @@ class ApiService {
         ),
       });
 
-      // Ensure the baseUrl ends with a slash for relative path resolution
-      final uploadUrl = _dio.options.baseUrl.endsWith('/') ? 'upload' : '/upload';
       final response = await _dio.post(
-        uploadUrl,
+        'upload',
         data: formData,
         options: Options(
           contentType: 'multipart/form-data',
