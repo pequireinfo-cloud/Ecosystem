@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './pages/Dashboard';
-import ProviderList from './pages/ProviderList';
 import ProviderManagement from './pages/ProviderManagement';
 import ServiceList from './pages/ServiceList';
 import ServiceForm from './pages/ServiceForm';
@@ -76,8 +75,7 @@ function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard': return <Dashboard />;
-      case 'providers-list': return <ProviderList />;
-      case 'providers-add': return <ProviderManagement onUpdate={() => setActiveTab('providers-list')} />;
+      case 'providers': return <ProviderManagement />;
       case 'services-list': return <ServiceList />;
       case 'services-add': return <ServiceForm onUpdate={() => setActiveTab('services-list')} />;
       case 'categories-list': return <CategoryList />;
@@ -131,7 +129,7 @@ function App() {
             <p style={{ fontSize: '13px', color: 'var(--text-muted)', lineHeight: '1.4' }}>{notification.message}</p>
             <button 
               onClick={() => {
-                setActiveTab('providers-add');
+                setActiveTab('providers');
                 setNotification(null);
               }}
               style={{

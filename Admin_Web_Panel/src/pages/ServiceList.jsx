@@ -133,10 +133,57 @@ const ServiceList = () => {
       </div>
 
       {loading ? (
-        <div style={{ padding: '60px', textAlign: 'center' }}>
-          <div className="loading-spinner" style={{ margin: '0 auto 20px' }}></div>
-          <p style={{ color: 'var(--text-muted)', fontWeight: '600' }}>Synchronizing Catalog...</p>
-        </div>
+        activeTab === 'listings' ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+            {Array.from({ length: 6 }).map((_, idx) => (
+              <div key={idx} className="glass-card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div className="skeleton" style={{ width: '100%', height: '140px' }} />
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div className="skeleton" style={{ width: '120px', height: '18px' }} />
+                    <div className="skeleton" style={{ width: '60px', height: '18px' }} />
+                  </div>
+                  <div className="skeleton" style={{ width: '150px', height: '14px' }} />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', borderTop: '1px solid #F1F5F9', paddingTop: '12px', marginTop: '6px' }}>
+                    <div className="skeleton" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+                    <div className="skeleton" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+            {Array.from({ length: 2 }).map((_, idx) => (
+              <div key={idx} className="glass-card" style={{ padding: '32px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
+                  <div className="skeleton" style={{ width: '48px', height: '48px', borderRadius: '14px' }} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flex: 1 }}>
+                    <div className="skeleton" style={{ width: '150px', height: '20px' }} />
+                    <div className="skeleton" style={{ width: '300px', height: '14px' }} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px' }}>
+                  <div>
+                    <div className="skeleton" style={{ width: '180px', height: '16px', marginBottom: '16px' }} />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      <div className="skeleton" style={{ width: '100px', height: '32px', borderRadius: '8px' }} />
+                      <div className="skeleton" style={{ width: '120px', height: '32px', borderRadius: '8px' }} />
+                      <div className="skeleton" style={{ width: '80px', height: '32px', borderRadius: '8px' }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="skeleton" style={{ width: '180px', height: '16px', marginBottom: '16px' }} />
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                      <div className="skeleton" style={{ width: '110px', height: '32px', borderRadius: '8px' }} />
+                      <div className="skeleton" style={{ width: '90px', height: '32px', borderRadius: '8px' }} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )
       ) : (
         <>
           {activeTab === 'listings' ? (

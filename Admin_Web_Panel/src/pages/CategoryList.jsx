@@ -56,7 +56,17 @@ const CategoryList = () => {
       {showAdd && <CategoryForm onCategoryAdded={() => { fetchCategories(); setShowAdd(false); }} />}
 
       {loading ? (
-        <div style={{ padding: '40px', textAlign: 'center' }}>Loading...</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div key={idx} className="glass-card" style={{ padding: '24px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+              <div className="skeleton" style={{ width: '60px', height: '60px', borderRadius: '12px' }} />
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="skeleton" style={{ width: '140px', height: '18px' }} />
+                <div className="skeleton" style={{ width: '80px', height: '12px' }} />
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '24px' }}>
           {categories.map((cat) => (

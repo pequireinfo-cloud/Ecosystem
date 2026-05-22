@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, UserCheck, ShieldCheck, Clock, Search, Filter, MoreHorizontal, Mail, Phone, Calendar, Star } from 'lucide-react';
+import { Users, UserCheck, ShieldCheck, Clock, Search, Filter, MoreHorizontal, Mail, Phone, Calendar, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 import api from '../utils/api';
 
 const UserManagement = () => {
@@ -14,16 +14,27 @@ const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Pagination states
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsersCount, setTotalUsersCount] = useState(0);
+  const limit = 20;
 
   const fetchUsers = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const res = await api.get('/admin/users');
-      setUsers(res.data.users);
-      setStats(res.data.stats);
+      const res = await api.get('/admin/users', {
+        params: {
+          page,
+          limit,
+          search: searchTerm,
+          filter: filterStatus
+        }
+      });
+      setUsers(res.data.users || []);
+      setStats(res.data.stats || { total: 0, active: 0, verified: 0, pending: 0 });
+      setTotalPages(res.data.totalPages || 1);
+      setTotalUsersCount(res.data.total || 0);
     } catch (err) {
       console.error('Error fetching users:', err);
     } finally {
@@ -31,13 +42,23 @@ const UserManagement = () => {
     }
   };
 
-  const filteredUsers = users.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          user.phoneNumber.includes(searchTerm);
-    const matchesFilter = filterStatus === 'all' || user.status === filterStatus || user.kycStatus === filterStatus;
-    return matchesSearch && matchesFilter;
-  });
+  // Debounced fetch for page, search, and filter status
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      fetchUsers();
+    }, 300);
+    return () => clearTimeout(handler);
+  }, [page, searchTerm, filterStatus]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setPage(1); // Reset page on new search
+  };
+
+  const handleFilterChange = (e) => {
+    setFilterStatus(e.target.value);
+    setPage(1); // Reset page on new filter
+  };
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -63,6 +84,42 @@ const UserManagement = () => {
     { label: 'KYC Verified', value: stats.verified, icon: ShieldCheck, color: '#8B5CF6' },
     { label: 'Pending KYC', value: stats.pending, icon: Clock, color: '#F59E0B' },
   ];
+
+  const renderPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5;
+    
+    let startPage = Math.max(1, page - 2);
+    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    
+    if (endPage - startPage < maxVisiblePages - 1) {
+      startPage = Math.max(1, endPage - maxVisiblePages + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(
+        <button
+          key={i}
+          onClick={() => setPage(i)}
+          style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '6px',
+            border: '1px solid var(--border)',
+            backgroundColor: page === i ? 'var(--primary)' : 'white',
+            color: page === i ? 'white' : 'var(--text-main)',
+            cursor: 'pointer',
+            fontSize: '13px',
+            fontWeight: '700',
+            transition: 'all 0.2s'
+          }}
+        >
+          {i}
+        </button>
+      );
+    }
+    return pages;
+  };
 
   return (
     <div className="animate-fade-in">
@@ -100,7 +157,7 @@ const UserManagement = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="glass-card" style={{ padding: '24px', minHeight: '500px' }}>
+      <div className="glass-card" style={{ padding: '24px', minHeight: '500px', display: 'flex', flexDirection: 'column' }}>
         {/* Toolbar */}
         <div style={{ 
           display: 'flex', 
@@ -115,14 +172,15 @@ const UserManagement = () => {
               type="text" 
               placeholder="Search by name, email or phone..." 
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearchChange}
               style={{
                 width: '100%',
                 padding: '10px 12px 10px 40px',
                 borderRadius: '8px',
                 border: '1px solid #E2E8F0',
                 backgroundColor: '#F8FAFC',
-                fontSize: '14px'
+                fontSize: '14px',
+                outline: 'none'
               }}
             />
           </div>
@@ -130,14 +188,15 @@ const UserManagement = () => {
           <div style={{ display: 'flex', gap: '12px' }}>
             <select 
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
+              onChange={handleFilterChange}
               style={{
                 padding: '10px 16px',
                 borderRadius: '8px',
                 border: '1px solid #E2E8F0',
                 backgroundColor: 'white',
                 fontSize: '14px',
-                outline: 'none'
+                outline: 'none',
+                cursor: 'pointer'
               }}
             >
               <option value="all">All Statuses</option>
@@ -146,53 +205,66 @@ const UserManagement = () => {
               <option value="pending">KYC Pending</option>
               <option value="inactive">Inactive</option>
             </select>
-            
-            <button style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '10px 16px',
-              borderRadius: '8px',
-              backgroundColor: 'var(--primary)',
-              color: 'white',
-              border: 'none',
-              fontWeight: '600',
-              fontSize: '14px',
-              cursor: 'pointer'
-            }}>
-              <Filter size={18} />
-              Advanced Filters
-            </button>
           </div>
         </div>
 
         {/* Table */}
-        <div style={{ overflowX: 'auto' }}>
+        <div style={{ overflowX: 'auto', flex: 1 }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #E2E8F0' }}>
+              <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>USER</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>CONTACT</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>STATUS</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>RATING</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>KYC VERIFICATION</th>
                 <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}>JOINED DATE</th>
-                <th style={{ padding: '16px 12px', color: '#64748B', fontWeight: '600', fontSize: '13px' }}></th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#94A3B8' }}>Loading users...</td>
-                </tr>
-              ) : filteredUsers.length === 0 ? (
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="skeleton" style={{ width: '40px', height: '40px', borderRadius: '50%' }} />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div className="skeleton" style={{ width: '120px', height: '14px' }} />
+                          <div className="skeleton" style={{ width: '80px', height: '11px' }} />
+                        </div>
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        <div className="skeleton" style={{ width: '150px', height: '13px' }} />
+                        <div className="skeleton" style={{ width: '100px', height: '13px' }} />
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div className="skeleton" style={{ width: '8px', height: '8px', borderRadius: '50%' }} />
+                        <div className="skeleton" style={{ width: '50px', height: '13px' }} />
+                      </div>
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div className="skeleton" style={{ width: '60px', height: '14px' }} />
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div className="skeleton" style={{ width: '80px', height: '22px', borderRadius: '20px' }} />
+                    </td>
+                    <td style={{ padding: '16px 12px' }}>
+                      <div className="skeleton" style={{ width: '90px', height: '13px' }} />
+                    </td>
+                  </tr>
+                ))
+              ) : users.length === 0 ? (
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#94A3B8' }}>No users found matching your search.</td>
                 </tr>
-              ) : filteredUsers.map((user) => {
+              ) : users.map((user) => {
                 const kyc = getKYCColor(user.kycStatus);
                 return (
-                  <tr key={user._id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.2s' }} className="table-row-hover">
+                  <tr key={user._id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.2s' }}>
                     <td style={{ padding: '16px 12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         <div style={{
@@ -206,11 +278,11 @@ const UserManagement = () => {
                           fontWeight: 'bold',
                           color: '#475569'
                         }}>
-                          {user.name.charAt(0)}
+                          {user.name?.charAt(0)}
                         </div>
                         <div>
                           <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{user.name}</div>
-                          <div style={{ fontSize: '12px', color: '#94A3B8' }}>ID: {user._id.substring(0, 8)}</div>
+                          <div style={{ fontSize: '12px', color: '#94A3B8' }}>ID: {user._id?.substring(0, 8)}</div>
                         </div>
                       </div>
                     </td>
@@ -252,13 +324,8 @@ const UserManagement = () => {
                     </td>
                     <td style={{ padding: '16px 12px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#475569' }}>
-                        <Calendar size={14} color="#94A3B8" /> {new Date(user.createdAt).toLocaleDateString()}
+                        <Calendar size={14} color="#94A3B8" /> {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </div>
-                    </td>
-                    <td style={{ padding: '16px 12px', textAlign: 'right' }}>
-                      <button style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#94A3B8' }}>
-                        <MoreHorizontal size={20} />
-                      </button>
                     </td>
                   </tr>
                 );
@@ -266,6 +333,68 @@ const UserManagement = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination Footer */}
+        {!loading && totalPages > 1 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 24px',
+            borderTop: '1px solid #E2E8F0',
+            backgroundColor: '#F8FAFC',
+            marginTop: '16px'
+          }}>
+            <span style={{ fontSize: '14px', color: 'var(--text-muted)' }}>
+              Showing <strong>{((page - 1) * limit) + 1}</strong> to <strong>{Math.min(page * limit, totalUsersCount)}</strong> of <strong>{totalUsersCount}</strong> users
+            </span>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border)',
+                  backgroundColor: page === 1 ? '#F1F5F9' : 'white',
+                  color: page === 1 ? '#94A3B8' : 'var(--text-main)',
+                  cursor: page === 1 ? 'not-allowed' : 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <ChevronLeft size={16} />
+                Previous
+              </button>
+              {renderPageNumbers()}
+              <button
+                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={page === totalPages}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--border)',
+                  backgroundColor: page === totalPages ? '#F1F5F9' : 'white',
+                  color: page === totalPages ? '#94A3B8' : 'var(--text-main)',
+                  cursor: page === totalPages ? 'not-allowed' : 'pointer',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  transition: 'all 0.2s'
+                }}
+              >
+                Next
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

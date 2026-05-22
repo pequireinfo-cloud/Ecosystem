@@ -44,7 +44,10 @@ async function seedCategories() {
       }
     ];
 
-    await Category.insertMany(categories);
+    // Create categories individually to trigger pre-save slug generation hook
+    for (const cat of categories) {
+      await Category.create(cat);
+    }
     console.log('Successfully seeded 4 categories');
 
     process.exit();

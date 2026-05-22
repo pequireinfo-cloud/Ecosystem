@@ -93,8 +93,144 @@ const users = [
     role: 'user',
     status: 'active',
     kycStatus: 'verified'
+  },
+  {
+    name: 'Rajesh Koothrapali',
+    email: 'rajesh@example.com',
+    password: 'password123',
+    phoneNumber: '9876543220',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Sheldon Cooper',
+    email: 'sheldon@example.com',
+    password: 'password123',
+    phoneNumber: '9876543221',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Leonard Hofstadter',
+    email: 'leonard@example.com',
+    password: 'password123',
+    phoneNumber: '9876543222',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'pending'
+  },
+  {
+    name: 'Penny Hofstadter',
+    email: 'penny@example.com',
+    password: 'password123',
+    phoneNumber: '9876543223',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Howard Wolowitz',
+    email: 'howard@example.com',
+    password: 'password123',
+    phoneNumber: '9876543224',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Bernadette Rostenkowski',
+    email: 'bernadette@example.com',
+    password: 'password123',
+    phoneNumber: '9876543225',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Amy Farrah Fowler',
+    email: 'amy@example.com',
+    password: 'password123',
+    phoneNumber: '9876543226',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Stuart Bloom',
+    email: 'stuart@example.com',
+    password: 'password123',
+    phoneNumber: '9876543227',
+    role: 'user',
+    status: 'inactive',
+    kycStatus: 'not_started'
+  },
+  {
+    name: 'Barry Kripke',
+    email: 'barry@example.com',
+    password: 'password123',
+    phoneNumber: '9876543228',
+    role: 'user',
+    status: 'blocked',
+    kycStatus: 'rejected'
+  },
+  {
+    name: 'Wil Wheaton',
+    email: 'wil@example.com',
+    password: 'password123',
+    phoneNumber: '9876543229',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Leslie Winkle',
+    email: 'leslie@example.com',
+    password: 'password123',
+    phoneNumber: '9876543230',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Beverly Hofstadter',
+    email: 'beverly@example.com',
+    password: 'password123',
+    phoneNumber: '9876543231',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Mary Cooper',
+    email: 'mary@example.com',
+    password: 'password123',
+    phoneNumber: '9876543232',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'verified'
+  },
+  {
+    name: 'Zack Johnson',
+    email: 'zack@example.com',
+    password: 'password123',
+    phoneNumber: '9876543233',
+    role: 'user',
+    status: 'active',
+    kycStatus: 'pending'
+  },
+  {
+    name: 'Debbie Wolowitz',
+    email: 'debbie@example.com',
+    password: 'password123',
+    phoneNumber: '9876543234',
+    role: 'user',
+    status: 'blocked',
+    kycStatus: 'not_started'
   }
 ];
+
 
 const seedUsers = async () => {
   try {

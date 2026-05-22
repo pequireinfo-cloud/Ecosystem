@@ -75,9 +75,9 @@ const BookingManagement = () => {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '32px' }}>
         {[
-          { label: 'Total Bookings', value: '452', color: '#3B82F6' },
-          { label: 'Pending Requests', value: '18', color: '#F59E0B' },
-          { label: 'Live Jobs', value: '12', color: '#10B981' },
+          { label: 'Total Bookings', value: bookings.length.toString(), color: '#3B82F6' },
+          { label: 'Pending Requests', value: bookings.filter(b => b.status === 'pending').length.toString(), color: '#F59E0B' },
+          { label: 'Live Jobs', value: bookings.filter(b => ['accepted', 'diagnosing', 'waiting_approval', 'working'].includes(b.status)).length.toString(), color: '#10B981' },
         ].map((stat, i) => (
           <div key={i} className="glass-card" style={{ padding: '20px' }}>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', marginBottom: '4px' }}>{stat.label.toUpperCase()}</p>
@@ -102,7 +102,39 @@ const BookingManagement = () => {
             </tr>
           </thead>
           <tbody>
-            {bookings.length > 0 ? (
+            {loading ? (
+              Array.from({ length: 5 }).map((_, idx) => (
+                <tr key={idx} style={{ borderTop: '1px solid var(--border)' }}>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div className="skeleton" style={{ width: '80px', height: '14px' }} />
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div className="skeleton" style={{ width: '120px', height: '14px' }} />
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      <div className="skeleton" style={{ width: '60px', height: '13px' }} />
+                      <div className="skeleton" style={{ width: '80px', height: '11px' }} />
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="skeleton" style={{ width: '14px', height: '14px', borderRadius: '50%' }} />
+                      <div className="skeleton" style={{ width: '70px', height: '13px' }} />
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div className="skeleton" style={{ width: '80px', height: '20px', borderRadius: '6px' }} />
+                  </td>
+                  <td style={{ padding: '16px 24px' }}>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <div className="skeleton" style={{ width: '18px', height: '18px', borderRadius: '4px' }} />
+                      <div className="skeleton" style={{ width: '18px', height: '18px', borderRadius: '4px' }} />
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : bookings.length > 0 ? (
               bookings.map((b, i) => (
                 <tr key={b._id || i} style={{ borderTop: '1px solid var(--border)' }}>
                   <td style={{ padding: '16px 24px', fontWeight: '600', color: 'var(--primary)', fontSize: '14px' }}>

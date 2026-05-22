@@ -88,13 +88,62 @@ exports.updateProviderKyc = async (req, res) => {
 };
 
 exports.getProviders = async (req, res) => {
-    try {
-        const providers = await Provider.find();
-        res.json(providers);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
+  try {
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit) || 20;
+    const search = req.query.search || '';
+    const filter = req.query.filter || 'All';
+
+    // If not requested by admin or no page specified, return all providers as an array for backward compatibility
+    if (!page && !req.originalUrl.includes('/admin/')) {
+      const providers = await Provider.find().sort({ createdAt: -1 });
+      return res.json(providers);
     }
-}
+
+    const activePage = page || 1;
+    const skip = (activePage - 1) * limit;
+
+    // 1. Build Query
+    const query = {};
+
+    // Search condition
+    if (search) {
+      query.$or = [
+        { fullName: { $regex: search, $options: 'i' } },
+        { serviceType: { $regex: search, $options: 'i' } },
+        { phoneNumber: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Filter conditions
+    if (filter === 'Pending KYC') {
+      query.kycStatus = { $in: ['Pending', 'In Review'] };
+    } else if (filter === 'Active') {
+      query.status = { $in: ['Online', 'Offline', 'Busy'] };
+    } else if (filter === 'Blocked') {
+      query.status = 'Blocked';
+    } else if (filter === 'Online') {
+      query.status = 'Online';
+    }
+
+    // 2. Fetch data with pagination
+    const total = await Provider.countDocuments(query);
+    const providers = await Provider.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      providers,
+      total,
+      page: activePage,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 exports.getProviderReviews = async (req, res) => {
   try {

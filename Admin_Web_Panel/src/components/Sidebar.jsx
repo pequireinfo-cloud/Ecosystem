@@ -29,16 +29,7 @@ const Sidebar = ({ activeTab, setActiveTab, onLogout }) => {
 
   const menuItems = [
     { id: 'dashboard', icon: LayoutDashboard, label: 'Dashboard', type: 'link' },
-    { 
-      id: 'providers', 
-      icon: Users, 
-      label: 'Providers', 
-      type: 'menu',
-      subItems: [
-        { id: 'providers-add', label: 'Add Provider', icon: PlusCircle },
-        { id: 'providers-list', label: 'Providers List', icon: List },
-      ]
-    },
+    { id: 'providers', icon: Users, label: 'Providers', type: 'link' },
     { 
       id: 'services', 
       icon: Layers, 
