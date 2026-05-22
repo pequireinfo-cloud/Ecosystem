@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Search, UserPlus, Star, Eye, Edit2, ShieldCheck, Clock, XCircle, Check, X, FileText } from 'lucide-react';
+import { Search, UserPlus, Star, Eye, ShieldCheck, Clock, XCircle } from 'lucide-react';
 import api from '../utils/api';
+import ProviderDetailsModal from '../components/ProviderDetailsModal';
 
 const ProviderManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -185,136 +186,13 @@ const ProviderManagement = () => {
           </tbody>
         </table>
       </div>
-      {/* Verification Modal */}
+      {/* Verification / Details Modal */}
       {showModal && selectedProvider && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 1000,
-          backdropFilter: 'blur(4px)'
-        }}>
-          <div className="glass-card animate-scale-in" style={{
-            width: '90%',
-            maxWidth: '800px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            padding: '32px',
-            position: 'relative'
-          }}>
-            <button 
-              onClick={() => setShowModal(false)}
-              style={{ position: 'absolute', right: '20px', top: '20px', border: 'none', background: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}
-            >
-              <X size={24} />
-            </button>
-
-            <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '8px' }}>Provider Verification</h2>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>Review documents submitted by {selectedProvider.fullName}.</p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '32px' }}>
-              <div>
-                <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-muted)' }}>BASIC INFORMATION</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div>
-                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>Full Name</label>
-                    <span style={{ fontWeight: '600' }}>{selectedProvider.fullName}</span>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>Service Type</label>
-                    <span style={{ fontWeight: '600' }}>{selectedProvider.serviceType}</span>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>Email</label>
-                    <span style={{ fontWeight: '600' }}>{selectedProvider.email || 'N/A'}</span>
-                  </div>
-                  <div>
-                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block' }}>Phone</label>
-                    <span style={{ fontWeight: '600' }}>{selectedProvider.phoneNumber}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 style={{ fontSize: '14px', fontWeight: '700', marginBottom: '16px', color: 'var(--text-muted)' }}>UPLOADED DOCUMENTS</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {['aadharCard', 'panCard', 'drivingLicense'].map(doc => (
-                    <div key={doc} style={{ 
-                      padding: '12px', 
-                      borderRadius: '8px', 
-                      border: '1px solid var(--border)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      backgroundColor: selectedProvider.documents?.[doc] ? '#F0F9FF' : '#F9FAFB'
-                    }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <FileText size={18} color={selectedProvider.documents?.[doc] ? 'var(--primary)' : '#94A3B8'} />
-                        <span style={{ fontSize: '13px', fontWeight: '600' }}>{doc.replace(/([A-Z])/g, ' $1').trim().toUpperCase()}</span>
-                      </div>
-                      {selectedProvider.documents?.[doc] ? (
-                        <a 
-                          href={selectedProvider.documents[doc]} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          style={{ fontSize: '12px', color: 'var(--primary)', fontWeight: '700', textDecoration: 'none' }}
-                        >VIEW</a>
-                      ) : (
-                        <span style={{ fontSize: '11px', color: '#94A3B8' }}>NOT UPLOADED</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', paddingTop: '24px', borderTop: '1px solid var(--border)' }}>
-              <button 
-                onClick={() => handleVerify(selectedProvider._id, 'Rejected', 'Documents are not clear')}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: '1px solid #FECACA',
-                  backgroundColor: '#FEF2F2',
-                  color: '#DC2626',
-                  fontWeight: '700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer'
-                }}
-              >
-                <X size={18} />
-                Reject
-              </button>
-              <button 
-                onClick={() => handleVerify(selectedProvider._id, 'Verified')}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  backgroundColor: '#059669',
-                  color: 'white',
-                  fontWeight: '700',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  boxShadow: '0 4px 12px rgba(5, 150, 105, 0.2)'
-                }}
-              >
-                <Check size={18} />
-                Verify & Approve
-              </button>
-            </div>
-          </div>
-        </div>
+        <ProviderDetailsModal 
+          provider={selectedProvider} 
+          onClose={() => { setSelectedProvider(null); setShowModal(false); }} 
+          onUpdate={fetchProviders}
+        />
       )}
     </div>
   );

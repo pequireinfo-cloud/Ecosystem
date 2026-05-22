@@ -3,6 +3,34 @@ import { createPortal } from 'react-dom';
 import { X, User, FileText, CheckCircle, AlertCircle, MapPin, Phone } from 'lucide-react';
 import api from '../utils/api';
 
+const getDocumentUrl = (url) => {
+  if (!url) return '';
+  // Normalize windows backslashes to forward slashes if any
+  let normalized = url.replace(/\\/g, '/');
+  
+  // If it starts with /uploads, prepend the backend base URL (removing /api from baseURL if present)
+  if (normalized.startsWith('/uploads')) {
+    const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.pequire.com/api';
+    const host = apiBase.replace('/api', '');
+    return `${host}${normalized}`;
+  }
+  
+  // If it contains localhost/127.0.0.1, check if the current browser window is NOT running on localhost.
+  // If we're on a production/staging domain, replace the localhost origin with the actual backend host.
+  if (normalized.includes('localhost:') || normalized.includes('127.0.0.1:')) {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocalhost) {
+      const apiBase = import.meta.env.VITE_API_BASE_URL || 'https://api.pequire.com/api';
+      const host = apiBase.replace('/api', '');
+      const uploadIndex = normalized.indexOf('/uploads/');
+      if (uploadIndex !== -1) {
+        return `${host}${normalized.substring(uploadIndex)}`;
+      }
+    }
+  }
+  return normalized;
+};
+
 const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [hoveredClose, setHoveredClose] = useState(false);
@@ -307,8 +335,9 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                 { key: 'panCard', label: 'PAN Card' },
                 { key: 'drivingLicense', label: 'Driving License' }
               ].map((doc) => {
-                const url = provider.documents?.[doc.key];
-                const uploaded = !!url;
+                const rawUrl = provider.documents?.[doc.key];
+                const url = getDocumentUrl(rawUrl);
+                const uploaded = !!rawUrl;
                 const isHovered = hoveredDoc === doc.key;
                 return (
                   <div 

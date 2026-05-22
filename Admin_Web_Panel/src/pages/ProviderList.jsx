@@ -111,7 +111,10 @@ const ProviderList = () => {
                     </div>
                   </td>
                   <td style={{ padding: '16px 24px', fontSize: '14px' }}>
-                    <span style={{ fontWeight: '600', color: p.kycStatus === 'Verified' ? '#059669' : '#D97706' }}>{p.kycStatus}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: p.kycStatus === 'Verified' ? '#059669' : (p.kycStatus === 'Rejected' ? '#DC2626' : '#D97706') }}>
+                      {p.kycStatus === 'Verified' ? <ShieldCheck size={16} /> : (p.kycStatus === 'Rejected' ? <XCircle size={16} /> : <Clock size={16} />)}
+                      <span style={{ fontWeight: '600' }}>{p.kycStatus || 'Pending'}</span>
+                    </div>
                   </td>
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
