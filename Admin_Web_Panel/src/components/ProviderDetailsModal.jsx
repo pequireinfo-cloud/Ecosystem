@@ -46,49 +46,58 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
       alignItems: 'center',
       justifyContent: 'center',
       padding: '16px',
-      backgroundColor: 'rgba(2, 6, 23, 0.85)',
+      backgroundColor: 'rgba(15, 23, 42, 0.5)',
       backdropFilter: 'blur(12px)',
       animation: 'fadeIn 0.25s ease-out'
     }}>
+      <style>{`
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
       <div style={{
-        backgroundColor: '#0B1329',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        backgroundColor: '#ffffff',
+        border: '1px solid #e2e8f0',
         width: '100%',
         maxWidth: '720px',
         maxHeight: '90vh',
         borderRadius: '28px',
         overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.03)',
         display: 'flex',
         flexDirection: 'column',
         fontFamily: "'Outfit', sans-serif",
-        color: '#F8FAFC'
+        color: '#1e293b'
       }}>
         {/* Header */}
         <div style={{
           padding: '28px 36px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.06)',
+          borderBottom: '1px solid #e2e8f0',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(2, 94, 243, 0.12) 0%, rgba(99, 102, 241, 0.12) 100%)'
+          background: 'linear-gradient(135deg, rgba(2, 94, 243, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%)'
         }}>
           <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
             <div style={{
               width: '68px',
               height: '68px',
               borderRadius: '20px',
-              backgroundColor: 'rgba(2, 94, 243, 0.1)',
-              border: '1px solid rgba(2, 94, 243, 0.25)',
+              backgroundColor: 'rgba(2, 94, 243, 0.06)',
+              border: '1px solid rgba(2, 94, 243, 0.12)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <User size={36} style={{ color: '#38BDF8' }} />
+              <User size={36} style={{ color: '#025EF3' }} />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0, color: '#ffffff', letterSpacing: '-0.5px' }}>
+                <h2 style={{ fontSize: '24px', fontWeight: '800', margin: 0, color: '#1e293b', letterSpacing: '-0.5px' }}>
                   {provider.fullName || 'Service Provider'}
                 </h2>
                 <span style={{
@@ -97,9 +106,9 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                   fontSize: '11px',
                   fontWeight: '800',
                   letterSpacing: '0.5px',
-                  backgroundColor: provider.status === 'Online' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
-                  color: provider.status === 'Online' ? '#34D399' : '#F87171',
-                  border: provider.status === 'Online' ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid rgba(239, 68, 68, 0.25)'
+                  backgroundColor: provider.status === 'Online' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(220, 38, 38, 0.08)',
+                  color: provider.status === 'Online' ? '#059669' : '#DC2626',
+                  border: provider.status === 'Online' ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(220, 38, 38, 0.15)'
                 }}>{provider.status?.toUpperCase() || 'OFFLINE'}</span>
               </div>
               <div style={{
@@ -107,16 +116,16 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                 flexWrap: 'wrap',
                 alignItems: 'center',
                 gap: '12px',
-                color: 'rgba(255, 255, 255, 0.55)',
+                color: '#64748b',
                 fontSize: '13px',
                 marginTop: '8px'
               }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <MapPin size={14} style={{ color: '#38BDF8' }} /> {provider.location?.address || (provider.location?.latitude !== undefined ? `${provider.location.latitude.toFixed(4)}, ${provider.location.longitude.toFixed(4)}` : 'Location N/A')}
+                  <MapPin size={14} style={{ color: '#025EF3' }} /> {provider.location?.address || (provider.location?.latitude !== undefined ? `${provider.location.latitude.toFixed(4)}, ${provider.location.longitude.toFixed(4)}` : 'Location N/A')}
                 </span>
-                <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: 'rgba(255, 255, 255, 0.3)' }} />
+                <span style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#cbd5e1' }} />
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Phone size={14} style={{ color: '#38BDF8' }} /> {provider.phoneNumber || 'No Phone/ID'}
+                  <Phone size={14} style={{ color: '#025EF3' }} /> {provider.phoneNumber || 'No Phone/ID'}
                 </span>
               </div>
             </div>
@@ -127,10 +136,10 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
             onMouseLeave={() => setHoveredClose(false)}
             style={{
               padding: '10px',
-              backgroundColor: hoveredClose ? 'rgba(255, 255, 255, 0.08)' : 'transparent',
+              backgroundColor: hoveredClose ? 'rgba(0, 0, 0, 0.05)' : 'transparent',
               border: 'none',
               borderRadius: '50%',
-              color: hoveredClose ? '#ffffff' : 'rgba(255, 255, 255, 0.4)',
+              color: hoveredClose ? '#1e293b' : '#64748b',
               transition: 'all 0.2s',
               cursor: 'pointer',
               display: 'flex',
@@ -143,18 +152,21 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
         </div>
 
         {/* Content */}
-        <div style={{
-          padding: '36px',
-          overflowY: 'auto',
-          flex: 1,
-          minHeight: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '28px'
-        }}>
+        <div 
+          className="no-scrollbar"
+          style={{
+            padding: '36px',
+            overflowY: 'auto',
+            flex: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '28px'
+          }}
+        >
           {/* Stats Overview */}
           <div>
-            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#38BDF8', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
+            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#025EF3', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
               Profile details & Configuration
             </h3>
             <div style={{
@@ -162,30 +174,30 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '16px'
             }}>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>SERVICE CATEGORY</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>{provider.serviceType || 'Not Assigned'}</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>SERVICE CATEGORY</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>{provider.serviceType || 'Not Assigned'}</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>PRICE LEVEL</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#38BDF8' }}>{provider.priceLevel ? provider.priceLevel.toUpperCase() : 'STANDARD'}</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>PRICE LEVEL</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#025EF3' }}>{provider.priceLevel ? provider.priceLevel.toUpperCase() : 'STANDARD'}</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>SERVICE RADIUS</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>{provider.serviceRadiusKm || 15} km</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>SERVICE RADIUS</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>{provider.serviceRadiusKm || 15} km</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>EMAIL ADDRESS</span>
-                <span style={{ fontSize: '14px', fontWeight: '600', color: '#ffffff', wordBreak: 'break-all' }}>{provider.email || 'N/A'}</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>EMAIL ADDRESS</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b', wordBreak: 'break-all' }}>{provider.email || 'N/A'}</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>EXPERIENCE</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>{provider.experienceYears || 0} Years</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>EXPERIENCE</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>{provider.experienceYears || 0} Years</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(255, 255, 255, 0.02)', border: '1px solid rgba(255, 255, 255, 0.04)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>RATING</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#F59E0B' }}>
-                  ★ {provider.rating?.toFixed(1) || '5.0'} <span style={{ fontSize: '12px', fontWeight: '500', color: 'rgba(255,255,255,0.4)' }}>({provider.reviewCount || 0})</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>RATING</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#d97706' }}>
+                  ★ {provider.rating?.toFixed(1) || '5.0'} <span style={{ fontSize: '12px', fontWeight: '500', color: '#64748b' }}>({provider.reviewCount || 0})</span>
                 </span>
               </div>
             </div>
@@ -193,7 +205,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
 
           {/* Job Performance & Earnings */}
           <div>
-            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#10B981', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
+            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#059669', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
               Business performance
             </h3>
             <div style={{
@@ -201,24 +213,24 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '16px'
             }}>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>JOBS COMPLETED</span>
-                <span style={{ fontSize: '16px', fontWeight: '800', color: '#ffffff' }}>{provider.totalJobsCompleted || 0} Jobs</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>JOBS COMPLETED</span>
+                <span style={{ fontSize: '16px', fontWeight: '800', color: '#1e293b' }}>{provider.totalJobsCompleted || 0} Jobs</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>TOTAL EARNINGS</span>
-                <span style={{ fontSize: '16px', fontWeight: '800', color: '#10B981' }}>₹{provider.earnings?.total || 0}</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>TOTAL EARNINGS</span>
+                <span style={{ fontSize: '16px', fontWeight: '800', color: '#059669' }}>₹{provider.earnings?.total || 0}</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>PENDING PAYMENTS</span>
-                <span style={{ fontSize: '16px', fontWeight: '800', color: '#F59E0B' }}>₹{provider.earnings?.pending || 0}</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(16, 185, 129, 0.03)', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>PENDING PAYMENTS</span>
+                <span style={{ fontSize: '16px', fontWeight: '800', color: '#d97706' }}>₹{provider.earnings?.pending || 0}</span>
               </div>
             </div>
           </div>
 
           {/* Gamification Stats */}
           <div>
-            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#F59E0B', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
+            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#b45309', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
               Activity & Gamification
             </h3>
             <div style={{
@@ -226,17 +238,17 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               gridTemplateColumns: 'repeat(3, 1fr)',
               gap: '16px'
             }}>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>CURRENT STREAK</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>🔥 {provider.currentStreak || 0} Days</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>CURRENT STREAK</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>🔥 {provider.currentStreak || 0} Days</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>HIGHEST STREAK</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#ffffff' }}>🏆 {provider.highestStreak || 0} Days</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>HIGHEST STREAK</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#1e293b' }}>🏆 {provider.highestStreak || 0} Days</span>
               </div>
-              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.08)' }}>
-                <span style={{ fontSize: '10px', fontWeight: '700', color: 'rgba(255,255,255,0.4)', display: 'block', marginBottom: '4px' }}>REWARD POINTS</span>
-                <span style={{ fontSize: '15px', fontWeight: '700', color: '#F59E0B' }}>✨ {provider.rewardPoints || 0} Pts</span>
+              <div style={{ padding: '16px', borderRadius: '16px', backgroundColor: 'rgba(245, 158, 11, 0.03)', border: '1px solid rgba(245, 158, 11, 0.1)' }}>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', display: 'block', marginBottom: '4px' }}>REWARD POINTS</span>
+                <span style={{ fontSize: '15px', fontWeight: '700', color: '#d97706' }}>✨ {provider.rewardPoints || 0} Pts</span>
               </div>
             </div>
           </div>
@@ -244,7 +256,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
           {/* Expertise/Skills */}
           {provider.expertise && provider.expertise.length > 0 && (
             <div>
-              <h3 style={{ fontSize: '12px', fontWeight: '800', color: 'rgba(255, 255, 255, 0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>
+              <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#64748b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '10px', marginTop: 0 }}>
                 Specialized Expertise
               </h3>
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -252,9 +264,9 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                   <span key={idx} style={{
                     padding: '6px 12px',
                     borderRadius: '8px',
-                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
-                    border: '1px solid rgba(56, 189, 248, 0.2)',
-                    color: '#38BDF8',
+                    backgroundColor: 'rgba(2, 94, 243, 0.06)',
+                    border: '1px solid rgba(2, 94, 243, 0.15)',
+                    color: '#025EF3',
                     fontSize: '13px',
                     fontWeight: '600'
                   }}>{skill}</span>
@@ -268,16 +280,16 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
             <div style={{
               padding: '16px 20px',
               borderRadius: '16px',
-              backgroundColor: 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
+              backgroundColor: 'rgba(220, 38, 38, 0.05)',
+              border: '1px solid rgba(220, 38, 38, 0.15)',
               display: 'flex',
               gap: '12px',
               alignItems: 'flex-start'
             }}>
-              <AlertCircle size={20} style={{ color: '#EF4444', flexShrink: 0, marginTop: '2px' }} />
+              <AlertCircle size={20} style={{ color: '#DC2626', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#EF4444' }}>KYC Rejected</h4>
-                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', lineHeight: '1.4' }}>
+                <h4 style={{ margin: 0, fontSize: '14px', fontWeight: '700', color: '#DC2626' }}>KYC Rejected</h4>
+                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#1e293b', lineHeight: '1.4' }}>
                   Reason: "{provider.rejectionReason}"
                 </p>
               </div>
@@ -286,7 +298,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
 
           {/* KYC Documents */}
           <div>
-            <h3 style={{ fontSize: '12px', fontWeight: '800', color: 'rgba(255, 255, 255, 0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
+            <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#64748b', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '14px', marginTop: 0 }}>
               KYC Documents Review
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -312,25 +324,25 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                       borderRadius: '16px',
                       border: '1px solid',
                       borderColor: uploaded 
-                        ? (isHovered ? '#38BDF8' : 'rgba(255,255,255,0.06)') 
-                        : 'rgba(239, 68, 68, 0.15)',
+                        ? (isHovered ? '#025EF3' : '#e2e8f0') 
+                        : 'rgba(220, 38, 38, 0.15)',
                       backgroundColor: uploaded 
-                        ? (isHovered ? 'rgba(56, 189, 248, 0.05)' : 'rgba(255,255,255,0.02)') 
-                        : 'rgba(239, 68, 68, 0.02)',
+                        ? (isHovered ? 'rgba(2, 94, 243, 0.03)' : '#ffffff') 
+                        : 'rgba(220, 38, 38, 0.02)',
                       cursor: uploaded ? 'pointer' : 'not-allowed',
                       transition: 'all 0.25s ease'
                     }}
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                      <FileText size={24} style={{ color: uploaded ? '#10B981' : 'rgba(255, 255, 255, 0.15)' }} />
+                      <FileText size={24} style={{ color: uploaded ? '#059669' : '#94a3b8' }} />
                       <div style={{ textAlign: 'left' }}>
-                        <p style={{ color: '#ffffff', fontWeight: '700', fontSize: '15px', margin: 0 }}>
+                        <p style={{ color: '#1e293b', fontWeight: '700', fontSize: '15px', margin: 0 }}>
                           {doc.label}
                         </p>
                         <p style={{ 
                           fontSize: '12px', 
                           fontWeight: '600', 
-                          color: uploaded ? '#10B981' : '#EF4444',
+                          color: uploaded ? '#059669' : '#DC2626',
                           margin: '3px 0 0 0'
                         }}>
                           {uploaded ? 'Submitted (Click to Preview)' : 'Not Uploaded'}
@@ -347,14 +359,14 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                             height: '48px',
                             borderRadius: '8px',
                             objectFit: 'cover',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            backgroundColor: 'rgba(0,0,0,0.2)'
+                            border: '1px solid #e2e8f0',
+                            backgroundColor: 'rgba(0,0,0,0.04)'
                           }}
                         />
                         <span style={{ 
                           fontSize: '13px', 
                           fontWeight: '700', 
-                          color: '#38BDF8',
+                          color: '#025EF3',
                           opacity: isHovered ? 1 : 0.6,
                           transition: 'opacity 0.2s ease',
                           display: 'flex',
@@ -370,7 +382,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               })}
             </div>
             {!hasAnyDoc && (
-              <p style={{ margin: '12px 0 0 0', fontSize: '13px', color: '#EF4444', textAlign: 'center', fontWeight: '600' }}>
+              <p style={{ margin: '12px 0 0 0', fontSize: '13px', color: '#DC2626', textAlign: 'center', fontWeight: '600' }}>
                 ⚠️ No documents have been uploaded by this provider yet.
               </p>
             )}
@@ -380,23 +392,23 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
           <div style={{
             padding: '16px 20px',
             borderRadius: '16px',
-            backgroundColor: 'rgba(255, 255, 255, 0.01)',
-            border: '1px solid rgba(255, 255, 255, 0.03)',
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
             display: 'flex',
             justifyContent: 'space-between',
             fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.4)'
+            color: '#64748b'
           }}>
-            <span>Joined On: <strong style={{ color: '#ffffff' }}>{provider.createdAt ? new Date(provider.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</strong></span>
-            <span>Last Active: <strong style={{ color: '#ffffff' }}>{provider.lastActive ? new Date(provider.lastActive).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : (provider.updatedAt ? new Date(provider.updatedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A')}</strong></span>
+            <span>Joined On: <strong style={{ color: '#1e293b' }}>{provider.createdAt ? new Date(provider.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A'}</strong></span>
+            <span>Last Active: <strong style={{ color: '#1e293b' }}>{provider.lastActive ? new Date(provider.lastActive).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : (provider.updatedAt ? new Date(provider.updatedAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' }) : 'N/A')}</strong></span>
           </div>
         </div>
 
         {/* Footer */}
         <div style={{
           padding: '24px 36px 36px 36px',
-          backgroundColor: 'rgba(255, 255, 255, 0.01)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+          backgroundColor: '#f8fafc',
+          borderTop: '1px solid #e2e8f0',
           display: 'flex',
           gap: '16px'
         }}>
@@ -409,9 +421,9 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               flex: 1,
               padding: '16px 20px',
               borderRadius: '16px',
-              backgroundColor: hoveredReject ? 'rgba(239, 68, 68, 0.18)' : 'rgba(239, 68, 68, 0.08)',
-              border: '1px solid rgba(239, 68, 68, 0.25)',
-              color: '#EF4444',
+              backgroundColor: hoveredReject ? 'rgba(220, 38, 38, 0.1)' : 'rgba(220, 38, 38, 0.04)',
+              border: '1px solid rgba(220, 38, 38, 0.15)',
+              color: '#DC2626',
               fontWeight: '700',
               fontSize: '14px',
               cursor: 'pointer',
@@ -434,9 +446,9 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
               flex: 1,
               padding: '16px 20px',
               borderRadius: '16px',
-              backgroundColor: !hasAnyDoc ? 'rgba(255,255,255,0.05)' : (hoveredApprove ? '#059669' : '#10B981'),
+              backgroundColor: !hasAnyDoc ? '#cbd5e1' : (hoveredApprove ? '#047857' : '#059669'),
               border: 'none',
-              color: !hasAnyDoc ? 'rgba(255,255,255,0.2)' : '#ffffff',
+              color: !hasAnyDoc ? '#94a3b8' : '#ffffff',
               fontWeight: '700',
               fontSize: '14px',
               cursor: !hasAnyDoc ? 'not-allowed' : 'pointer',
