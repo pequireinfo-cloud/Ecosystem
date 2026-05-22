@@ -9,7 +9,7 @@ const BookingDetailsModal = ({ bookingId, onClose }) => {
   useEffect(() => {
     const fetchDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:4000/api/bookings/${bookingId}`);
+        const res = await api.get(`/bookings/${bookingId}`);
         setBooking(res.data);
       } catch (err) {
         console.error('Error fetching booking details:', err);
