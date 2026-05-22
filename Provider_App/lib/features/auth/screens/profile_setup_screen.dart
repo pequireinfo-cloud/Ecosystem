@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/provider_service.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
   const ProfileSetupScreen({super.key});
@@ -15,10 +18,69 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _cityController = TextEditingController();
+  bool _isLoading = false;
 
   bool get _isValid => _nameController.text.length >= 3 && 
                        _emailController.text.contains('@') && 
                        _cityController.text.isNotEmpty;
+
+  void _onSubmitProfile() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Session expired. Please log in again.')),
+      );
+      context.go('/login');
+      return;
+    }
+
+    if (!_isValid) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter valid details'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final success = await ProviderService().updateProfile(providerId, {
+        'fullName': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'city': _cityController.text.trim(),
+      });
+
+      if (success) {
+        final prefs = await SharedPreferences.getInstance();
+        ApiConfig.registrationStep = 'kyc';
+        await prefs.setString('registration_step', 'kyc');
+        
+        if (mounted) {
+          context.push('/kyc');
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to save profile. Please try again.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -113,19 +175,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: GestureDetector(
-                onTap: () {
-                  if (_isValid) {
-                     context.push('/kyc');
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Please enter valid details'),
-                        backgroundColor: Colors.redAccent,
-                        behavior: SnackBarBehavior.floating,
-                      ),
-                    );
-                  }
-                },
+                onTap: (_isValid && !_isLoading) ? _onSubmitProfile : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   height: 60,
@@ -136,24 +186,33 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     boxShadow: _isValid ? AppColors.primaryGlow : null,
                   ),
                   child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Continue to Verification',
-                          style: AppTypography.h3.copyWith(
-                            color: _isValid ? Colors.white : const Color(0xFF94A3B8),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Continue to Verification',
+                                style: AppTypography.h3.copyWith(
+                                  color: _isValid ? Colors.white : const Color(0xFF94A3B8),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              if (_isValid) ...[
+                                const SizedBox(width: 10),
+                                const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
+                              ],
+                            ],
                           ),
-                        ),
-                        if (_isValid) ...[
-                          const SizedBox(width: 10),
-                          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 18),
-                        ],
-                      ],
-                    ),
                   ),
                 ),
               ),

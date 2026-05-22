@@ -8,6 +8,8 @@ import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 import 'dart:async';
 
+import 'package:pequire_provider_app/core/services/provider_service.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -101,11 +103,44 @@ class _LoginScreenState extends State<LoginScreen> {
         
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('current_provider_id', providerId);
-        await prefs.setString('kyc_status', kycStatus ?? 'Pending');
+        
+        // Fetch the provider profile to see what steps have been completed
+        final profile = await ProviderService().getProfile(providerId);
+        String step = 'service-selection';
+        String kyc = kycStatus ?? 'Pending';
+        
+        if (profile != null) {
+          kyc = profile['kycStatus'] ?? 'Pending';
+          final List? expertise = profile['expertise'];
+          final String? fullName = profile['fullName'];
+          
+          if (kyc == 'Verified') {
+            step = 'home';
+          } else if (kyc == 'In Review') {
+            step = 'verification-pending';
+          } else if (fullName != null && fullName != 'New Partner' && fullName.isNotEmpty) {
+            step = 'kyc';
+          } else if (expertise != null && expertise.isNotEmpty) {
+            step = 'profile-setup';
+          } else {
+            step = 'service-selection';
+          }
+        }
+        
+        ApiConfig.kycStatus = kyc;
+        ApiConfig.registrationStep = step;
+        await prefs.setString('kyc_status', kyc);
+        await prefs.setString('registration_step', step);
 
         if (mounted) {
-          if (kycStatus == 'Verified') {
+          if (step == 'home') {
             context.go('/home');
+          } else if (step == 'verification-pending') {
+            context.go('/verification-pending');
+          } else if (step == 'kyc') {
+            context.go('/kyc');
+          } else if (step == 'profile-setup') {
+            context.go('/profile-setup');
           } else {
             context.go('/service-selection');
           }

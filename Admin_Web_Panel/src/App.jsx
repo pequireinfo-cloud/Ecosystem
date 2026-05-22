@@ -24,7 +24,7 @@ function App() {
   useEffect(() => {
     if (!currentUser) return;
 
-    const socket = io(SOCKET_URL);
+    const socket = io(SOCKET_URL, { transports: ['websocket'] });
 
     socket.on('kyc_submitted', (data) => {
       console.log('New KYC submission:', data);

@@ -42,9 +42,11 @@ void main() async {
   // Load persistent session
   final prefs = await SharedPreferences.getInstance();
   ApiConfig.currentProviderId = prefs.getString('current_provider_id');
+  ApiConfig.kycStatus = prefs.getString('kyc_status');
+  ApiConfig.registrationStep = prefs.getString('registration_step');
   
   // Initialize Firebase
-  debugPrint("Starting Firebase initialization...");
+  debugPrint("Starting Firebase initialization... Provider ID: ${ApiConfig.currentProviderId}, KYC: ${ApiConfig.kycStatus}, Step: ${ApiConfig.registrationStep}");
   await FirebaseService().initialize();
   debugPrint("Firebase initialization check complete.");
 
@@ -63,8 +65,7 @@ void main() async {
 final _router = GoRouter(
   initialLocation: '/',
   redirect: (context, state) {
-    final session = Descope.sessionManager.session;
-    final isLoggedIn = session != null && !session.sessionToken.isExpired;
+    final isLoggedIn = ApiConfig.currentProviderId != null;
     
     final isLoggingIn = state.matchedLocation == '/login' || 
                         state.matchedLocation == '/onboarding' || 
@@ -77,7 +78,22 @@ final _router = GoRouter(
     }
     
     // Logged in
-    if (isLoggingIn || state.matchedLocation == '/') return '/home'; // If logged in, don't show login screens and redirect to home from root
+    if (isLoggingIn || state.matchedLocation == '/') {
+      final kyc = ApiConfig.kycStatus;
+      final step = ApiConfig.registrationStep;
+      
+      if (kyc == 'Verified') {
+        return '/home';
+      } else if (kyc == 'In Review') {
+        return '/verification-pending';
+      } else if (step == 'kyc') {
+        return '/kyc';
+      } else if (step == 'profile-setup') {
+        return '/profile-setup';
+      } else {
+        return '/service-selection';
+      }
+    }
     
     return null; // Let them proceed to their destination
   },

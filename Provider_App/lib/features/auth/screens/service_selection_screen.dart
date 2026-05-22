@@ -3,6 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/provider_service.dart';
 
 class ServiceSelectionScreen extends StatefulWidget {
   const ServiceSelectionScreen({super.key});
@@ -13,6 +16,7 @@ class ServiceSelectionScreen extends StatefulWidget {
 
 class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
   final Set<int> _selectedIndices = {};
+  bool _isLoading = false;
 
   final List<_Service> _services = [
     const _Service(Icons.bolt_rounded, 'Electrical'),
@@ -20,6 +24,55 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
     const _Service(Icons.chair_rounded, 'Carpentry'),
     const _Service(Icons.local_laundry_service_rounded, 'Laundry'),
   ];
+
+  void _onConfirm() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Session expired. Please log in again.')),
+      );
+      context.go('/login');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final selectedServices = _selectedIndices.map((index) => _services[index].name).toList();
+      final String serviceType = selectedServices.isNotEmpty ? selectedServices.first : '';
+
+      final success = await ProviderService().updateProfile(providerId, {
+        'expertise': selectedServices,
+        'serviceType': serviceType,
+      });
+
+      if (success) {
+        final prefs = await SharedPreferences.getInstance();
+        ApiConfig.registrationStep = 'profile-setup';
+        await prefs.setString('registration_step', 'profile-setup');
+        
+        if (mounted) {
+          context.push('/profile-setup');
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to save selected services. Please try again.')),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -161,7 +214,7 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
               child: GestureDetector(
-                onTap: _selectedIndices.isNotEmpty ? () => context.push('/profile-setup') : null,
+                onTap: (_selectedIndices.isNotEmpty && !_isLoading) ? _onConfirm : null,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
                   height: 64,
@@ -172,24 +225,33 @@ class _ServiceSelectionScreenState extends State<ServiceSelectionScreen> {
                     boxShadow: _selectedIndices.isNotEmpty ? AppColors.primaryGlow : null,
                   ),
                   child: Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Confirm & Continue',
-                          style: AppTypography.h3.copyWith(
-                            color: _selectedIndices.isNotEmpty ? Colors.white : const Color(0xFF94A3B8),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.5,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Confirm & Continue',
+                                style: AppTypography.h3.copyWith(
+                                  color: _selectedIndices.isNotEmpty ? Colors.white : const Color(0xFF94A3B8),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                              if (_selectedIndices.isNotEmpty) ...[
+                                const SizedBox(width: 12),
+                                const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
+                              ],
+                            ],
                           ),
-                        ),
-                        if (_selectedIndices.isNotEmpty) ...[
-                          const SizedBox(width: 12),
-                          const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 20),
-                        ],
-                      ],
-                    ),
                   ),
                 ),
               ),

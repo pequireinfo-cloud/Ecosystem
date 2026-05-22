@@ -1,14 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/provider_service.dart';
 
-class PequireDrawer extends StatelessWidget {
+class PequireDrawer extends ConsumerStatefulWidget {
   const PequireDrawer({super.key});
 
   @override
+  ConsumerState<PequireDrawer> createState() => _PequireDrawerState();
+}
+
+class _PequireDrawerState extends ConsumerState<PequireDrawer> {
+  Map<String, dynamic>? _providerData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId != null) {
+      final data = await ProviderService().getProfile(providerId);
+      if (mounted) {
+        setState(() {
+          _providerData = data;
+          _isLoading = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final String fullName = _providerData?['fullName'] ?? (_isLoading ? 'Loading...' : 'New Partner');
+    final String rating = (_providerData?['rating'] ?? 5.0).toStringAsFixed(1);
+    final double totalEarnings = double.tryParse((_providerData?['earnings']?['total'] ?? 0).toString()) ?? 0.0;
+    final double pendingEarnings = double.tryParse((_providerData?['earnings']?['pending'] ?? 0).toString()) ?? 0.0;
+
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.82,
       backgroundColor: Colors.white,
@@ -25,14 +66,14 @@ class PequireDrawer extends StatelessWidget {
               right: 24,
               bottom: 24,
             ),
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [AppColors.secondary, Color(0xFF1E293B)],
-                ),
-                borderRadius: BorderRadius.only(topLeft: Radius.circular(24)),
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.secondary, Color(0xFF1E293B)],
               ),
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(24)),
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -63,7 +104,7 @@ class PequireDrawer extends StatelessWidget {
                         width: 36,
                         height: 36,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
+                          color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(Icons.close_rounded, color: Colors.white, size: 18),
@@ -79,7 +120,7 @@ class PequireDrawer extends StatelessWidget {
                       height: 52,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 2),
+                        border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
                         color: const Color(0xFF1E293B),
                       ),
                       clipBehavior: Clip.hardEdge,
@@ -93,13 +134,13 @@ class PequireDrawer extends StatelessWidget {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Alex Provider', style: AppTypography.h2.copyWith(color: Colors.white, fontSize: 18)),
+                        Text(fullName, style: AppTypography.h2.copyWith(color: Colors.white, fontSize: 18)),
                         const SizedBox(height: 2),
                         Row(
                           children: [
                             const Icon(Icons.star_rounded, color: Color(0xFFFACC15), size: 14),
                             const SizedBox(width: 4),
-                            Text('4.8', style: AppTypography.label.copyWith(color: Colors.white, fontSize: 12)),
+                            Text(rating, style: AppTypography.label.copyWith(color: Colors.white, fontSize: 12)),
                           ],
                         ),
                       ],
@@ -120,7 +161,7 @@ class PequireDrawer extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 12, offset: const Offset(0, 4)),
+                  BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 4)),
                 ],
               ),
               child: Row(
@@ -129,9 +170,9 @@ class PequireDrawer extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('TODAY', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                        Text('TOTAL', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
                         const SizedBox(height: 2),
-                        Text('₹1,280', style: AppTypography.h2.copyWith(color: const Color(0xFF0F172A), fontSize: 20)),
+                        Text('₹${totalEarnings.toStringAsFixed(0)}', style: AppTypography.h2.copyWith(color: const Color(0xFF0F172A), fontSize: 20)),
                       ],
                     ),
                   ),
@@ -141,9 +182,9 @@ class PequireDrawer extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('THIS WEEK', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
+                        Text('PENDING', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 1)),
                         const SizedBox(height: 2),
-                        Text('₹5,480', style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 20)),
+                        Text('₹${pendingEarnings.toStringAsFixed(0)}', style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 20)),
                       ],
                     ),
                   ),
@@ -164,7 +205,7 @@ class PequireDrawer extends StatelessWidget {
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
-                BoxShadow(color: const Color(0xFF6366F1).withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(color: const Color(0xFF6366F1).withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 4)),
               ],
             ),
             child: Column(
@@ -183,9 +224,9 @@ class PequireDrawer extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withValues(alpha: 0.2),
+                        color: const Color(0xFF6366F1).withOpacity(0.2),
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: const Color(0xFF6366F1).withValues(alpha: 0.4)),
+                        border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.4)),
                       ),
                       child: Row(
                         children: [
@@ -211,7 +252,7 @@ class PequireDrawer extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: 0.8,
                     minHeight: 6,
-                    backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    backgroundColor: Colors.white.withOpacity(0.1),
                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
                   ),
                 ),
@@ -249,9 +290,9 @@ class PequireDrawer extends StatelessWidget {
               border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
             ),
             child: GestureDetector(
-              onTap: () {
+              onTap: () async {
                 Scaffold.of(context).closeEndDrawer();
-                context.go('/login');
+                await ApiConfig.logout(context);
               },
               child: Row(
                 children: [
@@ -320,5 +361,3 @@ class PequireDrawer extends StatelessWidget {
     );
   }
 }
-
-

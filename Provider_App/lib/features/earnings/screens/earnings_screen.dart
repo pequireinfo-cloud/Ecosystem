@@ -1,14 +1,52 @@
 import 'package:flutter/material.dart';
-
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/provider_service.dart';
 
-class EarningsScreen extends StatelessWidget {
+class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
 
   @override
+  State<EarningsScreen> createState() => _EarningsScreenState();
+}
+
+class _EarningsScreenState extends State<EarningsScreen> {
+  Map<String, dynamic>? _providerProfile;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId != null) {
+      final profile = await ProviderService().getProfile(providerId);
+      if (mounted) {
+        setState(() {
+          _providerProfile = profile;
+          _isLoading = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final double total = double.tryParse((_providerProfile?['earnings']?['total'] ?? 0).toString()) ?? 0.0;
+    final double pending = double.tryParse((_providerProfile?['earnings']?['pending'] ?? 0).toString()) ?? 0.0;
+    final double available = (total - pending).clamp(0.0, double.infinity);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
@@ -28,79 +66,81 @@ class EarningsScreen extends StatelessWidget {
             ],
           ),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Hero Card
-                  Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Total Balance', style: AppTypography.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.5), fontSize: 13)),
-                        const SizedBox(height: 4),
-                        Text('₹28,450', style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
-                        const SizedBox(height: 20),
-                        Row(
+            child: _isLoading 
+              ? const Center(child: CircularProgressIndicator())
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Hero Card
+                      Container(
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _statChip('Available', '₹22,400', const Color(0xFF10B981)),
-                            const SizedBox(width: 8),
-                            _statChip('Pending', '₹6,050', const Color(0xFFF59E0B)),
+                            Text('Total Balance', style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.5), fontSize: 13)),
+                            const SizedBox(height: 4),
+                            Text('₹${total.toStringAsFixed(0)}', style: AppTypography.h1.copyWith(color: Colors.white, fontSize: 36, fontWeight: FontWeight.w900)),
+                            const SizedBox(height: 20),
+                            Row(
+                              children: [
+                                _statChip('Available', '₹${available.toStringAsFixed(0)}', const Color(0xFF10B981)),
+                                const SizedBox(width: 8),
+                                _statChip('Pending', '₹${pending.toStringAsFixed(0)}', const Color(0xFFF59E0B)),
+                              ],
+                            ),
                           ],
                         ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                      ),
+                      const SizedBox(height: 16),
 
-                  // Action Buttons
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _actionBtn(Icons.account_balance_rounded, 'Add Bank', const Color(0xFF475569)),
+                      // Action Buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _actionBtn(Icons.account_balance_rounded, 'Add Bank', const Color(0xFF475569)),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: _actionBtn(Icons.download_rounded, 'Withdraw', const Color(0xFF059669)),
+                          ),
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _actionBtn(Icons.download_rounded, 'Withdraw', const Color(0xFF059669)),
+                      const SizedBox(height: 28),
+
+                      // Period filters
+                      SizedBox(
+                        height: 36,
+                        child: ListView(
+                          scrollDirection: Axis.horizontal,
+                          children: [
+                            _filterPill('Today', true),
+                            _filterPill('This Week', false),
+                            _filterPill('This Month', false),
+                            _filterPill('All Time', false),
+                          ],
+                        ),
                       ),
+                      const SizedBox(height: 20),
+
+                      Text('Recent Transactions', style: AppTypography.h3.copyWith(color: const Color(0xFF0F172A))),
+                      const SizedBox(height: 12),
+                      _txnItem('Electrical Repair', 'Priya S. · 2:30 PM', '+₹480', true),
+                      _txnItem('Plumbing Fix', 'Arjun M. · 11:00 AM', '+₹620', true),
+                      _txnItem('Withdrawal', 'To HDFC ****1234', '-₹5,000', false),
+                      _txnItem('Wiring Install', 'Meena R. · Yesterday', '+₹350', true),
                     ],
                   ),
-                  const SizedBox(height: 28),
-
-                  // Period filters
-                  SizedBox(
-                    height: 36,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      children: [
-                        _filterPill('Today', true),
-                        _filterPill('This Week', false),
-                        _filterPill('This Month', false),
-                        _filterPill('All Time', false),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Text('Recent Transactions', style: AppTypography.h3.copyWith(color: const Color(0xFF0F172A))),
-                  const SizedBox(height: 12),
-                  _txnItem('Electrical Repair', 'Priya S. · 2:30 PM', '+₹480', true),
-                  _txnItem('Plumbing Fix', 'Arjun M. · 11:00 AM', '+₹620', true),
-                  _txnItem('Withdrawal', 'To HDFC ****1234', '-₹5,000', false),
-                  _txnItem('Wiring Install', 'Meena R. · Yesterday', '+₹350', true),
-                ],
-              ),
-            ),
+                ),
           ),
         ],
       ),
@@ -112,13 +152,13 @@ class EarningsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.08),
+          color: Colors.white.withOpacity(0.08),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: AppTypography.bodySmall.copyWith(color: Colors.white.withValues(alpha: 0.5), fontSize: 11)),
+            Text(label, style: AppTypography.bodySmall.copyWith(color: Colors.white.withOpacity(0.5), fontSize: 11)),
             const SizedBox(height: 4),
             Text(value, style: AppTypography.h3.copyWith(color: color, fontSize: 16)),
           ],
@@ -133,7 +173,7 @@ class EarningsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 6, offset: const Offset(0, 2))],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: const Offset(0, 2))],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,

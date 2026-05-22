@@ -13,6 +13,8 @@ class ApiConfig {
 
   // State management (Session)
   static String? currentProviderId;
+  static String? kycStatus;
+  static String? registrationStep;
   
   // Shared Headers
   static Map<String, String> get headers => {
@@ -33,7 +35,10 @@ class ApiConfig {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('current_provider_id');
     await prefs.remove('kyc_status');
+    await prefs.remove('registration_step');
     currentProviderId = null;
+    kycStatus = null;
+    registrationStep = null;
     
     if (context.mounted) {
       context.go('/login');

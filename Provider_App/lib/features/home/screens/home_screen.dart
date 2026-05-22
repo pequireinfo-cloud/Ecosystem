@@ -52,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const LatLng(28.5623, 77.2144), // South Ext
     const LatLng(28.6448, 77.2167), // Karol Bagh
   ];
+  Map<String, dynamic>? _providerProfile;
 
   @override
   void initState() {
@@ -69,6 +70,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     
     final profile = await ProviderService().getProfile(providerId);
     if (profile != null && mounted) {
+      setState(() {
+        _providerProfile = profile;
+      });
       final status = profile['kycStatus'] ?? 'Pending';
       KycState newState;
       if (status == 'Verified') {
@@ -273,6 +277,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       right: 20,
                       bottom: 30,
                       child: _buildKycBanner(kycState),
+                    ),
+                  
+                  // 3b. Earnings Strip Bottom Overlay (if verified and no active job)
+                  if (isVerified && _activeBookingId == null)
+                    Positioned(
+                      left: 20,
+                      right: 20,
+                      bottom: 30,
+                      child: _buildEarningsStrip(),
                     ),
                   
                   // 4. Minimal Map Navigation Overlay
@@ -735,13 +748,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildEarningsStrip() {
+    final double totalEarnings = double.tryParse((_providerProfile?['earnings']?['total'] ?? 0).toString()) ?? 0.0;
+    final double pendingEarnings = double.tryParse((_providerProfile?['earnings']?['pending'] ?? 0).toString()) ?? 0.0;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Row(
@@ -750,12 +766,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Today\'s Earnings', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text('Total Earnings', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   alignment: Alignment.centerLeft,
-                  child: Text('₹1,280', style: AppTypography.h1.copyWith(color: const Color(0xFF0F172A), fontSize: 28)),
+                  child: Text('₹${totalEarnings.toStringAsFixed(0)}', style: AppTypography.h1.copyWith(color: const Color(0xFF0F172A), fontSize: 28)),
                 ),
               ],
             ),
@@ -766,7 +782,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('This Week', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text('Pending Payouts', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
                 Row(
                   children: [
@@ -774,14 +790,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
-                        child: Text('₹5,480', style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 22)),
+                        child: Text('₹${pendingEarnings.toStringAsFixed(0)}', style: AppTypography.h2.copyWith(color: AppColors.primary, fontSize: 22)),
                       ),
-                    ),
-                    const SizedBox(width: 6),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      decoration: BoxDecoration(color: const Color(0xFFECFDF5), borderRadius: BorderRadius.circular(6)),
-                      child: Text('+12%', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF059669), fontSize: 10, fontWeight: FontWeight.w600)),
                     ),
                   ],
                 ),

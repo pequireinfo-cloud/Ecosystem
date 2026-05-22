@@ -27,6 +27,16 @@ class ProviderService {
     }
   }
 
+  Future<bool> updateProfile(String providerId, Map<String, dynamic> updateData) async {
+    try {
+      await ApiService().put('/providers/$providerId', data: updateData);
+      return true;
+    } catch (e) {
+      print('Error updating profile: $e');
+      return false;
+    }
+  }
+
   Future<List<Map<String, dynamic>>> getReviews(String providerId) async {
     try {
       final response = await ApiService().get('/providers/$providerId/reviews');

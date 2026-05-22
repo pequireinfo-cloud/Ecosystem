@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:file_picker/file_picker.dart';
@@ -83,6 +84,12 @@ class _KycScreenState extends ConsumerState<KycScreen> {
         'kycStatus': 'In Review',
         'documents': downloadUrls,
       });
+
+      final prefs = await SharedPreferences.getInstance();
+      ApiConfig.registrationStep = 'verification-pending';
+      ApiConfig.kycStatus = 'In Review';
+      await prefs.setString('registration_step', 'verification-pending');
+      await prefs.setString('kyc_status', 'In Review');
 
       if (mounted) {
         ref.read(kycProvider.notifier).updateState(KycState.pending);
