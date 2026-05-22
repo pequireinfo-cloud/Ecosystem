@@ -8,6 +8,8 @@ import 'package:pequire_provider_app/core/providers/kyc_provider.dart';
 
 import 'package:pequire_provider_app/core/services/provider_service.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pequire_provider_app/core/services/socket_service.dart';
 
 class VerificationPendingScreen extends ConsumerStatefulWidget {
   const VerificationPendingScreen({super.key});
@@ -25,6 +27,100 @@ class _VerificationPendingScreenState extends ConsumerState<VerificationPendingS
   void initState() {
     super.initState();
     _checkStatus();
+    
+    // Join provider socket room and register a real-time updates listener
+    if (ApiConfig.currentProviderId != null) {
+      SocketService().joinProvider(ApiConfig.currentProviderId!);
+    }
+    SocketService().listenToKycUpdates(_handleKycSocketEvent);
+  }
+
+  @override
+  void dispose() {
+    SocketService().stopListeningToKycUpdates();
+    super.dispose();
+  }
+
+  void _handleKycSocketEvent(Map<String, dynamic> data) async {
+    final status = data['status'] as String?;
+    final reason = data['rejectionReason'] as String? ?? '';
+    
+    if (status != null && mounted) {
+      debugPrint('KYC Status updated via Socket: $status (reason: $reason)');
+      
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('kyc_status', status);
+      ApiConfig.kycStatus = status;
+
+      setState(() {
+        _status = status;
+        _rejectionReason = reason;
+      });
+
+      KycState kycState;
+      if (status == 'Verified') {
+        kycState = KycState.verified;
+      } else if (status == 'In Review' || status == 'Pending') {
+        kycState = KycState.pending;
+      } else {
+        kycState = KycState.unverified;
+      }
+      ref.read(kycProvider.notifier).updateState(kycState);
+
+      if (status == 'Verified') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('🎉 Your KYC has been approved! Redirecting...'),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 3),
+          ),
+        );
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            context.go('/home');
+          }
+        });
+      } else if (status == 'Rejected') {
+        _showRejectionDialog(reason);
+      }
+    }
+  }
+
+  void _showRejectionDialog(String reason) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: const [
+            Icon(Icons.cancel_rounded, color: Colors.red, size: 28),
+            SizedBox(width: 10),
+            Text('KYC Verification Failed', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          ],
+        ),
+        content: Text(
+          'Your KYC document verification was rejected for the following reason:\n\n'
+          '${reason.isNotEmpty ? reason : "No reason provided."}\n\n'
+          'Please reupload valid documents to activate your account.',
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0F172A),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close dialog
+              context.push('/kyc'); // Route back to reupload screen
+            },
+            child: const Text('Re-upload Documents', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _checkStatus() async {

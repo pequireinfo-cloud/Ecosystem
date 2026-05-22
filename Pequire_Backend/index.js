@@ -92,6 +92,12 @@ io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} joined room: ${orderId}`);
   });
 
+  // Provider joins their own private room to receive status updates / KYC notifications
+  socket.on('join_provider', (providerId) => {
+    socket.join(providerId.toString());
+    console.log(`Socket ${socket.id} joined provider room: ${providerId}`);
+  });
+
   // Providers broadcast their location to a specific order room
   socket.on('update_location', (data) => {
     const { orderId, latitude, longitude } = data;
