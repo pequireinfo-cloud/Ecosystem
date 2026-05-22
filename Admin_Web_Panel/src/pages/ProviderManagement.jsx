@@ -16,7 +16,7 @@ const ProviderManagement = () => {
 
   const fetchProviders = async () => {
     try {
-      const response = await api.get('/providers');
+      const response = await api.get('/admin/providers');
       setProviders(response.data);
     } catch (error) {
       console.error('Error fetching providers:', error);
@@ -27,7 +27,7 @@ const ProviderManagement = () => {
 
   const handleVerify = async (id, status, reason = '') => {
     try {
-      await api.put(`/providers/${id}/kyc`, { kycStatus: status, rejectionReason: reason });
+      await api.put(`/admin/providers/${id}/kyc`, { kycStatus: status, rejectionReason: reason });
       fetchProviders();
       setShowModal(false);
     } catch (error) {

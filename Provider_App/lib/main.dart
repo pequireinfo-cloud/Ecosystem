@@ -77,7 +77,7 @@ final _router = GoRouter(
     }
     
     // Logged in
-    if (isLoggingIn) return '/home'; // If logged in, don't show login screens
+    if (isLoggingIn || state.matchedLocation == '/') return '/home'; // If logged in, don't show login screens and redirect to home from root
     
     return null; // Let them proceed to their destination
   },

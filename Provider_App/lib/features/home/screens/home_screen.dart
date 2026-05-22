@@ -18,6 +18,7 @@ import 'package:pequire_provider_app/core/services/tracking_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/provider_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -57,6 +58,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     TrackingService().startTracking('initial'); // Or remove if not needed for init
     _startBookingListener();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkKycStatus();
+    });
+  }
+
+  Future<void> _checkKycStatus() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId == null) return;
+    
+    final profile = await ProviderService().getProfile(providerId);
+    if (profile != null && mounted) {
+      final status = profile['kycStatus'] ?? 'Pending';
+      KycState newState;
+      if (status == 'Verified') {
+        newState = KycState.verified;
+      } else if (status == 'In Review' || status == 'Pending') {
+        newState = KycState.pending;
+      } else {
+        newState = KycState.unverified;
+      }
+      ref.read(kycProvider.notifier).updateState(newState);
+    }
   }
 
   void _startBookingListener() {

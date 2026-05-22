@@ -8,7 +8,7 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
   const handleKycAction = async (status) => {
     setLoading(true);
     try {
-      await axios.put(`http://localhost:4000/api/admin/providers/${provider._id}/kyc`, { kycStatus: status });
+      await api.put(`/admin/providers/${provider._id}/kyc`, { kycStatus: status });
       onUpdate();
       onClose();
     } catch (err) {
@@ -61,21 +61,39 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
           <h3 className="text-sm font-bold text-white/40 uppercase tracking-[2px] mb-4">KYC Documents for Review</h3>
           <div className="space-y-3">
             {[
-              { label: 'Aadhar Card', status: 'Submitted', icon: FileText, color: 'text-green-400' },
-              { label: 'PAN Card', status: 'Submitted', icon: FileText, color: 'text-green-400' },
-              { label: 'Trade License', status: 'In Review', icon: AlertCircle, color: 'text-yellow-400' },
-            ].map((doc, i) => (
-              <div key={i} className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/[0.07] transition-colors cursor-pointer group">
-                <div className="flex items-center gap-4">
-                  <doc.icon className={doc.color} />
-                  <div>
-                    <p className="text-white font-medium">{doc.label}</p>
-                    <p className="text-xs text-white/40">{doc.status}</p>
+              { key: 'aadharCard', label: 'Aadhar Card' },
+              { key: 'panCard', label: 'PAN Card' },
+              { key: 'drivingLicense', label: 'Driving License' }
+            ].map((doc) => {
+              const url = provider.documents?.[doc.key];
+              const uploaded = !!url;
+              return (
+                <div 
+                  key={doc.key} 
+                  onClick={() => uploaded && window.open(url, '_blank')}
+                  className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
+                    uploaded 
+                      ? 'bg-white/5 border-white/5 hover:bg-white/[0.07] cursor-pointer group' 
+                      : 'bg-red-500/5 border-red-500/10 cursor-not-allowed'
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <FileText className={uploaded ? 'text-green-400' : 'text-white/20'} />
+                    <div>
+                      <p className="text-white font-medium">{doc.label}</p>
+                      <p className={`text-xs ${uploaded ? 'text-white/40' : 'text-red-400'}`}>
+                        {uploaded ? 'Submitted' : 'Not Uploaded'}
+                      </p>
+                    </div>
                   </div>
+                  {uploaded && (
+                    <div className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                      Preview Document
+                    </div>
+                  )}
                 </div>
-                <div className="text-xs text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity">Preview Document</div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

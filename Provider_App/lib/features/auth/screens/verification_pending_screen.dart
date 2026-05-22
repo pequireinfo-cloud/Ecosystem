@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
+import 'package:pequire_provider_app/core/providers/kyc_provider.dart';
 
 import 'package:pequire_provider_app/core/services/provider_service.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 
-class VerificationPendingScreen extends StatefulWidget {
+class VerificationPendingScreen extends ConsumerStatefulWidget {
   const VerificationPendingScreen({super.key});
 
   @override
-  State<VerificationPendingScreen> createState() => _VerificationPendingScreenState();
+  ConsumerState<VerificationPendingScreen> createState() => _VerificationPendingScreenState();
 }
 
-class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
+class _VerificationPendingScreenState extends ConsumerState<VerificationPendingScreen> {
   String _status = 'In Review';
   String _rejectionReason = '';
   bool _isLoading = true;
@@ -29,10 +31,22 @@ class _VerificationPendingScreenState extends State<VerificationPendingScreen> {
     setState(() => _isLoading = true);
     final profile = await ProviderService().getProfile(ApiConfig.currentProviderId ?? "");
     if (profile != null) {
+      final status = profile['kycStatus'] ?? 'In Review';
       setState(() {
-        _status = profile['kycStatus'] ?? 'In Review';
+        _status = status;
         _rejectionReason = profile['rejectionReason'] ?? '';
       });
+      if (mounted) {
+        KycState kycState;
+        if (status == 'Verified') {
+          kycState = KycState.verified;
+        } else if (status == 'In Review' || status == 'Pending') {
+          kycState = KycState.pending;
+        } else {
+          kycState = KycState.unverified;
+        }
+        ref.read(kycProvider.notifier).updateState(kycState);
+      }
     }
     setState(() => _isLoading = false);
   }

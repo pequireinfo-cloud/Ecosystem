@@ -27,7 +27,7 @@ class ApiConfig {
       await FirebaseAuth.instance.signOut();
     } catch (_) {}
     try {
-      await Descope.sessionManager.clearSession();
+      Descope.sessionManager.clearSession();
     } catch (_) {}
     
     final prefs = await SharedPreferences.getInstance();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
@@ -7,16 +8,17 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:pequire_provider_app/core/services/api_service.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
+import 'package:pequire_provider_app/core/providers/kyc_provider.dart';
 import 'dart:io';
 
-class KycScreen extends StatefulWidget {
+class KycScreen extends ConsumerStatefulWidget {
   const KycScreen({super.key});
 
   @override
-  State<KycScreen> createState() => _KycScreenState();
+  ConsumerState<KycScreen> createState() => _KycScreenState();
 }
 
-class _KycScreenState extends State<KycScreen> {
+class _KycScreenState extends ConsumerState<KycScreen> {
   final Map<String, String?> _uploadedFiles = {
     'Aadhar Card': null,
     'PAN Card': null,
@@ -83,6 +85,7 @@ class _KycScreenState extends State<KycScreen> {
       });
 
       if (mounted) {
+        ref.read(kycProvider.notifier).updateState(KycState.pending);
         context.push('/verification-pending');
       }
     } catch (e) {

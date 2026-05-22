@@ -9,10 +9,8 @@ class SocketService {
   IO.Socket? socket;
 
   void connect() {
-    // Replace with your server IP if not running on localhost/emulator
-    // For Android Emulator, use 10.0.2.2
-    // For physical device, use the server's local IP (e.g., 192.168.x.x)
-    const String serverUrl = 'http://10.46.122.48:4000'; 
+    // Use production URL for socket connection
+    const String serverUrl = 'https://api.pequire.com'; 
 
     socket = IO.io(serverUrl, IO.OptionBuilder()
       .setTransports(['websocket'])
