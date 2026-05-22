@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, User, FileText, CheckCircle, AlertCircle, MapPin, Phone } from 'lucide-react';
 import api from '../utils/api';
 
@@ -33,10 +34,13 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
 
   const hasAnyDoc = provider.documents && Object.values(provider.documents).some(url => !!url);
 
-  return (
+  return createPortal(
     <div style={{
       position: 'fixed',
-      inset: 0,
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
       zIndex: 1000,
       display: 'flex',
       alignItems: 'center',
@@ -142,6 +146,8 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
         <div style={{
           padding: '36px',
           overflowY: 'auto',
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
           gap: '28px'
@@ -447,7 +453,8 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
