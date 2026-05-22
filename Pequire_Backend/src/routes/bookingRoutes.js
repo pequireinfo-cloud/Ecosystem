@@ -8,6 +8,7 @@ router.get('/', bookingController.getAllBookings);
 router.post('/', bookingController.createBooking);
 router.get('/:id', bookingController.getBookingById);
 router.get('/user/:userId', bookingController.getUserBookings);
+router.get('/provider/:providerId', bookingController.getProviderBookings);
 
 // Lifecycle routes
 router.post('/:id/confirm-payment', bookingController.confirmPayment);

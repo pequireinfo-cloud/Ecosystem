@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pequire_provider_app/core/constants/app_colors.dart';
 import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
+import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/core/services/booking_service.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
   const BookingHistoryScreen({super.key});
@@ -12,19 +14,60 @@ class BookingHistoryScreen extends StatefulWidget {
 
 class _BookingHistoryScreenState extends State<BookingHistoryScreen> with SingleTickerProviderStateMixin {
   late TabController _tc;
+  List<Map<String, dynamic>> _bookings = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _tc = TabController(length: 3, vsync: this);
     _tc.addListener(() => setState(() {}));
+    _fetchBookings();
+  }
+
+  Future<void> _fetchBookings() async {
+    final providerId = ApiConfig.currentProviderId;
+    if (providerId != null) {
+      final list = await BookingService().getProviderBookings(providerId);
+      if (mounted) {
+        setState(() {
+          _bookings = list;
+          _isLoading = false;
+        });
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
-  void dispose() { _tc.dispose(); super.dispose(); }
+  void dispose() {
+    _tc.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Segment bookings
+    final activeJobs = _bookings.where((b) {
+      final status = b['status'] as String? ?? '';
+      return ['accepted', 'at_location', 'diagnosing', 'waiting_approval', 'working'].contains(status);
+    }).toList();
+
+    final upcomingJobs = _bookings.where((b) {
+      final status = b['status'] as String? ?? '';
+      return ['pending', 'searching'].contains(status);
+    }).toList();
+
+    final completedJobs = _bookings.where((b) {
+      final status = b['status'] as String? ?? '';
+      return ['completed', 'cancelled'].contains(status);
+    }).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
@@ -40,27 +83,23 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
             ),
             child: Row(
               children: [
-                _tab('Active', 0),
-                _tab('Upcoming', 1),
-                _tab('Completed', 2),
+                _tab('Active (${activeJobs.length})', 0),
+                _tab('Upcoming (${upcomingJobs.length})', 1),
+                _tab('Completed (${completedJobs.length})', 2),
               ],
             ),
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tc,
-              children: [
-                _tabContent([_Job('Priya S.', 'Electrical Repair', Icons.bolt_rounded, const Color(0xFFFEF3C7), const Color(0xFFD97706), 'In Progress', '₹480', '2.4 km')]),
-                _tabContent([
-                  _Job('Deepak P.', 'Carpentry Work', Icons.handyman_rounded, const Color(0xFFF5F3FF), const Color(0xFF7C3AED), 'Tomorrow 3PM', '₹750', '1.8 km'),
-                  _Job('Sita R.', 'Electrical Install', Icons.bolt_rounded, const Color(0xFFFEF3C7), const Color(0xFFD97706), 'Wed 10AM', '₹520', '4.2 km'),
-                ]),
-                _tabContent([
-                  _Job('Arjun M.', 'Plumbing Fix', Icons.plumbing_rounded, const Color(0xFFDBEAFE), const Color(0xFF2563EB), 'Completed', '₹620', '3.1 km'),
-                  _Job('Meena R.', 'Wiring Install', Icons.bolt_rounded, const Color(0xFFFEF3C7), const Color(0xFFD97706), 'Completed', '₹350', '2.0 km'),
-                ]),
-              ],
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : TabBarView(
+                    controller: _tc,
+                    children: [
+                      _tabContent(activeJobs),
+                      _tabContent(upcomingJobs),
+                      _tabContent(completedJobs),
+                    ],
+                  ),
           ),
         ],
       ),
@@ -81,15 +120,41 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
             boxShadow: active ? [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)] : null,
           ),
           child: Center(
-            child: Text(label, style: AppTypography.label.copyWith(color: active ? AppColors.primary : const Color(0xFF94A3B8), fontSize: 13)),
+            child: Text(label, style: AppTypography.label.copyWith(color: active ? AppColors.primary : const Color(0xFF94A3B8), fontSize: 12)),
           ),
         ),
       ),
     );
   }
 
-  Widget _tabContent(List<_Job> jobs) {
-    if (jobs.isEmpty) return Center(child: Text('No jobs yet', style: AppTypography.body.copyWith(color: const Color(0xFFCBD5E1))));
+  Widget _tabContent(List<Map<String, dynamic>> jobs) {
+    if (jobs.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF1F5F9),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.calendar_today_outlined, color: Color(0xFF94A3B8), size: 32),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No jobs found',
+              style: AppTypography.label.copyWith(color: const Color(0xFF64748B), fontSize: 16),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'No bookings in this tab yet.',
+              style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12),
+            ),
+          ],
+        ),
+      );
+    }
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       itemCount: jobs.length,
@@ -97,7 +162,43 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
     );
   }
 
-  Widget _jobCard(_Job j) {
+  Widget _jobCard(Map<String, dynamic> j) {
+    final clientName = j['userId']?['fullName'] ?? 'Client';
+    final service = j['serviceType'] ?? 'General Service';
+    final status = (j['status'] as String? ?? 'pending').replaceAll('_', ' ').toUpperCase();
+    final address = j['location']?['address'] ?? 'Nearby Location';
+
+    final priceVal = j['finalPrice'] ?? j['estimatedPrice'] ?? 0;
+    final priceStr = '₹$priceVal';
+
+    // Map style helper
+    IconData icon = Icons.build_rounded;
+    Color bgColor = const Color(0xFFF1F5F9);
+    Color iconColor = const Color(0xFF64748B);
+
+    final serviceLower = service.toString().toLowerCase();
+    if (serviceLower.contains('plumb')) {
+      icon = Icons.plumbing_rounded;
+      bgColor = const Color(0xFFDBEAFE);
+      iconColor = const Color(0xFF2563EB);
+    } else if (serviceLower.contains('elect') || serviceLower.contains('wir')) {
+      icon = Icons.bolt_rounded;
+      bgColor = const Color(0xFFFEF3C7);
+      iconColor = const Color(0xFFD97706);
+    } else if (serviceLower.contains('carpen')) {
+      icon = Icons.handyman_rounded;
+      bgColor = const Color(0xFFF5F3FF);
+      iconColor = const Color(0xFF7C3AED);
+    } else if (serviceLower.contains('laund') || serviceLower.contains('wash')) {
+      icon = Icons.local_laundry_service_rounded;
+      bgColor = const Color(0xFFE0F2FE);
+      iconColor = const Color(0xFF0284C7);
+    } else if (serviceLower.contains('clean')) {
+      icon = Icons.cleaning_services_rounded;
+      bgColor = const Color(0xFFECFDF5);
+      iconColor = const Color(0xFF059669);
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -113,27 +214,27 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
               Container(
                 width: 44,
                 height: 44,
-                decoration: BoxDecoration(color: j.bgColor, borderRadius: BorderRadius.circular(12)),
-                child: Icon(j.icon, color: j.iconColor, size: 22),
+                decoration: BoxDecoration(color: bgColor, borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, color: iconColor, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(j.name, style: AppTypography.label.copyWith(color: const Color(0xFF0F172A), fontSize: 15)),
+                    Text(clientName, style: AppTypography.label.copyWith(color: const Color(0xFF0F172A), fontSize: 15)),
                     const SizedBox(height: 2),
-                    Text(j.service, style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12)),
+                    Text(service, style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12)),
                   ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: j.iconColor.withValues(alpha: 0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(j.status, style: AppTypography.bodySmall.copyWith(color: j.iconColor, fontWeight: FontWeight.w600, fontSize: 11)),
+                child: Text(status, style: AppTypography.bodySmall.copyWith(color: iconColor, fontWeight: FontWeight.w600, fontSize: 11)),
               ),
             ],
           ),
@@ -142,22 +243,21 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
           const SizedBox(height: 12),
           Row(
             children: [
-              Icon(Icons.location_on_outlined, size: 14, color: const Color(0xFFCBD5E1)),
+              const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFFCBD5E1)),
               const SizedBox(width: 4),
-              Text(j.distance, style: AppTypography.bodySmall.copyWith(fontSize: 12)),
-              const Spacer(),
-              Text(j.price, style: AppTypography.h4.copyWith(color: const Color(0xFF059669))),
+              Expanded(
+                child: Text(
+                  address,
+                  style: AppTypography.bodySmall.copyWith(fontSize: 12, overflow: TextOverflow.ellipsis),
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(priceStr, style: AppTypography.h4.copyWith(color: const Color(0xFF059669))),
             ],
           ),
         ],
       ),
     );
   }
-}
-
-class _Job {
-  final String name, service, status, price, distance;
-  final IconData icon;
-  final Color bgColor, iconColor;
-  const _Job(this.name, this.service, this.icon, this.bgColor, this.iconColor, this.status, this.price, this.distance);
 }

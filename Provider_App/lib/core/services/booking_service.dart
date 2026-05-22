@@ -110,4 +110,16 @@ class BookingService {
       rethrow;
     }
   }
+
+  /// Fetch booking history for the professional
+  Future<List<Map<String, dynamic>>> getProviderBookings(String providerId) async {
+    try {
+      final response = await ApiService().get('/bookings/provider/$providerId');
+      final List data = response.data;
+      return data.cast<Map<String, dynamic>>();
+    } catch (e) {
+      print('Error fetching provider bookings: $e');
+      return [];
+    }
+  }
 }

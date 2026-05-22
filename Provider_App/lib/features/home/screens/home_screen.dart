@@ -239,13 +239,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Theme.of(context).dividerColor, width: 1.5),
-                        color: Theme.of(context).brightness == Brightness.dark ? Colors.white10 : const Color(0xFFF8FAFC),
+                        color: const Color(0xFF025EF3),
                       ),
-                      clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                        'https://i.pravatar.cc/150?img=11',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Color(0xFFCBD5E1), size: 20),
+                      child: Center(
+                        child: Text(
+                          (_providerProfile?['fullName'] as String?)?.isNotEmpty == true
+                              ? _providerProfile!['fullName'][0].toUpperCase()
+                              : 'P',
+                          style: AppTypography.h2.copyWith(color: Colors.white, fontSize: 16),
+                        ),
                       ),
                     ),
                   ),

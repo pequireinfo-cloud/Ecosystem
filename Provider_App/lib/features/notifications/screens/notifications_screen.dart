@@ -22,18 +22,57 @@ class NotificationsScreen extends StatelessWidget {
             ],
           ),
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
-              children: [
-                _sectionLabel('TODAY'),
-                _notifItem(Icons.account_balance_wallet_rounded, const Color(0xFF059669), const Color(0xFFECFDF5), 'Payment Received', 'You received ₹480 for Electrical Repair with Priya S.', '2 min ago', true),
-                _notifItem(Icons.star_rounded, const Color(0xFFD97706), const Color(0xFFFEF3C7), 'New Review', 'Priya S. gave you a 5-star review!', '10 min ago', true),
-                _sectionLabel('YESTERDAY'),
-                _notifItem(Icons.calendar_today_outlined, const Color(0xFF2563EB), const Color(0xFFDBEAFE), 'New Booking', 'Deepak P. scheduled for tomorrow 3 PM.', '1 hr ago', false),
-                _notifItem(Icons.warning_amber_rounded, const Color(0xFFDC2626), const Color(0xFFFEE2E2), 'KYC Reminder', 'Complete your KYC verification to start earning.', '3 hrs ago', false),
-                _sectionLabel('THIS WEEK'),
-                _notifItem(Icons.bar_chart_rounded, const Color(0xFF7C3AED), const Color(0xFFF5F3FF), 'Weekly Summary', 'You earned ₹7,890 this week across 8 jobs. Great work!', '2 days ago', false),
-              ],
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1F5F9),
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 10,
+                            spreadRadius: 2,
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.notifications_none_rounded,
+                          size: 36,
+                          color: Color(0xFF94A3B8),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'No notifications yet',
+                      style: AppTypography.h3.copyWith(
+                        color: const Color(0xFF0F172A),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      "You'll receive real-time alerts for booking requests, status changes, and earnings updates here.",
+                      style: AppTypography.bodySmall.copyWith(
+                        color: const Color(0xFF64748B),
+                        fontSize: 13,
+                        height: 1.5,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],

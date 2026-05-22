@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "User App",
+      "request": "launch",
+      "type": "dart",
+      "program": "User_app/lib/main.dart"
+    },
+    {
+      "name": "Provider App",
+      "request": "launch",
+      "type": "dart",
+      "program": "Provider_App/lib/main.dart"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Both Apps (User & Provider)",
+      "configurations": [
+        "User App",
+        "Provider App"
+      ]
+    }
+  ]
+}

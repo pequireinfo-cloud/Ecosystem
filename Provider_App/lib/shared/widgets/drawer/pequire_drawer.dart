@@ -50,6 +50,20 @@ class _PequireDrawerState extends ConsumerState<PequireDrawer> {
     final double totalEarnings = double.tryParse((_providerData?['earnings']?['total'] ?? 0).toString()) ?? 0.0;
     final double pendingEarnings = double.tryParse((_providerData?['earnings']?['pending'] ?? 0).toString()) ?? 0.0;
 
+    final int rewardPoints = int.tryParse((_providerData?['rewardPoints'] ?? 0).toString()) ?? 0;
+    final int level = (rewardPoints / 1000).floor() + 1;
+    final int currentXp = rewardPoints % 1000;
+    final double progress = currentXp / 1000.0;
+    final String levelBadge = level >= 10 ? 'LEGEND' : (level >= 5 ? 'PRO' : 'ROOKIE');
+
+    String feedbackText = 'Focus on customer satisfaction to improve your rating and unlock rewards.';
+    final double ratingVal = double.tryParse((_providerData?['rating'] ?? 5.0).toString()) ?? 5.0;
+    if (ratingVal >= 4.8) {
+      feedbackText = 'You\'re an exceptional provider! Keep up the excellent work.';
+    } else if (ratingVal >= 4.0) {
+      feedbackText = 'Solid ratings! Keep delivering great service to unlock more jobs.';
+    }
+
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.82,
       backgroundColor: Colors.white,
@@ -121,13 +135,14 @@ class _PequireDrawerState extends ConsumerState<PequireDrawer> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
-                        color: const Color(0xFF1E293B),
+                        color: const Color(0xFF025EF3),
                       ),
                       clipBehavior: Clip.hardEdge,
-                      child: Image.network(
-                        'https://i.pravatar.cc/150?img=11',
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Colors.white, size: 28),
+                      child: Center(
+                        child: Text(
+                          fullName.isNotEmpty ? fullName[0].toUpperCase() : 'P',
+                          style: AppTypography.h2.copyWith(color: Colors.white, fontSize: 22),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -232,7 +247,7 @@ class _PequireDrawerState extends ConsumerState<PequireDrawer> {
                         children: [
                           const Icon(Icons.insights_rounded, color: Color(0xFF6366F1), size: 10),
                           const SizedBox(width: 4),
-                          Text('TOP PRO', style: AppTypography.label.copyWith(color: const Color(0xFF6366F1), fontSize: 9)),
+                          Text(levelBadge, style: AppTypography.label.copyWith(color: const Color(0xFF6366F1), fontSize: 9)),
                         ],
                       ),
                     ),
@@ -242,15 +257,15 @@ class _PequireDrawerState extends ConsumerState<PequireDrawer> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Level 12', style: AppTypography.h3.copyWith(color: Colors.white, fontSize: 18)),
-                    Text('2,450 / 3,000 XP', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10)),
+                    Text('Level $level', style: AppTypography.h3.copyWith(color: Colors.white, fontSize: 18)),
+                    Text('$currentXp / 1000 XP', style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 10)),
                   ],
                 ),
                 const SizedBox(height: 8),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
-                    value: 0.8,
+                    value: progress,
                     minHeight: 6,
                     backgroundColor: Colors.white.withOpacity(0.1),
                     valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
@@ -258,7 +273,7 @@ class _PequireDrawerState extends ConsumerState<PequireDrawer> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'You\'re in the top 5% of providers this month! Keep it up.',
+                  feedbackText,
                   style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 11, height: 1.4),
                 ),
               ],

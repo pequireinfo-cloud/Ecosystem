@@ -4,6 +4,8 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/services/booking_service.dart';
+import 'package:intl/intl.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -14,6 +16,7 @@ class EarningsScreen extends StatefulWidget {
 
 class _EarningsScreenState extends State<EarningsScreen> {
   Map<String, dynamic>? _providerProfile;
+  List<Map<String, dynamic>> _bookings = [];
   bool _isLoading = true;
 
   @override
@@ -26,9 +29,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final providerId = ApiConfig.currentProviderId;
     if (providerId != null) {
       final profile = await ProviderService().getProfile(providerId);
+      final bookings = await BookingService().getProviderBookings(providerId);
       if (mounted) {
         setState(() {
           _providerProfile = profile;
+          _bookings = bookings;
           _isLoading = false;
         });
       }
@@ -46,6 +51,17 @@ class _EarningsScreenState extends State<EarningsScreen> {
     final double total = double.tryParse((_providerProfile?['earnings']?['total'] ?? 0).toString()) ?? 0.0;
     final double pending = double.tryParse((_providerProfile?['earnings']?['pending'] ?? 0).toString()) ?? 0.0;
     final double available = (total - pending).clamp(0.0, double.infinity);
+
+    final completedJobs = _bookings.where((b) {
+      final status = b['status'] as String? ?? '';
+      return status == 'completed';
+    }).toList();
+
+    completedJobs.sort((a, b) {
+      final dateA = DateTime.tryParse(a['updatedAt'] ?? '') ?? DateTime.now();
+      final dateB = DateTime.tryParse(b['updatedAt'] ?? '') ?? DateTime.now();
+      return dateB.compareTo(dateA);
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -134,10 +150,44 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
                       Text('Recent Transactions', style: AppTypography.h3.copyWith(color: const Color(0xFF0F172A))),
                       const SizedBox(height: 12),
-                      _txnItem('Electrical Repair', 'Priya S. · 2:30 PM', '+₹480', true),
-                      _txnItem('Plumbing Fix', 'Arjun M. · 11:00 AM', '+₹620', true),
-                      _txnItem('Withdrawal', 'To HDFC ****1234', '-₹5,000', false),
-                      _txnItem('Wiring Install', 'Meena R. · Yesterday', '+₹350', true),
+                      if (completedJobs.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 24, bottom: 24),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFFF1F5F9),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.account_balance_wallet_outlined, color: Color(0xFF94A3B8), size: 32),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'No transactions yet',
+                                  style: AppTypography.label.copyWith(color: const Color(0xFF64748B), fontSize: 16),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Completed bookings will show up here.',
+                                  style: AppTypography.bodySmall.copyWith(color: const Color(0xFF94A3B8), fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        ...completedJobs.map((j) {
+                          return _txnItem(
+                            j['serviceType'] ?? 'Service Job',
+                            '${j['userId']?['fullName'] ?? 'Client'} · ${_formatTxnDate(j['updatedAt'])}',
+                            '+₹${j['finalPrice'] ?? j['estimatedPrice'] ?? 0}',
+                            true,
+                          );
+                        }),
                     ],
                   ),
                 ),
@@ -145,6 +195,22 @@ class _EarningsScreenState extends State<EarningsScreen> {
         ],
       ),
     );
+  }
+
+  String _formatTxnDate(String? dateStr) {
+    if (dateStr == null) return '';
+    final date = DateTime.tryParse(dateStr);
+    if (date == null) return '';
+    final diff = DateTime.now().difference(date);
+    if (diff.inDays == 0) {
+      return 'Today';
+    } else if (diff.inDays == 1) {
+      return 'Yesterday';
+    } else if (diff.inDays < 7) {
+      return '${diff.inDays} days ago';
+    } else {
+      return DateFormat('MMM d').format(date);
+    }
   }
 
   Widget _statChip(String label, String value, Color color) {

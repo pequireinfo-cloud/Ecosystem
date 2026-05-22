@@ -443,6 +443,10 @@ class BookingService {
     return await Booking.find({ userId }).sort({ createdAt: -1 });
   }
 
+  async getProviderBookings(providerId) {
+    return await Booking.find({ providerId }).populate('userId').sort({ createdAt: -1 });
+  }
+
   _generateOtp() {
     return Math.floor(1000 + Math.random() * 9000).toString();
   }

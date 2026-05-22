@@ -140,4 +140,13 @@ exports.getUserBookings = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
+};
+
+exports.getProviderBookings = async (req, res) => {
+  try {
+    const bookings = await bookingService.getProviderBookings(req.params.providerId);
+    res.status(200).json(bookings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
