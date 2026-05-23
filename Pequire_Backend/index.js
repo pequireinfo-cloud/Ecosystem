@@ -3,23 +3,96 @@ const cors = require('cors');
 const http = require('http');
 const path = require('path');
 const { Server } = require('socket.io');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
 require('dotenv').config();
+
+// Allowed CORS origins
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : [
+      'http://localhost:5173',
+      'https://admin.pequire.com',
+      'https://pequire.com',
+      'https://www.pequire.com'
+    ];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
 // Export io for use in services
 module.exports = { app, server, io };
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// Rate limiters
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // limit each IP to 200 requests per windowMs
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour window
+  max: 20, // limit each IP to 20 auth attempts per hour
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many login or OTP attempts from this IP, please try again after an hour.' }
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // limit each IP to 15 uploads per 15 minutes
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many upload attempts, please try again later.' }
+});
+
+// Apply Security Middlewares
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow frontends to access static assets from uploads/
+}));
+app.use(cors(corsOptions));
+app.use(express.json({ limit: '10kb' })); // Limit request payloads to 10kb
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(mongoSanitize()); // Prevent NoSQL injection attacks
+
+// Apply Rate Limiters
+app.use('/api/', globalLimiter);
+app.use('/api/auth/user/login', authLimiter);
+app.use('/api/auth/user/register', authLimiter);
+app.use('/api/auth/user/send-otp', authLimiter);
+app.use('/api/admin/auth/login', authLimiter);
+app.use('/api/upload', uploadLimiter);
+
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Attach socket.io to request for use in controllers
