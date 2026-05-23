@@ -22,3 +22,7 @@
 # Tink and Protobuf keep rules (Required for EncryptedSharedPreferences used by Descope SDK)
 -keep class com.google.crypto.tink.** { *; }
 -dontwarn com.google.crypto.tink.**
+
+# Google Maps SDK
+-keep class com.google.maps.android.** { *; }
+-dontwarn com.google.android.gms.maps.**

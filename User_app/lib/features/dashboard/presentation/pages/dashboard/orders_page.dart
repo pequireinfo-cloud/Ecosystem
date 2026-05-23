@@ -8,6 +8,7 @@ import 'package:pequire_user_app/features/quick_fix/presentation/bloc/order_stat
 import 'package:pequire_user_app/injection_container.dart';
 import 'chat_page.dart';
 import 'tracking_page.dart';
+import 'package:pequire_user_app/core/widgets/pequire_shimmer.dart';
 
 class OrdersPage extends StatelessWidget {
   const OrdersPage({super.key});
@@ -40,7 +41,7 @@ class OrdersPage extends StatelessWidget {
         body: BlocBuilder<OrderBloc, OrderState>(
           builder: (context, state) {
             if (state is OrderLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return PequireShimmer.ordersList();
             } else if (state is OrderLoaded) {
               if (state.orders.isEmpty) {
                 return const Center(child: Text('No orders found'));

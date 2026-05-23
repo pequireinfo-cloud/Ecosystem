@@ -10,10 +10,10 @@ class RoutingService {
   // Configured in Google Cloud Console with Directions API.
   static const String apiKey = AppConfig.mapsApiKey;
 
-  /// Fetches polyline points and distance from Google Directions API
+  /// Fetches polyline points, distance, and traffic-aware ETA from Google Directions API
   static Future<Map<String, dynamic>> getDirections(LatLng start, LatLng end) async {
     final url = Uri.parse(
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&key=$apiKey');
+        'https://maps.googleapis.com/maps/api/directions/json?origin=${start.latitude},${start.longitude}&destination=${end.latitude},${end.longitude}&departure_time=now&traffic_model=best_guess&key=$apiKey');
 
     try {
       final response = await http.get(url);
@@ -22,9 +22,15 @@ class RoutingService {
         if (data['status'] == 'OK') {
           final routes = data['routes'] as List;
           if (routes.isNotEmpty) {
-            final steps = routes[0]['legs'][0]['steps'] as List;
-            final num totalDistNum = routes[0]['legs'][0]['distance']['value'] as num;
+            final leg = routes[0]['legs'][0];
+            final steps = leg['steps'] as List;
+            final num totalDistNum = leg['distance']['value'] as num;
             final double totalDistance = totalDistNum.toDouble();
+            
+            // Extract duration in traffic (fallback to normal duration)
+            final int durationInSeconds = (leg['duration_in_traffic'] != null) 
+                  ? leg['duration_in_traffic']['value'] as int 
+                  : leg['duration']['value'] as int;
             
             List<LatLng> coords = [];
 
@@ -32,7 +38,7 @@ class RoutingService {
               final points = PolylinePoints.decodePolyline(step['polyline']['points']);
               coords.addAll(points.map((p) => LatLng(p.latitude, p.longitude)));
             }
-            return {'coords': coords, 'totalDistance': totalDistance};
+            return {'coords': coords, 'totalDistance': totalDistance, 'durationInSeconds': durationInSeconds};
           }
         } else {
           print('Directions API Error: ${data['status']} - ${data['error_message']}');
@@ -43,7 +49,7 @@ class RoutingService {
     } catch (e) {
       print('Routing error: $e');
     }
-    return {'coords': <LatLng>[], 'totalDistance': 0.0};
+    return {'coords': <LatLng>[], 'totalDistance': 0.0, 'durationInSeconds': 0};
   }
 
   /// Calculates the Haversine distance in meters between two LatLng coordinates

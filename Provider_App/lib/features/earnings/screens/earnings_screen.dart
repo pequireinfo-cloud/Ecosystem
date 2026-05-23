@@ -6,6 +6,7 @@ import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
 import 'package:pequire_provider_app/core/services/booking_service.dart';
 import 'package:intl/intl.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_shimmer.dart';
 
 class EarningsScreen extends StatefulWidget {
   const EarningsScreen({super.key});
@@ -83,7 +84,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
           ),
           Expanded(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
+              ? PequireShimmer.earningsScreen()
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(

@@ -6,6 +6,7 @@ import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:intl/intl.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_shimmer.dart';
 
 class ReviewsScreen extends StatefulWidget {
   const ReviewsScreen({super.key});
@@ -64,7 +65,7 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
           const PequireAppBar(title: 'Reviews'),
           Expanded(
             child: _isLoading 
-              ? const Center(child: CircularProgressIndicator())
+              ? PequireShimmer.reviewsScreen()
               : RefreshIndicator(
                   onRefresh: _fetchData,
                   child: SingleChildScrollView(

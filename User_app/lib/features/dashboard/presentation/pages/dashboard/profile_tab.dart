@@ -21,6 +21,7 @@ import 'package:pequire_user_app/features/profile/presentation/bloc/profile_bloc
 import 'package:pequire_user_app/features/profile/presentation/bloc/profile_event.dart';
 import 'package:pequire_user_app/features/profile/presentation/bloc/profile_state.dart';
 import 'package:pequire_user_app/injection_container.dart';
+import 'package:pequire_user_app/core/widgets/pequire_shimmer.dart';
 
 class ProfileTab extends StatefulWidget {
   final UserEntity user;
@@ -65,7 +66,7 @@ class _ProfileTabState extends State<ProfileTab> {
               automaticallyImplyLeading: false,
             ),
             body: state is ProfileLoading && state is! ProfileLoaded
-                ? const Center(child: CircularProgressIndicator())
+                ? PequireShimmer.profileTab()
                 : ListView(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     children: [

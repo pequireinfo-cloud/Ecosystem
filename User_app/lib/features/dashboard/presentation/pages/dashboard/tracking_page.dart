@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pequire_user_app/core/services/tracking_service.dart';
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
@@ -18,30 +19,21 @@ class TrackingPage extends StatefulWidget {
   State<TrackingPage> createState() => _TrackingPageState();
 }
 
-class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-  
+class _TrackingPageState extends State<TrackingPage> {
+  final Completer<GoogleMapController> _mapController = Completer();
   StreamSubscription? _trackingSubscription;
-  Offset _currentProPosition = const Offset(0.2, 0.2); // Default mock start
-  final Offset _userPosition = const Offset(0.6, 0.7); // Static user pos
-  int _remainingMinutes = 8;
+  
+  LatLng? _currentProPosition;
+  final LatLng _userPosition = const LatLng(28.6139, 77.2090); // Default user position (Delhi)
+  
+  String _remainingTime = '--';
   String _statusStatus = 'Connecting...';
   bool _hasReceivedUpdate = false;
+  double _heading = 0.0;
 
   @override
   void initState() {
     super.initState();
-    
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-    
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.5).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-
     _startTracking();
   }
 
@@ -53,10 +45,19 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
         
         setState(() {
           _hasReceivedUpdate = true;
-          _currentProPosition = _mapCoordsToUI(data['latitude'], data['longitude']);
-          // Calculate minutes if needed (mocked for now)
-          _remainingMinutes = 5; 
-          _statusStatus = 'Tracking Live (Firestore)';
+          _currentProPosition = LatLng(data['latitude'], data['longitude']);
+          
+          if (data['heading'] != null) {
+             _heading = (data['heading'] is int) ? (data['heading'] as int).toDouble() : data['heading'];
+          }
+
+          if (data['eta'] != null) {
+             _remainingTime = data['eta'].toString();
+          }
+
+          _statusStatus = 'Provider on the way';
+          
+          _animateCameraToPro();
         });
       } else {
         setState(() => _statusStatus = 'Waiting for Provider...');
@@ -67,21 +68,22 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
     });
   }
 
-  // Helper to map real coords to our local painter (Demo only)
-  Offset _mapCoordsToUI(double lat, double lon) {
-    // This is a simple projection for the demo CUSTOM PAINTER
-    // 192.168.1.7:3000 broadcast -> this listener
-    return Offset(0.2 + (lat % 1), 0.2 + (lon % 1));
-  }
-
-  int _calculateTimeRemaining(double lat, double lon) {
-    // Simulating time calculation
-    return 5; 
+  Future<void> _animateCameraToPro() async {
+    if (_currentProPosition == null) return;
+    
+    final controller = await _mapController.future;
+    controller.animateCamera(CameraUpdate.newCameraPosition(
+      CameraPosition(
+        target: _currentProPosition!,
+        zoom: 17,
+        tilt: 45,
+        bearing: _heading,
+      ),
+    ));
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
     _trackingSubscription?.cancel();
     super.dispose();
   }
@@ -140,49 +142,58 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
   }
 
   Widget _buildInteractiveMap() {
+    Set<Marker> markers = {
+      Marker(
+        markerId: const MarkerId('user_home'),
+        position: _userPosition,
+        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
+        infoWindow: const InfoWindow(title: 'Your Home'),
+      ),
+    };
+
+    if (_currentProPosition != null) {
+      markers.add(
+        Marker(
+          markerId: const MarkerId('provider_car'),
+          position: _currentProPosition!,
+          rotation: _heading,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange),
+          infoWindow: const InfoWindow(title: 'Technician'),
+          anchor: const Offset(0.5, 0.5),
+        ),
+      );
+    }
+
+    Set<Polyline> polylines = {};
+    if (_currentProPosition != null) {
+       polylines.add(
+         Polyline(
+           polylineId: const PolylineId('route_line'),
+           color: AppColors.primary,
+           width: 4,
+           points: [_currentProPosition!, _userPosition],
+         )
+       );
+    }
+
     return Container(
       width: double.infinity,
       height: double.infinity,
       color: const Color(0xFFE5E7EB),
-      child: Stack(
-        children: [
-          CustomPaint(
-            size: Size.infinite,
-            painter: MapPainter(proPos: _currentProPosition, userPos: _userPosition),
-          ),
-          
-          Positioned(
-            left: MediaQuery.of(context).size.width * _userPosition.dx - 20,
-            top: MediaQuery.of(context).size.height * _userPosition.dy - 20,
-            child: ScaleTransition(
-              scale: _pulseAnimation,
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-          
-          Positioned(
-            left: MediaQuery.of(context).size.width * _currentProPosition.dx - 15,
-            top: MediaQuery.of(context).size.height * _currentProPosition.dy - 15,
-            child: ScaleTransition(
-              scale: _pulseAnimation,
-              child: Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-        ],
+      child: GoogleMap(
+        initialCameraPosition: CameraPosition(
+          target: _userPosition,
+          zoom: 14,
+        ),
+        onMapCreated: (GoogleMapController controller) {
+          _mapController.complete(controller);
+        },
+        markers: markers,
+        polylines: polylines,
+        myLocationEnabled: false,
+        zoomControlsEnabled: false,
+        mapToolbarEnabled: false,
+        compassEnabled: false,
       ),
     );
   }
@@ -216,7 +227,7 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      !_hasReceivedUpdate ? 'Waiting for Provider...' : 'Coming in $_remainingMinutes mins',
+                      !_hasReceivedUpdate ? 'Waiting for Provider...' : 'Coming in $_remainingTime mins',
                       style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
@@ -291,38 +302,4 @@ class _TrackingPageState extends State<TrackingPage> with SingleTickerProviderSt
       child: Icon(icon, color: color, size: 22),
     );
   }
-}
-
-class MapPainter extends CustomPainter {
-  final Offset proPos;
-  final Offset userPos;
-
-  MapPainter({required this.proPos, required this.userPos});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final dashPaint = Paint()
-      ..color = Colors.grey.shade300
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    for (int i = 0; i < 20; i++) {
-      canvas.drawLine(Offset(0, i * 60.0), Offset(size.width, i * 60.0), dashPaint);
-      canvas.drawLine(Offset(i * 60.0, 0), Offset(i * 60.0, size.height), dashPaint);
-    }
-
-    final proMarkerPaint = Paint()..color = Colors.orange;
-    canvas.drawCircle(Offset(size.width * proPos.dx, size.height * proPos.dy), 10, proMarkerPaint);
-    proMarkerPaint.color = Colors.white;
-    canvas.drawCircle(Offset(size.width * proPos.dx, size.height * proPos.dy), 4, proMarkerPaint);
-
-    final userMarkerPaint = Paint()..color = AppColors.primary;
-    canvas.drawCircle(Offset(size.width * userPos.dx, size.height * userPos.dy), 10, userMarkerPaint);
-    userMarkerPaint.color = Colors.white;
-    canvas.drawCircle(Offset(size.width * userPos.dx, size.height * userPos.dy), 4, userMarkerPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant MapPainter oldDelegate) => 
-      oldDelegate.proPos != proPos || oldDelegate.userPos != userPos;
 }

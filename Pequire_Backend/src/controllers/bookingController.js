@@ -2,10 +2,11 @@ const bookingService = require('../services/bookingService');
 
 exports.createBooking = async (req, res) => {
   try {
-    const { userId, serviceType, problemDescription, location, estimatedPrice, paymentTiming } = req.body;
+    const { userId, serviceType, problemDescription = 'Standard service request', location, estimatedPrice, paymentTiming } = req.body;
     const newBooking = await bookingService.createBooking({ userId, serviceType, problemDescription, location, estimatedPrice, paymentTiming });
     res.status(201).json({ message: 'Booking created successfully', booking: newBooking });
   } catch (error) {
+    console.error("CREATE BOOKING ERROR:", error);
     res.status(500).json({ error: error.message });
   }
 };

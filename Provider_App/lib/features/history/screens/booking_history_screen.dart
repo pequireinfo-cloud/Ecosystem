@@ -4,6 +4,7 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:pequire_provider_app/core/services/booking_service.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_shimmer.dart';
 
 class BookingHistoryScreen extends StatefulWidget {
   const BookingHistoryScreen({super.key});
@@ -91,7 +92,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> with Single
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? PequireShimmer.bookingList()
                 : TabBarView(
                     controller: _tc,
                     children: [

@@ -57,6 +57,7 @@ dependencies:
   descope: ^0.7.2
   glassmorphism: ^3.0.0
   shared_preferences: ^2.2.2
+  shimmer: ^3.0.0
 
 
 dev_dependencies:

@@ -6,6 +6,7 @@ import 'package:pequire_provider_app/core/constants/app_typography.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_app_bar.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:pequire_provider_app/shared/widgets/pequire_shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -43,7 +44,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: Column(
+          children: [
+            const PequireAppBar(title: 'Profile'),
+            Expanded(child: PequireShimmer.profileScreen()),
+          ],
+        ),
+      );
     }
 
     final name = _profile?['fullName'] ?? 'Unknown Professional';
