@@ -83,7 +83,7 @@ app.use(helmet({
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10kb' })); // Limit request payloads to 10kb
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-app.use(mongoSanitize()); // Prevent NoSQL injection attacks
+// app.use(mongoSanitize()); // Prevent NoSQL injection attacks (Incompatible with Express 5)
 
 // Apply Rate Limiters
 app.use('/api/', globalLimiter);

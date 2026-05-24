@@ -1,6 +1,6 @@
 class ApiConfig {
   // Production Backend URL
-  static const String baseUrl = 'https://api.pequire.com/api';
+  static const String baseUrl = 'https://api.pequire.com/api/';
   
   // Descope Project ID
   static const String descopeProjectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';
