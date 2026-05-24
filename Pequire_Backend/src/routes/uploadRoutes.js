@@ -2,49 +2,46 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
+const { admin } = require('../config/firebase');
 
-// Ensure uploads directory exists
-const UPLOADS_DIR = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(UPLOADS_DIR)) {
-  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
-}
-
-// Configure Storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, UPLOADS_DIR);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
-  }
-});
-
+// Configure Memory Storage (buffer)
 const upload = multer({
-  storage: storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 });
 
-router.post('/', upload.single('file'), (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: 'No file uploaded' });
     }
+
+    if (!admin || !admin.apps.length) {
+      throw new Error('Firebase Admin not initialized. Cannot upload to cloud storage.');
+    }
+
+    const bucket = admin.storage().bucket();
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(req.file.originalname);
+    const filename = `uploads/${req.file.fieldname}-${uniqueSuffix}${ext}`;
     
-    // Construct public URL
-    // Try to get protocol and host dynamically, respecting forwarding headers
-    const proto = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.headers['x-forwarded-host'] || req.get('host');
-    
-    // The static files are served at /uploads/, not /api/uploads/
-    const fileUrl = `${proto}://${host}/uploads/${req.file.filename}`;
-    
+    const fileUpload = bucket.file(filename);
+
+    // Save buffer to Firebase Storage
+    await fileUpload.save(req.file.buffer, {
+      metadata: {
+        contentType: req.file.mimetype,
+      },
+      public: true, // Make file publicly accessible
+    });
+
+    // Get the public URL
+    const fileUrl = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+
     res.status(200).json({
       success: true,
       url: fileUrl,
-      filename: req.file.filename
+      filename: filename
     });
   } catch (error) {
     console.error('File upload error:', error);

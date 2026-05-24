@@ -652,7 +652,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           const SizedBox(width: 12),
           // Small Toggle Switch
           GestureDetector(
-            onTap: () => setState(() => _isOnline = !_isOnline),
+            onTap: () async {
+              final newStatus = !_isOnline;
+              setState(() => _isOnline = newStatus);
+              
+              final providerId = ApiConfig.currentProviderId;
+              if (providerId != null) {
+                await ProviderService().updateProfile(providerId, {
+                  'status': newStatus ? 'Online' : 'Offline'
+                });
+              }
+            },
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               width: 36,

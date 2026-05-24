@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const providerSchema = new mongoose.Schema({
+  spId: {
+    type: String,
+    unique: true
+  },
   fullName: { 
     type: String, 
     required: [true, 'Full name is required'],
@@ -71,10 +75,16 @@ const providerSchema = new mongoose.Schema({
 });
 
 // Middleware to keep geo coordinates updated if lat/lng changes
-providerSchema.pre('save', async function() {
+providerSchema.pre('save', async function(next) {
+  if (this.isNew || !this.spId) {
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
+    this.spId = `SP-${randomHex}`;
+  }
+
   if (this.location && this.location.latitude !== undefined && this.location.longitude !== undefined) {
     this.location.geo.coordinates = [this.location.longitude, this.location.latitude];
   }
+  next();
 });
 
 module.exports = mongoose.model('Provider', providerSchema);

@@ -42,7 +42,9 @@ exports.verifyDescopeToken = async (req, res) => {
 
     // 2. Extract user info from Descope authDetails
     const loginId = authDetails.token.sub;
-    const phoneNumber = authDetails.token.phone || loginId;
+    const loginIds = authDetails.token.loginIds || [];
+    const phoneFromLoginIds = loginIds.find(id => id.startsWith('+')) || loginIds[0];
+    const phoneNumber = authDetails.token.phone || phoneFromLoginIds || loginId;
 
     let account;
     let isNew = false;

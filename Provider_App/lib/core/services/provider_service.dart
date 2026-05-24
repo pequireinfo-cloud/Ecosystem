@@ -8,8 +8,12 @@ class ProviderService {
   Future<Map<String, dynamic>?> getProfile(String providerId) async {
     try {
       final response = await ApiService().get('/providers');
-      final List data = response.data;
-      final provider = data.firstWhere((p) => p['_id'] == providerId, orElse: () => null);
+      final dynamic data = response.data;
+      
+      // Handle both raw array and paginated object ({ providers: [...] })
+      final List providersList = data is List ? data : (data['providers'] ?? []);
+      
+      final provider = providersList.firstWhere((p) => p['_id'] == providerId, orElse: () => null);
       return provider != null ? Map<String, dynamic>.from(provider) : null;
     } catch (e) {
       print('Error fetching provider profile: $e');

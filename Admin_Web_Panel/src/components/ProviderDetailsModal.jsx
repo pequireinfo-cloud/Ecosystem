@@ -138,6 +138,19 @@ const ProviderDetailsModal = ({ provider, onClose, onUpdate }) => {
                   color: provider.status === 'Online' ? '#059669' : '#DC2626',
                   border: provider.status === 'Online' ? '1px solid rgba(16, 185, 129, 0.2)' : '1px solid rgba(220, 38, 38, 0.15)'
                 }}>{provider.status?.toUpperCase() || 'OFFLINE'}</span>
+                
+                {provider.spId && (
+                  <span style={{
+                    padding: '4px 10px',
+                    borderRadius: '99px',
+                    fontSize: '11px',
+                    fontWeight: '800',
+                    letterSpacing: '0.5px',
+                    backgroundColor: '#f1f5f9',
+                    color: '#475569',
+                    border: '1px solid #e2e8f0'
+                  }}>{provider.spId}</span>
+                )}
               </div>
               <div style={{
                 display: 'flex',

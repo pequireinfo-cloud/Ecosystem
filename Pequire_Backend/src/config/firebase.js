@@ -13,7 +13,8 @@ try {
     
     if (!admin.apps.length) {
       admin.initializeApp({
-        credential: admin.credential.cert(resolvedPath)
+        credential: admin.credential.cert(resolvedPath),
+        storageBucket: 'pequire-a5303.appspot.com'
       });
       console.log('✅ Firebase Admin Initialized successfully.');
     } else {

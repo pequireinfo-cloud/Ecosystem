@@ -263,16 +263,13 @@ class _PaymentPageState extends State<PaymentPage> {
     );
 
     try {
-      if (await canLaunchUrl(upiUri)) {
-        await launchUrl(upiUri, mode: LaunchMode.externalApplication);
-        // We wait a few seconds so when they return, we assume payment was done (Phase 1 zero-cost assumption)
-        await Future.delayed(const Duration(seconds: 3));
-      } else {
-        // Fallback if no UPI app is installed
-        throw Exception("No UPI app found on this device");
-      }
+      // Android 11+ often blocks canLaunchUrl for custom schemes even if added to queries.
+      // So we force launch it and catch the exception if it fails.
+      await launchUrl(upiUri, mode: LaunchMode.externalApplication);
+      // We wait a few seconds so when they return, we assume payment was done (Phase 1 zero-cost assumption)
+      await Future.delayed(const Duration(seconds: 3));
     } catch (e) {
-      throw Exception("Could not launch UPI app: $e");
+      throw Exception("No UPI app found or could not launch: $e");
     }
   }
 }
