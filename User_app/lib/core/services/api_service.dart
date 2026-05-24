@@ -14,6 +14,7 @@ class ApiService {
   ApiService._internal();
 
   Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+    path = path.startsWith('/') ? path.substring(1) : path;
     try {
       return await _dio.get(path, queryParameters: queryParameters);
     } on DioException catch (e) {
@@ -23,6 +24,7 @@ class ApiService {
   }
 
   Future<Response> post(String path, {dynamic data}) async {
+    path = path.startsWith('/') ? path.substring(1) : path;
     try {
       return await _dio.post(path, data: data);
     } on DioException catch (e) {
@@ -32,6 +34,7 @@ class ApiService {
   }
 
   Future<Response> put(String path, {dynamic data}) async {
+    path = path.startsWith('/') ? path.substring(1) : path;
     try {
       return await _dio.put(path, data: data);
     } on DioException catch (e) {

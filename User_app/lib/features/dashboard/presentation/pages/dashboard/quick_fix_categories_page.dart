@@ -57,7 +57,7 @@ class _QuickFixCategoriesPageState extends State<QuickFixCategoriesPage> {
     ];
 
     try {
-      final response = await ApiService().get('/categories');
+      final response = await ApiService().get('categories');
       final List data = response.data;
       
       if (data.isEmpty) return defaultCategories;

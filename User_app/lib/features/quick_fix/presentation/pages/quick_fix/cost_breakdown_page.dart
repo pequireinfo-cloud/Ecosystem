@@ -3,6 +3,7 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
 import 'searching_provider_page.dart';
+import 'payment_page.dart';
 
 class CostBreakdownPage extends StatelessWidget {
   final BookingSession session;
@@ -75,18 +76,18 @@ class CostBreakdownPage extends StatelessWidget {
 
             if (_isLaundry) ...[
               _buildCostItem('Service Cost (${session.numberOfClothes} items)',
-                  '\$${(session.numberOfClothes ?? 1) * 12}', false),
-              _buildCostItem('Visiting & Delivery Cost', '\$20', false),
+                  '₹${(session.numberOfClothes ?? 1) * 12}', false),
+              _buildCostItem('Visiting & Delivery Cost', '₹20', false),
               const Divider(height: 32),
               _buildCostItem('Total Estimated',
-                  '\$${((session.numberOfClothes ?? 1) * 12) + 20}', true),
+                  '₹${((session.numberOfClothes ?? 1) * 12) + 20}', true),
             ] else ...[
-              _buildCostItem('Service Cost', '\$45', false),
-              _buildCostItem('Visiting Cost (Compulsory)', '\$15', false),
-              _buildCostItem('Component Cost (Estimated)', '\$20 - \$100', false,
+              _buildCostItem('Service Cost', '₹45', false),
+              _buildCostItem('Visiting Cost (Compulsory)', '₹15', false),
+              _buildCostItem('Component Cost (Estimated)', '₹20 - ₹100', false,
                   subtitle: 'Varying range, SP confirms upon analysis'),
               const Divider(height: 32),
-              _buildCostItem('Total Estimated Min', '\$80', true),
+              _buildCostItem('Total Estimated Min', '₹80', true),
             ],
             const SizedBox(height: 24),
 
@@ -125,10 +126,17 @@ class CostBreakdownPage extends StatelessWidget {
               height: 56,
               child: ElevatedButton(
                 onPressed: () {
+                  // Calculate estimated min price for backend mapping
+                  double minPrice = 80;
+                  if (_isLaundry) {
+                    minPrice = ((session.numberOfClothes ?? 1) * 12.0) + 20.0;
+                  }
+                  session.price = minPrice;
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => SearchingProviderPage(session: session),
+                      builder: (context) => PaymentPage(session: session),
                     ),
                   );
                 },
@@ -143,34 +151,6 @@ class CostBreakdownPage extends StatelessWidget {
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton(
-                onPressed: () {
-                  session.isSimulation = true;
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SearchingProviderPage(session: session),
-                    ),
-                  );
-                },
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: AppColors.primary, width: 2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-                child: const Text(
-                  'Simulate UI Flow (No Backend)',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
                   ),
                 ),
               ),

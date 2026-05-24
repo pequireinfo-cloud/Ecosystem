@@ -53,7 +53,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String phoneNumber,
   }) async {
     await dio.post(
-      '$baseUrl/auth/user/send-whatsapp-otp',
+      '${baseUrl}auth/user/send-whatsapp-otp',
       options: Options(headers: ApiConfig.headers),
       data: {
         'phoneNumber': phoneNumber,
@@ -68,7 +68,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     required String role,
   }) async {
     final response = await dio.post(
-      '$baseUrl/auth/user/verify-whatsapp-otp',
+      '${baseUrl}auth/user/verify-whatsapp-otp',
       options: Options(headers: ApiConfig.headers),
       data: {
         'phoneNumber': phoneNumber,
@@ -95,10 +95,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       debugPrint('AUTH_REMOTE: Verifying Descope token with backend...');
-      debugPrint('AUTH_REMOTE: URL: $baseUrl/auth/user/verify-descope');
+      debugPrint('AUTH_REMOTE: URL: ${baseUrl}auth/user/verify-descope');
       
       final response = await dio.post(
-        '$baseUrl/auth/user/verify-descope',
+        '${baseUrl}auth/user/verify-descope',
         options: Options(headers: ApiConfig.headers),
         data: {
           'sessionToken': token,

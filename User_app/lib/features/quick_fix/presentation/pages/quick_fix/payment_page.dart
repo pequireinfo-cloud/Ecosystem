@@ -7,6 +7,8 @@ import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_sess
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/rating_feedback_page.dart';
 import 'searching_provider_page.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pequire_user_app/features/auth/presentation/bloc/auth_bloc.dart';
 
 class PaymentPage extends StatefulWidget {
   final BookingSession session;
@@ -120,6 +122,14 @@ class _PaymentPageState extends State<PaymentPage> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () async {
+                        final authState = context.read<AuthBloc>().state;
+                        String currentUserId = 'temp_user_789';
+                        if (authState is AuthAuthenticated) {
+                           currentUserId = authState.user.id;
+                        } else {
+                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please log in to book a service')));
+                           return;
+                        }
 
                         // Show loading
                         showDialog(
@@ -150,7 +160,7 @@ class _PaymentPageState extends State<PaymentPage> {
                           } else {
                             String timing = _selectedMethod.contains('UPI') ? 'prepaid' : 'postpaid';
                             final bookingId = await BookingService().createBooking(
-                              userId: widget.session.userId ?? 'temp_user_789',
+                              userId: currentUserId,
                               serviceType: widget.session.category ?? 'General Service',
                               lat: widget.session.pickupLocation?.latitude ?? 28.6139,
                               lng: widget.session.pickupLocation?.longitude ?? 77.2090,

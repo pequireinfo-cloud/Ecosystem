@@ -34,8 +34,9 @@ class ApiService {
   }
 
   Future<Response> post(String path, {dynamic data}) async {
+    path = _normalizePath(path);
     try {
-      return await _dio.post(_normalizePath(path), data: data);
+      return await _dio.post(path, data: data);
     } on DioException catch (e) {
       debugPrint('API POST Error: ${e.message}');
       rethrow;
@@ -43,8 +44,9 @@ class ApiService {
   }
 
   Future<Response> put(String path, {dynamic data}) async {
+    path = _normalizePath(path);
     try {
-      return await _dio.put(_normalizePath(path), data: data);
+      return await _dio.put(path, data: data);
     } on DioException catch (e) {
       debugPrint('API PUT Error: ${e.message}');
       rethrow;

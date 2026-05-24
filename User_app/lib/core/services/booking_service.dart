@@ -13,7 +13,7 @@ class BookingService {
     String paymentTiming = 'postpaid',
   }) async {
     try {
-      final response = await ApiService().post('/bookings', data: {
+      final response = await ApiService().post('bookings', data: {
         'userId': userId,
         'serviceType': serviceType,
         'location': {
@@ -37,7 +37,7 @@ class BookingService {
 
   Future<Map<String, dynamic>?> getBooking(String bookingId) async {
     try {
-      final response = await ApiService().get('/bookings/$bookingId');
+      final response = await ApiService().get('bookings/$bookingId');
       return response.data;
     } catch (e) {
       print('Error fetching booking: $e');
@@ -47,7 +47,7 @@ class BookingService {
 
   Future<void> approveDiagnosis(String bookingId) async {
     try {
-      await ApiService().post('/bookings/$bookingId/approve-diagnosis');
+      await ApiService().post('bookings/$bookingId/approve-diagnosis');
     } catch (e) {
       print('Error approving diagnosis: $e');
     }
@@ -55,7 +55,7 @@ class BookingService {
 
   Future<void> confirmPayment(String bookingId, {String method = 'upi'}) async {
     try {
-      await ApiService().post('/bookings/$bookingId/confirm-payment', data: {
+      await ApiService().post('bookings/$bookingId/confirm-payment', data: {
         'method': method,
       });
     } catch (e) {
@@ -69,7 +69,7 @@ class BookingService {
     required String feedback,
   }) async {
     try {
-      await ApiService().post('/bookings/$bookingId/feedback', data: {
+      await ApiService().post('bookings/$bookingId/feedback', data: {
         'rating': rating,
         'feedback': feedback,
       });

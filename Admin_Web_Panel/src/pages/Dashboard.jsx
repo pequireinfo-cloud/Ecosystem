@@ -20,9 +20,9 @@ const Dashboard = () => {
       ]);
       
       setStats({
-        totalProviders: provs.data.length,
-        totalUsers: usersData.data.stats.total,
-        totalBookings: books.data.length,
+        totalProviders: provs.data.providers ? provs.data.providers.length : (provs.data.length || 0),
+        totalUsers: usersData.data.users ? usersData.data.users.length : (usersData.data.stats?.total || usersData.data.length || 0),
+        totalBookings: books.data.length || 0,
         revenue: books.data.reduce((acc, curr) => acc + (curr.estimatedPrice || 0), 0)
       });
     } catch (err) {

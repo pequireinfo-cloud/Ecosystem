@@ -15,7 +15,7 @@ class BookingSession {
   double? price;
   dynamic pickupLocation;
   String? pickupAddress;
-  bool isSimulation = false;
+
 
   BookingSession({
     required this.category, 

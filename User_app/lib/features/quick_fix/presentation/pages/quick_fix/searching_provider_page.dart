@@ -3,6 +3,8 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
 import 'tracking_page.dart';
+import 'dart:async';
+import 'package:pequire_user_app/core/services/booking_service.dart';
 
 class SearchingProviderPage extends StatefulWidget {
   final BookingSession session;
@@ -14,6 +16,8 @@ class SearchingProviderPage extends StatefulWidget {
 }
 
 class _SearchingProviderPageState extends State<SearchingProviderPage> {
+  StreamSubscription? _bookingSubscription;
+
   @override
   void initState() {
     super.initState();
@@ -21,15 +25,29 @@ class _SearchingProviderPageState extends State<SearchingProviderPage> {
   }
 
   Future<void> _startSearch() async {
-    // Mocking 3 seconds search delay
-    await Future.delayed(const Duration(seconds: 3));
-    
-    if (mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => TrackingPage(session: widget.session)),
-      );
+    final bookingId = widget.session.bookingId;
+    if (bookingId == null) {
+      if (mounted) Navigator.pop(context);
+      return;
     }
+
+    _bookingSubscription = BookingService().watchBooking(bookingId).listen((data) {
+      if (!mounted) return;
+      final status = data['booking']['status'];
+      if (status == 'Assigned' || status == 'Accepted' || status == 'Provider En Route' || status == 'Arrived' || status == 'In Progress') {
+        _bookingSubscription?.cancel();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => TrackingPage(session: widget.session)),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _bookingSubscription?.cancel();
+    super.dispose();
   }
 
   @override

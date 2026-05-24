@@ -51,7 +51,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       final success = await ProviderService().updateProfile(providerId, {
         'fullName': _nameController.text.trim(),
         'email': _emailController.text.trim(),
-        'city': _cityController.text.trim(),
+        'location': { 'address': _cityController.text.trim() },
       });
 
       if (success) {
