@@ -13,14 +13,10 @@ class BookingService {
     this.io = null;
     this.firestore = null;
     try {
-      const admin = require('firebase-admin');
-      if (admin.apps.length === 0) {
-        // Mock init if no key is found, avoid crash
-        admin.initializeApp({
-          projectId: 'pequire-provider-mock'
-        });
+      const { admin } = require('../config/firebase');
+      if (admin && admin.apps.length > 0) {
+        this.firestore = admin.firestore();
       }
-      this.firestore = admin.firestore();
     } catch (e) {
       console.warn('Firebase Admin not initialized - real-time Provider updates will skip Firestore sync.');
     }
