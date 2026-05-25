@@ -266,7 +266,36 @@ class _PaymentPageState extends State<PaymentPage> {
       // Android 11+ blocks canLaunchUrl for custom schemes, so force launch it
       await launchUrl(upiUri, mode: LaunchMode.externalApplication);
       
-      // Show Verification Dialog when user returns to app
+      bool paymentConfirmed = false;
+
+      // Ask user if they completed it
+      if (mounted) {
+        paymentConfirmed = await showDialog<bool>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Text('Payment Verification', style: TextStyle(fontWeight: FontWeight.bold)),
+            content: const Text('Did you successfully complete the payment in your UPI app?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel Payment', style: TextStyle(color: Colors.red)),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                child: const Text('Yes, I Paid', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ) ?? false;
+      }
+
+      if (!paymentConfirmed) {
+        throw Exception("Payment was cancelled or not completed.");
+      }
+
+      // Show Verification Dialog
       if (mounted) {
         showDialog(
           context: context,
@@ -279,7 +308,7 @@ class _PaymentPageState extends State<PaymentPage> {
                 const CircularProgressIndicator(),
                 const SizedBox(height: 20),
                 const Text(
-                  'Verifying payment with ddayal7143@okaxis...',
+                  'Verifying payment with bank...',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
@@ -303,7 +332,7 @@ class _PaymentPageState extends State<PaymentPage> {
         Navigator.pop(context);
       }
     } catch (e) {
-      throw Exception("No UPI app found or could not launch: $e");
+      throw Exception("Payment failed: $e");
     }
   }
 }
