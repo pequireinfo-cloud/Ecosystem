@@ -57,7 +57,8 @@ exports.verifyDescopeToken = async (req, res) => {
           phoneNumber,
           fullName: 'New Partner',
           serviceType: 'Carpentry',
-          status: 'Offline'
+          status: 'Offline',
+          location: { geo: { type: 'Point', coordinates: [0, 0] } }
         });
         isNew = true;
       }
@@ -162,7 +163,8 @@ exports.verifyOtpCode = async (req, res) => {
         account = await Provider.create({
           phoneNumber: phone,
           fullName: 'New Partner',
-          status: 'Offline'
+          status: 'Offline',
+          location: { geo: { type: 'Point', coordinates: [0, 0] } }
         });
         isNew = true;
       }
