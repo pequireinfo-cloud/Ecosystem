@@ -32,15 +32,24 @@ class ProfileTab extends StatefulWidget {
 }
 
 class _ProfileTabState extends State<ProfileTab> {
+  late ProfileBloc _profileBloc;
+
   @override
   void initState() {
     super.initState();
+    _profileBloc = sl<ProfileBloc>()..add(GetProfile());
+  }
+
+  @override
+  void dispose() {
+    _profileBloc.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => sl<ProfileBloc>()..add(GetProfile()),
+    return BlocProvider.value(
+      value: _profileBloc,
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
           UserEntity currentUser = widget.user;

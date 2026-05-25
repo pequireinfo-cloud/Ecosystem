@@ -165,7 +165,7 @@ exports.getProviderReviews = async (req, res) => {
 exports.updateProvider = async (req, res) => {
   try {
     const { id } = req.params;
-    const { fullName, email, serviceType, expertise, city, status, kycStatus, documents, rejectionReason } = req.body;
+    const { fullName, email, serviceType, expertise, city, status, kycStatus, documents, rejectionReason, latitude, longitude } = req.body;
 
     const updateData = {};
     if (fullName !== undefined) updateData.fullName = fullName;
@@ -181,11 +181,18 @@ exports.updateProvider = async (req, res) => {
     } else if (rejectionReason !== undefined) {
       updateData.rejectionReason = rejectionReason;
     }
+
+    if (latitude !== undefined && longitude !== undefined) {
+      updateData['location.latitude'] = latitude;
+      updateData['location.longitude'] = longitude;
+      updateData['location.geo'] = {
+        type: 'Point',
+        coordinates: [longitude, latitude] // GeoJSON expects [longitude, latitude]
+      };
+    }
     
     if (city !== undefined) {
-      updateData.location = {
-        address: city
-      };
+      updateData['location.address'] = city;
     }
 
     console.log(`Updating provider ${id} with:`, updateData);

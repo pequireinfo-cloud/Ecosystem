@@ -15,7 +15,7 @@ if (localPropertiesFile.exists()) {
 val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
 android {
-    namespace = "com.pequire.provider.pequire_provider_app"
+    namespace = "com.pequire.provider"
     compileSdk = 35
     buildToolsVersion = "35.0.0"
     ndkVersion = "26.1.10909125"
@@ -31,7 +31,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.pequire.provider.pequire_provider_app"
+        applicationId = "com.pequire.provider"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 24

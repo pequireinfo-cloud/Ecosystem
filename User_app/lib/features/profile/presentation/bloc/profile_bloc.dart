@@ -15,11 +15,15 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   Future<void> _onGetProfile(GetProfile event, Emitter<ProfileState> emit) async {
     emit(ProfileLoading());
-    final result = await repository.getProfile();
-    result.fold(
-      (failure) => emit(ProfileError(failure.message)),
-      (user) => emit(ProfileLoaded(user)),
-    );
+    try {
+      final result = await repository.getProfile();
+      result.fold(
+        (failure) => emit(ProfileError(failure.message)),
+        (user) => emit(ProfileLoaded(user)),
+      );
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+    }
   }
 
   Future<void> _onUpdateProfile(UpdateProfile event, Emitter<ProfileState> emit) async {

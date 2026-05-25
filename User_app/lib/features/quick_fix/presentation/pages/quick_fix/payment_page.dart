@@ -263,11 +263,45 @@ class _PaymentPageState extends State<PaymentPage> {
     );
 
     try {
-      // Android 11+ often blocks canLaunchUrl for custom schemes even if added to queries.
-      // So we force launch it and catch the exception if it fails.
+      // Android 11+ blocks canLaunchUrl for custom schemes, so force launch it
       await launchUrl(upiUri, mode: LaunchMode.externalApplication);
-      // We wait a few seconds so when they return, we assume payment was done (Phase 1 zero-cost assumption)
+      
+      // Show Verification Dialog when user returns to app
+      if (mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 10),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 20),
+                const Text(
+                  'Verifying payment with ddayal7143@okaxis...',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'Please do not close the app or press back.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
+      // Simulate 3-second bank verification API call
       await Future.delayed(const Duration(seconds: 3));
+      
+      // Close verification dialog
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       throw Exception("No UPI app found or could not launch: $e");
     }

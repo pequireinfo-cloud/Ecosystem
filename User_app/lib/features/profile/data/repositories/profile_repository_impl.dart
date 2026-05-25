@@ -16,7 +16,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
       final profile = await remoteDataSource.getProfile();
       return Right(profile);
     } on DioException catch (e) {
-      return Left(ServerFailure(e.response?.data['message'] ?? 'Failed to fetch profile'));
+      String message = 'Failed to fetch profile';
+      if (e.response?.data is Map<String, dynamic> && e.response?.data['message'] != null) {
+        message = e.response?.data['message'];
+      } else if (e.response?.data is String) {
+        message = e.response?.data;
+      }
+      return Left(ServerFailure(message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

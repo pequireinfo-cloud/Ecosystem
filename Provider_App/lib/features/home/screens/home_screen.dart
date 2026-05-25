@@ -19,6 +19,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
 import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/services/location_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -58,6 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     TrackingService().startTracking('initial'); // Or remove if not needed for init
+    LocationService().startLocationTracking(); // Continuously update Firestore
     _startBookingListener();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkKycStatus();
@@ -658,8 +660,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               
               final providerId = ApiConfig.currentProviderId;
               if (providerId != null) {
+                final location = ref.read(locationProvider).value;
                 await ProviderService().updateProfile(providerId, {
-                  'status': newStatus ? 'Online' : 'Offline'
+                  'status': newStatus ? 'Online' : 'Offline',
+                  if (newStatus && location != null) 'latitude': location.latitude,
+                  if (newStatus && location != null) 'longitude': location.longitude,
                 });
               }
             },
