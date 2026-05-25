@@ -5,10 +5,10 @@ const admin = require('firebase-admin');
 // Place it in the backend folder or use environment variables.
 
 try {
-  const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+  const path = require('path');
+  const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.FIREBASE_SERVICE_ACCOUNT_PATH || path.resolve(__dirname, '../../serviceAccountKey.json');
   
   if (serviceAccountPath) {
-    const path = require('path');
     const resolvedPath = path.resolve(serviceAccountPath);
     
     if (!admin.apps.length) {
