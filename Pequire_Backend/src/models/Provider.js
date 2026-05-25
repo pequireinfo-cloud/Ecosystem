@@ -74,8 +74,7 @@ const providerSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Middleware to keep geo coordinates updated if lat/lng changes
-providerSchema.pre('save', async function(next) {
+providerSchema.pre('save', async function() {
   if (this.isNew || !this.spId) {
     const randomHex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
     this.spId = `SP-${randomHex}`;
@@ -84,7 +83,6 @@ providerSchema.pre('save', async function(next) {
   if (this.location && this.location.latitude !== undefined && this.location.longitude !== undefined) {
     this.location.geo.coordinates = [this.location.longitude, this.location.latitude];
   }
-  next();
 });
 
 module.exports = mongoose.model('Provider', providerSchema);
