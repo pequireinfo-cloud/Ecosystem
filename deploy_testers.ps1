@@ -26,6 +26,12 @@ try {
 # Skip prompt for automated run
 $releaseNotes = "Fixed Provider Search, UPI flow, and Firebase bugs"
 
+$notifyTesters = Read-Host "Do you want to notify testers immediately via email? (y/N)"
+$sendEmail = ($notifyTesters -match "^[yY]")
+if (-not $sendEmail) {
+    Write-Host "`n[INFO] Skipping tester notification. You can distribute manually from the Firebase Console later." -ForegroundColor Yellow
+}
+
 # -------------------------------------------------------------------------
 # 1. USER APP DEPLOYMENT
 # -------------------------------------------------------------------------
@@ -36,7 +42,11 @@ if ($LASTEXITCODE -ne 0) { Write-Host "User App build failed!" -ForegroundColor 
 
 $userApkPath = "build\app\outputs\flutter-apk\app-arm64-v8a-release.apk"
 Write-Host "---> Uploading User App to Firebase..." -ForegroundColor Yellow
-& $firebase appdistribution:distribute $userApkPath --app $userAppId --release-notes "$releaseNotes" --groups "user-app-testing"
+if ($sendEmail) {
+    & $firebase appdistribution:distribute $userApkPath --app $userAppId --release-notes "$releaseNotes" --groups "user-app-testing"
+} else {
+    & $firebase appdistribution:distribute $userApkPath --app $userAppId --release-notes "$releaseNotes"
+}
 cd ..
 
 
@@ -50,7 +60,11 @@ if ($LASTEXITCODE -ne 0) { Write-Host "Provider App build failed!" -ForegroundCo
 
 $providerApkPath = "build\app\outputs\flutter-apk\app-arm64-v8a-release.apk"
 Write-Host "---> Uploading Provider App to Firebase..." -ForegroundColor Yellow
-& $firebase appdistribution:distribute $providerApkPath --app $providerAppId --release-notes "$releaseNotes" --groups "sps-app-testing"
+if ($sendEmail) {
+    & $firebase appdistribution:distribute $providerApkPath --app $providerAppId --release-notes "$releaseNotes" --groups "sps-app-testing"
+} else {
+    & $firebase appdistribution:distribute $providerApkPath --app $providerAppId --release-notes "$releaseNotes"
+}
 cd ..
 
 Write-Host "`n=============================================" -ForegroundColor Green

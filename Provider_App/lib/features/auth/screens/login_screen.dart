@@ -94,6 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await ApiService().post('auth/user/verify-descope', data: {
         'sessionToken': session.sessionToken.jwt,
         'role': 'provider',
+        'phoneNumber': fullPhone,
       });
 
       if (response.data['success'] == true) {

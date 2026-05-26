@@ -19,7 +19,7 @@ try {
 // @access  Public
 exports.verifyDescopeToken = async (req, res) => {
   try {
-    const { sessionToken, role = 'user' } = req.body;
+    const { sessionToken, role = 'user', phoneNumber: providedPhone } = req.body;
 
     if (!sessionToken) {
       return res.status(400).json({
@@ -44,7 +44,7 @@ exports.verifyDescopeToken = async (req, res) => {
     const loginId = authDetails.token.sub;
     const loginIds = authDetails.token.loginIds || [];
     const phoneFromLoginIds = loginIds.find(id => id.startsWith('+')) || loginIds[0];
-    const phoneNumber = authDetails.token.phone || phoneFromLoginIds || loginId;
+    const phoneNumber = providedPhone || authDetails.token.phone || phoneFromLoginIds || loginId;
 
     let account;
     let isNew = false;
