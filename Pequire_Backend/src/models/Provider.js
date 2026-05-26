@@ -77,7 +77,7 @@ const providerSchema = new mongoose.Schema({
 providerSchema.pre('save', async function() {
   if (this.isNew || !this.spId) {
     const randomHex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
-    this.spId = `SP-${randomHex}`;
+    this.spId = `PEQ-SP-${randomHex}`;
   }
 
   if (this.location && this.location.latitude !== undefined && this.location.longitude !== undefined) {

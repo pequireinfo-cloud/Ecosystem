@@ -219,11 +219,11 @@ const ProviderManagement = () => {
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#F1F5F9', border: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', fontSize: '12px', color: 'var(--primary)' }}>
-                        {p.fullName?.charAt(0)}
+                        {(page - 1) * limit + i + 1}
                       </div>
                       <div>
                         <span style={{ fontWeight: '600', display: 'block' }}>{p.fullName}</span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{p.phoneNumber}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>ID: {p.spId || p._id?.substring(0, 8)} • {p.phoneNumber}</span>
                       </div>
                     </div>
                   </td>

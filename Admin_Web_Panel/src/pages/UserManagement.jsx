@@ -261,7 +261,7 @@ const UserManagement = () => {
                 <tr>
                   <td colSpan="6" style={{ textAlign: 'center', padding: '40px', color: '#94A3B8' }}>No users found matching your search.</td>
                 </tr>
-              ) : users.map((user) => {
+              ) : users.map((user, index) => {
                 const kyc = getKYCColor(user.kycStatus);
                 return (
                   <tr key={user._id} style={{ borderBottom: '1px solid #F1F5F9', transition: 'background 0.2s' }}>
@@ -278,11 +278,11 @@ const UserManagement = () => {
                           fontWeight: 'bold',
                           color: '#475569'
                         }}>
-                          {user.name?.charAt(0)}
+                          {(page - 1) * limit + index + 1}
                         </div>
                         <div>
                           <div style={{ fontWeight: '600', color: 'var(--text-main)' }}>{user.name}</div>
-                          <div style={{ fontSize: '12px', color: '#94A3B8' }}>ID: {user._id?.substring(0, 8)}</div>
+                          <div style={{ fontSize: '12px', color: '#94A3B8' }}>ID: {user.userId || user._id?.substring(0, 8)}</div>
                         </div>
                       </div>
                     </td>

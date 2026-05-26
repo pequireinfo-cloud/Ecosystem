@@ -4,6 +4,7 @@ import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_state.dart';
 import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile_setup_page.dart';
 import 'package:pequire_user_app/core/widgets/pequire_logo.dart';
 
 class LoginPage extends StatefulWidget {
@@ -31,10 +32,17 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => HomePage(user: state.user)),
-            (route) => false,
-          );
+          if (state.user.name == 'New User' || state.user.name.isEmpty) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => ProfileSetupPage(user: state.user)),
+              (route) => false,
+            );
+          } else {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => HomePage(user: state.user)),
+              (route) => false,
+            );
+          }
         } else if (state is OtpSent) {
           setState(() {
             _isOtpSent = true;

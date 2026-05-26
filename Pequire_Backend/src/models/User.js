@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    unique: true
+  },
   name: { 
     type: String, 
     required: [true, 'Name is required'],
@@ -85,6 +89,13 @@ const userSchema = new mongoose.Schema({
   lastLogin: Date
 }, {
   timestamps: true // Automatically manages createdAt and updatedAt
+});
+
+userSchema.pre('save', async function() {
+  if (this.isNew || !this.userId) {
+    const randomHex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
+    this.userId = `PEQ-U-${randomHex}`;
+  }
 });
 
 // Index for geo-spatial queries if we want to find users near a location
