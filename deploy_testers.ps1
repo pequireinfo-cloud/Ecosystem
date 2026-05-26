@@ -29,12 +29,12 @@ $releaseNotes = "Fixed Provider Search, UPI flow, and Firebase bugs"
 # -------------------------------------------------------------------------
 # 1. USER APP DEPLOYMENT
 # -------------------------------------------------------------------------
-Write-Host "`n---> Building User App (Size Reduced)..." -ForegroundColor Yellow
+Write-Host "`n---> Building User App (Size Reduced - 64-bit)..." -ForegroundColor Yellow
 cd .\User_app
 & $flutter build apk --release --split-per-abi
 if ($LASTEXITCODE -ne 0) { Write-Host "User App build failed!" -ForegroundColor Red; exit 1 }
 
-$userApkPath = "build\app\outputs\flutter-apk\app-armeabi-v7a-release.apk"
+$userApkPath = "build\app\outputs\flutter-apk\app-arm64-v8a-release.apk"
 Write-Host "---> Uploading User App to Firebase..." -ForegroundColor Yellow
 & $firebase appdistribution:distribute $userApkPath --app $userAppId --release-notes "$releaseNotes" --groups "user-app-testing"
 cd ..
@@ -43,12 +43,12 @@ cd ..
 # -------------------------------------------------------------------------
 # 2. PROVIDER APP DEPLOYMENT
 # -------------------------------------------------------------------------
-Write-Host "`n---> Building Provider App (Size Reduced)..." -ForegroundColor Yellow
+Write-Host "`n---> Building Provider App (Size Reduced - 64-bit)..." -ForegroundColor Yellow
 cd .\Provider_App
 & $flutter build apk --release --split-per-abi
 if ($LASTEXITCODE -ne 0) { Write-Host "Provider App build failed!" -ForegroundColor Red; exit 1 }
 
-$providerApkPath = "build\app\outputs\flutter-apk\app-armeabi-v7a-release.apk"
+$providerApkPath = "build\app\outputs\flutter-apk\app-arm64-v8a-release.apk"
 Write-Host "---> Uploading Provider App to Firebase..." -ForegroundColor Yellow
 & $firebase appdistribution:distribute $providerApkPath --app $providerAppId --release-notes "$releaseNotes" --groups "sps-app-testing"
 cd ..

@@ -1,4 +1,4 @@
-package com.pequire.provider.pequire_provider_app
+package com.pequire.provider
 
 import io.flutter.embedding.android.FlutterActivity
 
