@@ -22,6 +22,7 @@ import 'package:pequire_user_app/features/profile/presentation/bloc/profile_even
 import 'package:pequire_user_app/features/profile/presentation/bloc/profile_state.dart';
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:pequire_user_app/core/widgets/pequire_shimmer.dart';
+import 'package:pequire_user_app/features/profile/presentation/pages/profile/payment_methods_page.dart';
 
 class ProfileTab extends StatefulWidget {
   final UserEntity user;
@@ -131,7 +132,7 @@ class _ProfileTabState extends State<ProfileTab> {
                           Icons.account_balance_wallet_outlined,
                           'Payment',
                           onTap: () {
-                            // Placeholder for Payment
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => const PaymentMethodsPage()));
                           },
                         ),
                         _buildMenuItem(

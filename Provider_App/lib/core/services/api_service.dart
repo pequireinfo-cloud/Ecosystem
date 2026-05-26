@@ -5,8 +5,8 @@ import '../config/api_config.dart';
 class ApiService {
   final Dio _dio = Dio(BaseOptions(
     baseUrl: ApiConfig.baseUrl.endsWith('/') ? ApiConfig.baseUrl : '${ApiConfig.baseUrl}/',
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
+    connectTimeout: const Duration(seconds: 60),
+    receiveTimeout: const Duration(seconds: 60),
     headers: ApiConfig.headers,
   ));
 

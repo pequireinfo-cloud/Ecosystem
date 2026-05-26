@@ -57,10 +57,13 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             // 1. Grid Background
             Positioned.fill(
-              child: Image.asset(
-                'assets/login_bg.webp',
-                fit: BoxFit.cover,
-                opacity: const AlwaysStoppedAnimation(0.6),
+              child: ColorFiltered(
+                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
+                child: Image.asset(
+                  'assets/login_bg.webp',
+                  fit: BoxFit.cover,
+                  gaplessPlayback: true,
+                ),
               ),
             ),
 
