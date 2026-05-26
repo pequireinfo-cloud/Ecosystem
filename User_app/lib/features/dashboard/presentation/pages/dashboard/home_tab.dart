@@ -19,6 +19,7 @@ import 'location_picker_page.dart';
 import 'map_location_picker_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
 import 'package:pequire_user_app/core/services/location_service.dart';
+import 'package:pequire_user_app/core/services/api_service.dart';
 import 'package:pequire_user_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -39,11 +40,39 @@ class _HomeTabState extends State<HomeTab> {
   bool _isFabOpen = false;
   String _currentLocation = 'Detecting location...';
   LatLng? _currentPosition;
+  List<Map<String, String>> _liveProviders = [];
+  bool _isLoadingProviders = true;
 
   @override
   void initState() {
     super.initState();
     _initLocation();
+    _fetchLiveProviders();
+  }
+
+  Future<void> _fetchLiveProviders() async {
+    try {
+      final response = await ApiService().get('providers?filter=Online');
+      if (response.data != null && response.data['providers'] != null) {
+        final List providers = response.data['providers'];
+        if (mounted) {
+          setState(() {
+            _liveProviders = providers.map((p) => {
+              'name': p['fullName']?.toString() ?? 'Professional',
+              'rate': '\$${p['hourlyRate'] ?? 50}',
+              'rating': (p['rating'] ?? 5.0).toString(),
+              'category': p['serviceType']?.toString() ?? 'General',
+            }).toList();
+            _isLoadingProviders = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoadingProviders = false);
+      }
+    } catch (e) {
+      debugPrint('Error fetching providers: $e');
+      if (mounted) setState(() => _isLoadingProviders = false);
+    }
   }
 
   Future<void> _initLocation() async {
@@ -652,16 +681,17 @@ class _HomeTabState extends State<HomeTab> {
   }
 
   Widget _buildFeaturedSection(BuildContext context) {
-    final providers = [
-      {'name': 'Dell Watson', 'rate': '\$50', 'rating': '4.9', 'category': 'Plumber'},
-      {'name': 'Sarah Miller', 'rate': '\$45', 'rating': '4.8', 'category': 'Electrician'},
-      {'name': 'John Smith', 'rate': '\$55', 'rating': '4.7', 'category': 'Laundry'},
-    ];
+    if (_isLoadingProviders) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 40),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
 
-    final filteredProviders = providers.where((p) {
+    final filteredProviders = _liveProviders.where((p) {
       final name = (p['name'] as String).toLowerCase();
       final category = (p['category'] as String).toLowerCase();
-      return name.contains(_searchQuery) || category.contains(_searchQuery);
+      return name.contains(_searchQuery.toLowerCase()) || category.contains(_searchQuery.toLowerCase());
     }).toList();
 
     return Column(
@@ -695,9 +725,9 @@ class _HomeTabState extends State<HomeTab> {
         ),
         const SizedBox(height: 16),
         if (filteredProviders.isEmpty)
-           const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Text('No results found for your search.', style: TextStyle(color: Colors.grey)),
+           Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+            child: Text(_searchQuery.isNotEmpty ? 'No results found for your search.' : 'No professionals online right now.', style: const TextStyle(color: Colors.grey)),
           )
         else
           SizedBox(
