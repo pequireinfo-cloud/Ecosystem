@@ -9,6 +9,7 @@ import 'package:pequire_provider_app/shared/widgets/pequire_logo.dart';
 import 'dart:async';
 
 import 'package:pequire_provider_app/core/services/provider_service.dart';
+import 'package:pequire_provider_app/core/services/notification_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -104,6 +105,9 @@ class _LoginScreenState extends State<LoginScreen> {
         
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('current_provider_id', providerId);
+        
+        // Sync FCM token
+        NotificationService().syncTokenWithBackend();
         
         // Fetch the provider profile to see what steps have been completed
         final profile = await ProviderService().getProfile(providerId);

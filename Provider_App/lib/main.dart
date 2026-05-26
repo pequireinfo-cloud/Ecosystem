@@ -32,10 +32,20 @@ import 'package:pequire_provider_app/core/providers/theme_provider.dart';
 import 'package:descope/descope.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pequire_provider_app/core/config/api_config.dart';
+import 'package:intl/intl.dart';
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  
+  // Initialize Notification Service
+  final notificationService = NotificationService();
+  await notificationService.initialize();
+
   // Initialize Descope
   Descope.projectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';
 

@@ -8,6 +8,8 @@ import 'features/auth/domain/usecases/register_usecase.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'core/services/tracking_service.dart';
 import 'core/services/location_service.dart';
+import 'core/services/socket_service.dart';
+import 'core/services/notification_service.dart';
 import 'core/locale/locale_cubit.dart';
 import 'core/theme/theme_cubit.dart';
 
@@ -72,5 +74,7 @@ Future<void> init() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => Dio());
   sl.registerLazySingleton(() => TrackingService());
-  sl.registerLazySingleton(() => LocationService());
+  sl.registerLazySingleton<LocationService>(() => LocationService());
+  sl.registerLazySingleton<SocketService>(() => SocketService());
+  sl.registerLazySingleton<NotificationService>(() => NotificationService());
 }

@@ -4,6 +4,7 @@ const Provider = require('../models/Provider');
 const User = require('../models/User');
 const matchingService = require('./MatchingService');
 const RewardService = require('./rewardService');
+const { sendPushNotification } = require('../utils/NotificationUtils');
 
 /**
  * Service to handle booking operations using MongoDB and real-time bridges.
@@ -100,6 +101,15 @@ class BookingService {
           distance: provider.currentDistanceKm
         });
       }
+
+      // Send Push Notification to Provider
+      sendPushNotification({
+        providerId: provider._id,
+        title: 'New Service Request!',
+        body: `A new ${booking.serviceType} request is available nearby. Tap to view.`,
+        type: 'booking_created',
+        data: { bookingId: booking._id.toString() }
+      });
     });
 
     // Real-time: Sync to Firestore for the Provider App view
@@ -178,6 +188,16 @@ class BookingService {
     await booking.save();
     this._broadcastStatusUpdate(booking);
     this._syncToFirestore(booking);
+    
+    // Notify User
+    sendPushNotification({
+      userId: booking.userId,
+      title: 'Booking Accepted!',
+      body: 'A provider has accepted your service request and is on the way.',
+      type: 'booking_accepted',
+      data: { bookingId: booking._id.toString() }
+    });
+    
     return booking;
   }
 
@@ -195,6 +215,16 @@ class BookingService {
     await booking.save();
     this._broadcastStatusUpdate(booking);
     this._syncToFirestore(booking);
+    
+    // Notify User
+    sendPushNotification({
+      userId: booking.userId,
+      title: 'Provider Arrived',
+      body: 'Your provider has arrived at the location.',
+      type: 'booking_arrived',
+      data: { bookingId: booking._id.toString() }
+    });
+
     return booking;
   }
 
@@ -251,6 +281,16 @@ class BookingService {
     await booking.save();
     this._broadcastStatusUpdate(booking);
     this._syncToFirestore(booking);
+    
+    // Notify User
+    sendPushNotification({
+      userId: booking.userId,
+      title: 'Service Completed',
+      body: 'Your service has been marked as completed. Please leave a review!',
+      type: 'booking_completed',
+      data: { bookingId: booking._id.toString() }
+    });
+    
     return booking;
   }
 

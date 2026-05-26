@@ -6,6 +6,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../../../core/config/api_config.dart';
 import '../../domain/entities/user_entity.dart';
 import 'auth_state.dart';
+import '../../../../core/services/notification_service.dart';
 export 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
@@ -57,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       if (isAuthenticated && authenticatedUser != null) {
         debugPrint('AUTH_BLOC: User authenticated from local cache');
         emit(AuthAuthenticated(authenticatedUser!));
+        di.sl<NotificationService>().syncTokenWithBackend();
         return;
       }
 
@@ -114,7 +116,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     failureOrUser.fold(
       (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthAuthenticated(user)),
+      (user) {
+        emit(AuthAuthenticated(user));
+        di.sl<NotificationService>().syncTokenWithBackend();
+      },
     );
   }
 
@@ -130,7 +135,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     failureOrUser.fold(
       (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthAuthenticated(user)),
+      (user) {
+        emit(AuthAuthenticated(user));
+        di.sl<NotificationService>().syncTokenWithBackend();
+      },
     );
   }
 
@@ -147,7 +155,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     failureOrUser.fold(
       (failure) => emit(AuthError(failure.message)),
-      (user) => emit(AuthAuthenticated(user)),
+      (user) {
+        emit(AuthAuthenticated(user));
+        di.sl<NotificationService>().syncTokenWithBackend();
+      },
     );
   }
 }

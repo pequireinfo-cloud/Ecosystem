@@ -111,6 +111,7 @@ const userAuthRoutes = require('./src/routes/userAuthRoutes');
 const userRoutes = require('./src/routes/userRoutes');
 const adminUserRoutes = require('./src/routes/adminUserRoutes');
 const adminStatsRoutes = require('./src/routes/adminStatsRoutes');
+const notificationRoutes = require('./src/routes/notificationRoutes');
 const connectDB = require('./src/config/db');
 
 // Connect to MongoDB
@@ -133,6 +134,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/support', require('./src/routes/supportRoutes'));
 app.use('/api/admin/users', adminUserRoutes);
 app.use('/api/admin/stats', adminStatsRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/upload', require('./src/routes/uploadRoutes'));
 
 app.get('/', (req, res) => {

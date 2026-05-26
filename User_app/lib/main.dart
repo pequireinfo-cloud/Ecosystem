@@ -14,7 +14,7 @@ import 'injection_container.dart' as di;
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/domain/entities/user_entity.dart';
 import 'features/auth/domain/entities/login_role.dart';
-
+import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,6 +23,9 @@ void main() async {
   );
   await di.init();
   
+  // Initialize Notification Service
+  await di.sl<NotificationService>().initialize();
+
   // Global Descope Initialization
   Descope.projectId = 'P3CyZF9IZxcIXXxhQ3fZLgWJmuy5';
 
