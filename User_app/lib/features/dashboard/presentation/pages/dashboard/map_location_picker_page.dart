@@ -33,6 +33,7 @@ class _MapLocationPickerPageState extends State<MapLocationPickerPage> {
           _pickedLocation = LatLng(pos.latitude, pos.longitude);
           _loading = false;
         });
+        _mapController?.animateCamera(CameraUpdate.newLatLng(_pickedLocation));
         _updateAddress(_pickedLocation);
       }
     } catch (e) {

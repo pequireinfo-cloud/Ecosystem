@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/widgets/quick_fix_base_layout.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pequire_user_app/core/services/storage_service.dart';
 import 'cost_breakdown_page.dart';
 
 class LaundrySetupPage extends StatefulWidget {
@@ -17,6 +19,8 @@ class _LaundrySetupPageState extends State<LaundrySetupPage> {
   int _itemCount = 1;
   late List<LaundryItem> _items;
   final List<String> _fabricTypes = ['Normal', 'Woolen', 'Cotton', 'Silk', 'Denim', 'Other'];
+  final ImagePicker _picker = ImagePicker();
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -117,12 +121,21 @@ class _LaundrySetupPageState extends State<LaundrySetupPage> {
                       const SizedBox(height: 16),
                       // Image Upload Button (Mocked for Web)
                       GestureDetector(
-                        onTap: () {
-                          // Mocking Image Upload
-                          setState(() {
-                            item.rawImageData = 'mock_image_path_${index}.jpg';
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Image Selected')));
+                        onTap: () async {
+                          final XFile? image = await _picker.pickImage(source: ImageSource.camera, imageQuality: 70);
+                          if (image != null) {
+                            setState(() => _isUploading = true);
+                            try {
+                              final url = await StorageService().uploadImage(image, 'laundry_images');
+                              setState(() {
+                                item.rawImageData = url; // Actually store the URL
+                              });
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload Failed: $e')));
+                            } finally {
+                              setState(() => _isUploading = false);
+                            }
+                          }
                         },
                         child: Container(
                           width: double.infinity,
@@ -136,9 +149,13 @@ class _LaundrySetupPageState extends State<LaundrySetupPage> {
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.add_a_photo_outlined, color: Colors.grey, size: 32),
-                                  const SizedBox(height: 8),
-                                  Text('Tap to upload image', style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                                  if (_isUploading)
+                                    const CircularProgressIndicator()
+                                  else ...[
+                                    const Icon(Icons.add_a_photo_outlined, color: Colors.grey, size: 32),
+                                    const SizedBox(height: 8),
+                                    Text('Tap to upload image', style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                                  ]
                                 ],
                               )
                             : Stack(

@@ -20,6 +20,9 @@ import 'map_location_picker_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/capture_issue_page.dart';
 import 'package:pequire_user_app/core/services/location_service.dart';
 import 'package:pequire_user_app/core/services/api_service.dart';
+import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_session.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/select_problem_page.dart';
+import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/laundry_setup_page.dart';
 import 'package:pequire_user_app/features/auth/domain/repositories/auth_repository.dart';
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -144,7 +147,7 @@ class _HomeTabState extends State<HomeTab> {
                   const SizedBox(height: 16),
                   _buildRecommendedSection(),
                   const SizedBox(height: 32),
-                  _buildCategories(),
+                  _buildCategories(context),
                   const SizedBox(height: 24),
                 ],
               ),
@@ -561,9 +564,9 @@ class _HomeTabState extends State<HomeTab> {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(
-                          'Recommended',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        child: Text(
+                          AppLocalizations.of(context)?.recommended ?? 'Recommended',
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -587,12 +590,13 @@ class _HomeTabState extends State<HomeTab> {
     );
   }
 
-  Widget _buildCategories() {
+  Widget _buildCategories(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final categories = [
-      {'icon': Icons.plumbing_rounded, 'label': 'Plumber', 'color': AppColors.primary},
-      {'icon': Icons.electrical_services_rounded, 'label': 'Electrician', 'color': AppColors.secondary},
-      {'icon': Icons.local_laundry_service_rounded, 'label': 'Laundry', 'color': AppColors.primary},
-      {'icon': Icons.carpenter_rounded, 'label': 'Carpenter', 'color': AppColors.secondary},
+      {'icon': Icons.plumbing_rounded, 'label': l10n?.plumber ?? 'Plumber', 'color': AppColors.primary},
+      {'icon': Icons.electrical_services_rounded, 'label': l10n?.electrician ?? 'Electrician', 'color': AppColors.secondary},
+      {'icon': Icons.local_laundry_service_rounded, 'label': l10n?.laundry ?? 'Laundry', 'color': AppColors.primary},
+      {'icon': Icons.carpenter_rounded, 'label': l10n?.carpenter ?? 'Carpenter', 'color': AppColors.secondary},
     ];
 
     return Column(
@@ -615,8 +619,8 @@ class _HomeTabState extends State<HomeTab> {
                   );
                 },
                 child: Text(
-                  'See All',
-                  style: TextStyle(fontSize: 13, color: AppColors.secondary, fontWeight: FontWeight.bold),
+                  AppLocalizations.of(context)?.seeAll ?? 'See All',
+                  style: const TextStyle(fontSize: 13, color: AppColors.secondary, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -640,7 +644,14 @@ class _HomeTabState extends State<HomeTab> {
 
   Widget _buildPremiumCategoryItem(Map<String, dynamic> category) {
     return _PressableContainer(
-      onTap: () {},
+      onTap: () {
+        final session = BookingSession(category: category['label'] as String);
+        if (session.category == 'Laundry') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => LaundrySetupPage(session: session)));
+        } else {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SelectProblemPage(session: session)));
+        }
+      },
       child: Container(
         width: 80,
         margin: const EdgeInsets.only(right: 16),
@@ -710,8 +721,8 @@ class _HomeTabState extends State<HomeTab> {
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Top rated in your community',
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                    AppLocalizations.of(context)?.topRated ?? 'Top rated in your community',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ],
               ),

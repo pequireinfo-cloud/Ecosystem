@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pequire_user_app/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import '../bloc/auth_bloc.dart';
@@ -66,142 +67,152 @@ class _LoginPageState extends State<LoginPage> {
             // 1. Grid Background
             Positioned.fill(
               child: ColorFiltered(
-                colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
-                child: Image.asset(
-                  'assets/login_bg.webp',
-                  fit: BoxFit.cover,
-                  gaplessPlayback: true,
+      child: Theme(
+        data: AppTheme.lightTheme,
+        child: Scaffold(
+          backgroundColor: const Color(0xFF0D1117), // Dark base color
+          body: Stack(
+            children: [
+              // 1. Grid Background
+              Positioned.fill(
+                child: ColorFiltered(
+                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
+                  child: Image.asset(
+                    'assets/login_bg.webp',
+                    fit: BoxFit.cover,
+                    gaplessPlayback: true,
+                  ),
                 ),
               ),
-            ),
 
-            // 2. Main Content
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const PequireLogo(height: 32, isLight: false),
-                        if (_isOtpSent)
-                          IconButton(
-                            onPressed: () => setState(() => _isOtpSent = false),
-                            icon: const Icon(Icons.arrow_back, color: Colors.white),
-                          ),
-                      ],
-                    ),
-
-                    const Spacer(flex: 2),
-
-                    // Heading
-                    Text(
-                      _isOtpSent ? 'Verify your\nnumber' : 'Enter your mobile\nnumber',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 40,
-                        fontWeight: FontWeight.w600,
-                        height: 1.1,
+              // 2. Main Content
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const PequireLogo(height: 32, isLight: false),
+                          if (_isOtpSent)
+                            IconButton(
+                              onPressed: () => setState(() => _isOtpSent = false),
+                              icon: const Icon(Icons.arrow_back, color: Colors.white),
+                            ),
+                        ],
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      _isOtpSent ? 'Code is sent to +91' : 'Join the Pequire ecosystem',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 16,
-                      ),
-                    ),
 
-                    const SizedBox(height: 48),
+                      const Spacer(flex: 2),
 
-                    // Label
-                    Text(
-                      _isOtpSent ? 'Enter 6-digit OTP' : 'Phone Number',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.6),
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Input Box
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                      child: _isOtpSent ? _buildOtpInput() : _buildPhoneInput(),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Action Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 60,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : (_isOtpSent ? _verifyOtp : _sendOtp),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          elevation: 0,
+                      // Heading
+                      Text(
+                        _isOtpSent ? 'Verify your\nnumber' : 'Enter your mobile\nnumber',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 40,
+                          fontWeight: FontWeight.w600,
+                          height: 1.1,
                         ),
-                        child: _isLoading 
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                              _isOtpSent ? 'Verify & Login' : 'Get OTP',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        _isOtpSent ? 'Code is sent to +91' : 'Join the Pequire ecosystem',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 16,
+                        ),
+                      ),
+
+                      const SizedBox(height: 48),
+
+                      // Label
+                      Text(
+                        _isOtpSent ? 'Enter 6-digit OTP' : 'Phone Number',
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.6),
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Input Box
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        child: _isOtpSent ? _buildOtpInput() : _buildPhoneInput(),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // Action Button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 60,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : (_isOtpSent ? _verifyOtp : _sendOtp),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: _isLoading 
+                            ? const CircularProgressIndicator(color: Colors.white)
+                            : Text(
+                                _isOtpSent ? 'Verify & Login' : 'Get OTP',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                        ),
+                      ),
+
+                      if (_isOtpSent) ...[
+                        const SizedBox(height: 24),
+                        Center(
+                          child: TextButton(
+                            onPressed: _sendOtp,
+                            child: const Text(
+                              'Resend Code',
+                              style: TextStyle(
+                                color: Color(0xFF3B82F6),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                      ),
-                    ),
+                          ),
+                        ),
+                      ],
 
-                    if (_isOtpSent) ...[
-                      const SizedBox(height: 24),
+                      const Spacer(flex: 3),
+
+                      // Footer
                       Center(
-                        child: TextButton(
-                          onPressed: _sendOtp,
-                          child: const Text(
-                            'Resend Code',
-                            style: TextStyle(
-                              color: Color(0xFF3B82F6),
-                              fontWeight: FontWeight.bold,
-                            ),
+                        child: Text(
+                          'By signing up, you agree to the Terms of Service\nand Data Processing Agreement',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.3),
+                            fontSize: 12,
+                            height: 1.5,
                           ),
                         ),
                       ),
+                      const SizedBox(height: 20),
                     ],
-
-                    const Spacer(flex: 3),
-
-                    // Footer
-                    Center(
-                      child: Text(
-                        'By signing up, you agree to the Terms of Service\nand Data Processing Agreement',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.3),
-                          fontSize: 12,
-                          height: 1.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

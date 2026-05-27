@@ -213,8 +213,11 @@ class _ProfileTabState extends State<ProfileTab> {
             height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(40),
-              image: const DecorationImage(
-                image: AssetImage('assets/profile_avatar.webp'),
+              color: Colors.grey.shade200,
+              image: DecorationImage(
+                image: user.avatarUrl != null 
+                  ? NetworkImage(user.avatarUrl!) as ImageProvider
+                  : const AssetImage('assets/profile_avatar.webp'),
                 fit: BoxFit.cover,
               ),
             ),
@@ -225,7 +228,7 @@ class _ProfileTabState extends State<ProfileTab> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  user.nickname ?? user.email.split('@')[0],
+                  user.name ?? user.nickname ?? user.email.split('@')[0],
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                 ),
                 const SizedBox(height: 4),

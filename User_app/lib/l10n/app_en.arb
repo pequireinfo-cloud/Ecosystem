@@ -22,5 +22,12 @@
   "onboarding1": "Transparent Pricing",
   "onboarding2": "Verified Professionals",
   "onboarding3": "Snap Problem, Get Solution",
-  "skip": "Skip"
+  "skip": "Skip",
+  "recommended": "Recommended",
+  "topRated": "Top rated in your community",
+  "seeAll": "See All",
+  "plumber": "Plumber",
+  "electrician": "Electrician",
+  "laundry": "Laundry",
+  "carpenter": "Carpenter"
 }

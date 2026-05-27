@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:pequire_user_app/core/services/storage_service.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,12 +28,16 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
   
   String _selectedCountry = 'United States';
   String _selectedGender = 'Male';
+  String? _avatarUrl;
+  bool _isUploadingAvatar = false;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(text: widget.user.email.split('@')[0]); // Fallback if name is empty
+    _fullNameController = TextEditingController(text: widget.user.name ?? widget.user.email.split('@')[0]);
     _nicknameController = TextEditingController(text: widget.user.nickname ?? '');
+    _avatarUrl = widget.user.avatarUrl;
     _dobController = TextEditingController(text: widget.user.dob ?? '');
     _emailController = TextEditingController(text: widget.user.email);
     _phoneController = TextEditingController(text: widget.user.phoneNumber ?? '');
@@ -89,6 +95,51 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
             child: Column(
               children: [
                 const SizedBox(height: 24),
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 50,
+                        backgroundColor: Colors.grey.shade200,
+                        backgroundImage: _avatarUrl != null 
+                          ? NetworkImage(_avatarUrl!) as ImageProvider
+                          : const AssetImage('assets/profile_avatar.webp'),
+                        child: _isUploadingAvatar 
+                          ? const CircularProgressIndicator(color: AppColors.redesignPurple)
+                          : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final image = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+                            if (image != null) {
+                              setState(() => _isUploadingAvatar = true);
+                              try {
+                                final url = await StorageService().uploadImage(image, 'avatars');
+                                setState(() => _avatarUrl = url);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
+                              } finally {
+                                setState(() => _isUploadingAvatar = false);
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: AppColors.redesignPurple,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit, color: Colors.white, size: 20),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 32),
                 _buildModernTextField(controller: _fullNameController, hint: 'Full Name'),
                 const SizedBox(height: 20),
                 _buildModernTextField(controller: _nicknameController, hint: 'Nickname'),
@@ -274,9 +325,9 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
   Widget _buildUpdateButton() {
     return Container(
       width: double.infinity,
-      height: 58,
+      height: 60,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
             color: AppColors.redesignPurple.withOpacity(0.35),
@@ -291,6 +342,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
             context.read<ProfileBloc>().add(UpdateProfile({
               'name': _fullNameController.text,
               'nickname': _nicknameController.text,
+              'avatarUrl': _avatarUrl,
               'dob': _dobController.text,
               'email': _emailController.text,
               'gender': _selectedGender,
@@ -302,7 +354,7 @@ class _ManageProfilePageState extends State<ManageProfilePage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.redesignPurple,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           elevation: 0,
         ),
         child: const Text(

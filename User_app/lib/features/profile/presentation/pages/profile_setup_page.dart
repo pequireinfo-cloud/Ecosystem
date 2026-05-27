@@ -233,13 +233,13 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
               // Save Button
               SizedBox(
                 width: double.infinity,
-                height: 56,
+                height: 60,
                 child: ElevatedButton(
                   onPressed: _isLoading ? null : _saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
