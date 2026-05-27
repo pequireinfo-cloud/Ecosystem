@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
-          if (state.user.name == 'New User' || state.user.name.isEmpty) {
+          if (state.user.name == 'New User' || (state.user.name?.isEmpty ?? true)) {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => ProfileSetupPage(user: state.user)),
               (route) => false,
@@ -60,13 +60,6 @@ class _LoginPageState extends State<LoginPage> {
           );
         }
       },
-      child: Scaffold(
-        backgroundColor: const Color(0xFF0D1117), // Dark base color
-        body: Stack(
-          children: [
-            // 1. Grid Background
-            Positioned.fill(
-              child: ColorFiltered(
       child: Theme(
         data: AppTheme.lightTheme,
         child: Scaffold(

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Search, UserPlus, Star, Eye, ShieldCheck, Clock, XCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, UserPlus, Star, Eye, ShieldCheck, Clock, XCircle, ChevronLeft, ChevronRight, FileText } from 'lucide-react';
 import api from '../utils/api';
-import ProviderDetailsModal from '../components/ProviderDetailsModal';
+import ProviderProfileModal from '../components/ProviderProfileModal';
+import ProviderDocumentsModal from '../components/ProviderDocumentsModal';
 
 const ProviderManagement = () => {
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedProvider, setSelectedProvider] = useState(null);
-  const [showModal, setShowModal] = useState(false);
+  const [selectedProfileProvider, setSelectedProfileProvider] = useState(null);
+  const [selectedDocumentProvider, setSelectedDocumentProvider] = useState(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDocumentModal, setShowDocumentModal] = useState(false);
   const [filter, setFilter] = useState('All');
 
   // Pagination states
@@ -254,23 +257,13 @@ const ProviderManagement = () => {
                   <td style={{ padding: '16px 24px' }}>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button 
-                        onClick={() => toggleStatus(p._id, p.status)}
-                        style={{ 
-                          padding: '6px 12px', 
-                          borderRadius: '6px', 
-                          border: '1px solid var(--border)', 
-                          fontSize: '12px', 
-                          fontWeight: '700',
-                          backgroundColor: p.status === 'Blocked' ? '#05966910' : '#DC262610',
-                          color: p.status === 'Blocked' ? '#059669' : '#DC2626',
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
+                        onClick={() => { setSelectedDocumentProvider(p); setShowDocumentModal(true); }}
+                        style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
-                        {p.status === 'Blocked' ? 'Activate' : 'Block'}
+                        <FileText size={18} />
                       </button>
                       <button 
-                        onClick={() => { setSelectedProvider(p); setShowModal(true); }}
+                        onClick={() => { setSelectedProfileProvider(p); setShowProfileModal(true); }}
                         style={{ padding: '6px', borderRadius: '6px', border: '1px solid var(--border)', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
                         <Eye size={18} />
@@ -346,11 +339,19 @@ const ProviderManagement = () => {
         )}
       </div>
 
-      {/* Verification / Details Modal */}
-      {showModal && selectedProvider && (
-        <ProviderDetailsModal 
-          provider={selectedProvider} 
-          onClose={() => { setSelectedProvider(null); setShowModal(false); }} 
+      {/* Modals */}
+      {showProfileModal && selectedProfileProvider && (
+        <ProviderProfileModal 
+          provider={selectedProfileProvider} 
+          onClose={() => { setSelectedProfileProvider(null); setShowProfileModal(false); }} 
+          onUpdate={fetchProviders}
+        />
+      )}
+      
+      {showDocumentModal && selectedDocumentProvider && (
+        <ProviderDocumentsModal 
+          provider={selectedDocumentProvider} 
+          onClose={() => { setSelectedDocumentProvider(null); setShowDocumentModal(false); }} 
           onUpdate={fetchProviders}
         />
       )}

@@ -26,11 +26,8 @@ try {
 # Skip prompt for automated run
 $releaseNotes = "Fixed Provider Search, UPI flow, and Firebase bugs"
 
-$notifyTesters = Read-Host "Do you want to notify testers immediately via email? (y/N)"
-$sendEmail = ($notifyTesters -match "^[yY]")
-if (-not $sendEmail) {
-    Write-Host "`n[INFO] Skipping tester notification. You can distribute manually from the Firebase Console later." -ForegroundColor Yellow
-}
+$sendEmail = $true
+Write-Host "`n[INFO] Sending tester notifications automatically." -ForegroundColor Yellow
 
 # -------------------------------------------------------------------------
 # 1. USER APP DEPLOYMENT

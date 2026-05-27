@@ -235,6 +235,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Skip'**
   String get skip;
+
+  /// No description provided for @recommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get recommended;
+
+  /// No description provided for @topRated.
+  ///
+  /// In en, this message translates to:
+  /// **'Top rated in your community'**
+  String get topRated;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See All'**
+  String get seeAll;
+
+  /// No description provided for @plumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Plumber'**
+  String get plumber;
+
+  /// No description provided for @electrician.
+  ///
+  /// In en, this message translates to:
+  /// **'Electrician'**
+  String get electrician;
+
+  /// No description provided for @laundry.
+  ///
+  /// In en, this message translates to:
+  /// **'Laundry'**
+  String get laundry;
+
+  /// No description provided for @carpenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Carpenter'**
+  String get carpenter;
 }
 
 class _AppLocalizationsDelegate

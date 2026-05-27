@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pequire_user_app/core/constants/app_colors.dart';
 import 'package:pequire_user_app/features/home/presentation/pages/home_page.dart';
-import 'package:pequire_user_app/features/auth/domain/entities/auth_user.dart';
+import 'package:pequire_user_app/features/auth/domain/entities/user_entity.dart';
 import 'package:dio/dio.dart';
 import 'package:pequire_user_app/core/config/api_config.dart';
 
 class ProfileSetupPage extends StatefulWidget {
-  final AuthUser user;
+  final UserEntity user;
   
   const ProfileSetupPage({super.key, required this.user});
 
@@ -62,7 +62,7 @@ class _ProfileSetupPageState extends State<ProfileSetupPage> {
 
       if (response.statusCode == 200) {
         // Update the user object
-        final updatedUser = AuthUser(
+        final updatedUser = UserEntity(
           id: widget.user.id,
           name: _nameController.text.trim(),
           email: widget.user.email,

@@ -76,4 +76,25 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get skip => 'छोड़ें';
+
+  @override
+  String get recommended => 'अनुशंसित';
+
+  @override
+  String get topRated => 'आपके समुदाय में टॉप रेटेड';
+
+  @override
+  String get seeAll => 'सभी देखें';
+
+  @override
+  String get plumber => 'प्लम्बर';
+
+  @override
+  String get electrician => 'इलेक्ट्रीशियन';
+
+  @override
+  String get laundry => 'लॉन्ड्री';
+
+  @override
+  String get carpenter => 'बढ़ई';
 }

@@ -76,4 +76,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get skip => 'Skip';
+
+  @override
+  String get recommended => 'Recommended';
+
+  @override
+  String get topRated => 'Top rated in your community';
+
+  @override
+  String get seeAll => 'See All';
+
+  @override
+  String get plumber => 'Plumber';
+
+  @override
+  String get electrician => 'Electrician';
+
+  @override
+  String get laundry => 'Laundry';
+
+  @override
+  String get carpenter => 'Carpenter';
 }
