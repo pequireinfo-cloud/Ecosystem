@@ -56,8 +56,16 @@ class _HomeTabState extends State<HomeTab> {
   Future<void> _fetchLiveProviders() async {
     try {
       final response = await ApiService().get('providers?filter=Online');
-      if (response.data != null && response.data['providers'] != null) {
-        final List providers = response.data['providers'];
+      if (response.data != null) {
+        final List providers;
+        if (response.data is List) {
+          providers = response.data;
+        } else if (response.data['providers'] != null) {
+          providers = response.data['providers'];
+        } else {
+          providers = [];
+        }
+
         if (mounted) {
           setState(() {
             _liveProviders = providers.map((p) => {

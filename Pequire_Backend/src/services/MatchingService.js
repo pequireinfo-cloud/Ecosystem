@@ -6,8 +6,8 @@ const Provider = require('../models/Provider');
  */
 class MatchingService {
   constructor() {
-    this.MAX_RADIUS = 20000; // 20km in meters
-    this.STEP_RADII = [5000, 10000, 20000]; // 5km, 10km, 20km
+    this.MAX_RADIUS = 500000; // 500km in meters
+    this.STEP_RADII = [50000, 100000, 500000]; // 50km, 100km, 500km
     
     // Skill keywords for extraction from problem description
     this.SKILL_KEYWORDS = {
