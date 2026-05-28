@@ -51,7 +51,7 @@ class NotificationService {
     );
 
     await _localNotificationsPlugin.initialize(
-      initializationSettings: initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (details) {
         _handleNotificationTap(details.payload != null ? jsonDecode(details.payload!) : {});
       },
