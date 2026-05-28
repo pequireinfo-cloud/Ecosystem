@@ -45,14 +45,16 @@ class NotificationService {
       requestBadgePermission: true,
       requestSoundPermission: true,
     );
-    const InitializationSettings initSettings = InitializationSettings(
+    const InitializationSettings initializationSettings = InitializationSettings(
       android: androidInitSettings,
       iOS: iosInitSettings,
     );
 
     await _localNotificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: _onSelectNotification,
+      initializationSettings: initializationSettings,
+      onDidReceiveNotificationResponse: (details) {
+        _handleNotificationTap(details.payload != null ? jsonDecode(details.payload!) : {});
+      },
     );
 
     // Set up Android Channel for Custom Sound/High Importance (Provider specifically needs loud alerts for new jobs)
@@ -81,10 +83,10 @@ class NotificationService {
 
       if (notification != null && android != null) {
         _localNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
+          id: notification.hashCode,
+          title: notification.title,
+          body: notification.body,
+          notificationDetails: NotificationDetails(
             android: AndroidNotificationDetails(
               channel.id,
               channel.name,
