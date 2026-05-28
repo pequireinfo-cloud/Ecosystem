@@ -24,6 +24,7 @@ import 'package:pequire_user_app/features/quick_fix/domain/entities/booking_sess
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/select_problem_page.dart';
 import 'package:pequire_user_app/features/quick_fix/presentation/pages/quick_fix/laundry_setup_page.dart';
 import 'package:pequire_user_app/features/auth/domain/repositories/auth_repository.dart';
+import 'package:pequire_user_app/core/services/socket_service.dart';
 import 'package:pequire_user_app/injection_container.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -51,6 +52,20 @@ class _HomeTabState extends State<HomeTab> {
     super.initState();
     _initLocation();
     _fetchLiveProviders();
+    _initSocket();
+  }
+
+  void _initSocket() {
+    final socketService = sl<SocketService>();
+    if (socketService.socket == null || !socketService.socket!.connected) {
+      socketService.connect();
+    }
+    
+    socketService.socket?.on('provider_status_updated', (data) {
+      if (mounted) {
+        _fetchLiveProviders(); // Re-fetch the live list
+      }
+    });
   }
 
   Future<void> _fetchLiveProviders() async {

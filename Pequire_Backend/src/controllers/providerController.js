@@ -46,6 +46,18 @@ exports.toggleProviderStatus = async (req, res) => {
     const { status } = req.body; // e.g., 'Blocked' or 'Offline'
     
     const provider = await Provider.findByIdAndUpdate(id, { status }, { new: true });
+    
+    if (req.io) {
+      req.io.emit('provider_status_updated', {
+        providerId: provider._id,
+        status: provider.status,
+        fullName: provider.fullName,
+        serviceType: provider.serviceType,
+        rating: provider.rating,
+        hourlyRate: provider.hourlyRate
+      });
+    }
+
     res.json(provider);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -211,6 +223,17 @@ exports.updateProvider = async (req, res) => {
         fullName: provider.fullName,
         kycStatus: provider.kycStatus,
         timestamp: new Date()
+      });
+    }
+
+    if (req.io && status !== undefined) {
+      req.io.emit('provider_status_updated', {
+        providerId: provider._id,
+        status: provider.status,
+        fullName: provider.fullName,
+        serviceType: provider.serviceType,
+        rating: provider.rating,
+        hourlyRate: provider.hourlyRate
       });
     }
 
