@@ -33,8 +33,8 @@ class _SearchingProviderPageState extends State<SearchingProviderPage> {
 
     _bookingSubscription = BookingService().watchBooking(bookingId).listen((data) {
       if (!mounted) return;
-      final status = data['booking']['status'];
-      if (status == 'Assigned' || status == 'Accepted' || status == 'Provider En Route' || status == 'Arrived' || status == 'In Progress') {
+      final status = (data['status'] ?? data['booking']?['status'])?.toString().toLowerCase();
+      if (status == 'assigned' || status == 'accepted' || status == 'provider en route' || status == 'arrived' || status == 'in progress' || status == 'in-progress') {
         _bookingSubscription?.cancel();
         Navigator.pushReplacement(
           context,
